@@ -2,10 +2,10 @@ package higo
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/utils"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	"higo.yumi.com/src/higo/utils"
 	"os"
 	"runtime/debug"
 	"strings"
@@ -16,14 +16,14 @@ var Logrus *logrus.Logger
 
 func Log(root string)  {
 	// 日志文件
-	logs := root + "runtime/logs"
+	logs := root + fmt.Sprintf("runtime%slogs", PathSeparator)
 
 	// 目录不存在，并创建
 	if _, err := os.Stat(logs); os.IsNotExist(err) {
 		if os.Mkdir(logs, os.ModePerm) != nil {}
 	}
 
-	fileName := logs + "/higo" // + fmt.Sprintf(".%s.log", time.Now().Format("20060102"))
+	fileName := logs + fmt.Sprintf("%shigo", PathSeparator)
 
 	// 实例化
 	Logrus = logrus.New()

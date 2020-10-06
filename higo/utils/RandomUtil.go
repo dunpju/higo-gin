@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"higo.yumi.com/src/app/Consts"
+	"github.com/dengpju/higo-gin/higo/consts"
 	"math/rand"
 	"time"
 )
@@ -14,7 +14,7 @@ func NewRandomUtil() *RandomUtil {
 
 // 随机0-86400
 func (this *RandomUtil) IntHour24ToSecond() int64 {
-	return rand.Int63n(Consts.HOUR_24_TO_SECOND)
+	return rand.Int63n(consts.HOUR_24_TO_SECOND)
 }
 
 // 随机字符串

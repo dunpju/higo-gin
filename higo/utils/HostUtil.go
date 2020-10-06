@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"higo.yumi.com/src/app/Consts"
+	"github.com/dengpju/higo-gin/higo/consts"
 	"regexp"
 	"strings"
 )
@@ -10,7 +10,7 @@ import (
 func HttpAddr(requestHost string) string  {
 
 	// 正则判断是否是ip:port
-	if m, _ := regexp.MatchString(Consts.IP_PORT, requestHost); !m {
+	if m, _ := regexp.MatchString(consts.IP_PORT, requestHost); !m {
 		return requestHost
 	}
 

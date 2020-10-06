@@ -1,0 +1,6 @@
+
+
+# 不需要认证的接口标记
+NotAuth:
+  Login: true
+  TestRsa: true

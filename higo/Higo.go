@@ -2,21 +2,26 @@ package higo
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
-	"higo.yumi.com/src/higo/utils"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
 
 var (
 	hg *Higo
+	// 系统类型 Windows Or Linux
+	SysType string
+	// 路径分隔符
+	PathSeparator string
 	// ssl 证书
 	SslOut, SslCrt, SslKey string
 )
@@ -27,6 +32,13 @@ type IHiContext interface {
 	OnResponse(result interface{}) (interface{}, error)
 }
 
+// http 服务结构体
+type Hse struct {
+	Config string
+	Router IRouterLoader
+	Serve  string
+}
+
 type Higo struct {
 	*gin.Engine
 	g            *gin.RouterGroup
@@ -35,6 +47,8 @@ type Higo struct {
 	currentGroup string
 	root         string
 	containers   *Containers
+	Middle       []*IMiddleware
+	Serve        []*Hse
 }
 
 // 初始化
@@ -43,24 +57,53 @@ func Init() *Higo {
 		Engine:     gin.New(),
 		exprData:   map[string]interface{}{},
 		containers: NewContainer(),
+		Middle:     make([]*IMiddleware, 0),
+		Serve:      make([]*Hse, 0),
 	}
+
 	// 全局异常
 	hg.Engine.Use(NewRecover().RuntimeException(hg))
+	// 系统类型
+	SysType = runtime.GOOS
+	// 初始分隔符
+	if SysType == "windows" {
+		PathSeparator = "\\"
+	} else {
+		PathSeparator = "/"
+	}
 
+	return hg
+}
+
+// 设置主目录
+func (this *Higo) SetRoot(root string) *Higo {
+	this.root = root
+	return this
+}
+
+// 获取主目录
+func (this *Higo) GetRoot() string {
+	return utils.If(this.root == "", ROOT, this.root).(string)
+}
+
+// 配置
+func (this *Higo) config() *Higo {
 	// 获取主目录
 	root := hg.GetRoot()
 
 	// runtime目录
-	runtime := root + "runtime"
-	if _, err := os.Stat(runtime); os.IsNotExist(err) {
-		if os.Mkdir(runtime, os.ModePerm) != nil {}
+	runtimeDir := root + "runtime"
+
+	if _, err := os.Stat(runtimeDir); os.IsNotExist(err) {
+		if os.Mkdir(runtimeDir, os.ModePerm) != nil {}
 	}
 
 	// 日志
 	Log(root)
 
+	confDir := root + "conf"
 	// 装载配置
-	filepathErr := filepath.Walk(root + "conf",
+	filepathErr := filepath.Walk(confDir,
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
 				return err
@@ -83,96 +126,82 @@ func Init() *Higo {
 	}
 
 	mapSslConf := Container().Config("SSL")
-	SslOut = root + mapSslConf["OUT"].(string)
+	SslOut = root + mapSslConf["OUT"].(string) + fmt.Sprintf("%s", PathSeparator)
 	SslCrt = mapSslConf["CRT"].(string)
 	SslKey = mapSslConf["KEY"].(string)
 	// 生成ssl证书
 	utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
-
-	return hg
-}
-
-// 设置主目录
-func (this *Higo) SetRoot(root string) {
-	this.root = root
-}
-
-// 获取主目录
-func (this *Higo) GetRoot() string {
-	return utils.If(this.root == "", ROOT, this.root).(string)
+	return this
 }
 
 // 中间件装载器
 func (this *Higo) Middleware(imiddleware ...IMiddleware) *Higo {
 	for _, middleware := range imiddleware {
-		this.Engine.Use(middleware.Loader(this))
+		this.Middle = append(this.Middle, &middleware)
 	}
 	return this
 }
 
 // http服务
 func (this *Higo) HttpServe(conf string, router IRouterLoader) *Higo {
-	config := Container().Config(conf)
-	addr, _ := config["Addr"]
-	rt, _ := config["ReadTimeout"]
-	wt, _ := config["WriteTimeout"]
-	readTimeout, _ := rt.(int)
-	writeTimeout, _ := wt.(int)
-	httpServe := &http.Server{
-		Addr:         addr.(string),
-		Handler:      router.Loader(this),
-		ReadTimeout:  time.Duration(readTimeout) * time.Second,
-		WriteTimeout: time.Duration(writeTimeout) * time.Second,
-	}
-	this.eg.Go(func() error {
-		return httpServe.ListenAndServe()
-	})
+	this.Serve = append(this.Serve, &Hse{Config: conf, Router: router, Serve: "http"})
 	return this
 }
 
 // https服务
 func (this *Higo) HttpsServe(conf string, router IRouterLoader) *Higo {
-	config := Container().Config(conf)
-	addr, _ := config["Addr"]
-	rt, _ := config["ReadTimeout"]
-	wt, _ := config["WriteTimeout"]
-	readTimeout, _ := rt.(int)
-	writeTimeout, _ := wt.(int)
-	httpsServe := &http.Server{
-		Addr:         addr.(string),
-		Handler:      router.Loader(this),
-		ReadTimeout:  time.Duration(readTimeout) * time.Second,
-		WriteTimeout: time.Duration(writeTimeout) * time.Second,
-	}
-	this.eg.Go(func() error {
-		return httpsServe.ListenAndServeTLS(SslOut + SslCrt, SslOut + SslKey)
-	})
+	this.Serve = append(this.Serve, &Hse{Config: conf, Router: router, Serve: "https"})
 	return this
 }
 
 // websocket服务
 func (this *Higo) WebsocketServe(conf string, router IRouterLoader) *Higo {
-	config := Container().Config(conf)
-	addr, _ := config["Addr"]
-	rt, _ := config["ReadTimeout"]
-	wt, _ := config["WriteTimeout"]
-	readTimeout, _ := rt.(int)
-	writeTimeout, _ := wt.(int)
-	websocket := &http.Server{
-		Addr:         addr.(string),
-		Handler:      router.Loader(this),
-		ReadTimeout:  time.Duration(readTimeout) * time.Second,
-		WriteTimeout: time.Duration(writeTimeout) * time.Second,
-	}
-	this.eg.Go(func() error {
-		return websocket.ListenAndServe()
-	})
+	this.Serve = append(this.Serve, &Hse{Config: conf, Router: router, Serve: "websocket"})
 	return this
 }
 
 // 启动
 func (this *Higo) Boot() {
+	// 配置
+	this.config()
+	// 中间件
+	for _,m := range this.Middle {
+		mp := *m
+		this.Engine.Use(mp.Loader(this))
+	}
+	// 服务
+	for _, s := range this.Serve {
+		config := Container().Config(s.Config)
+		addr, _ := config["Addr"]
+		rt, _ := config["ReadTimeout"]
+		wt, _ := config["WriteTimeout"]
+		readTimeout, _ := rt.(int)
+		writeTimeout, _ := wt.(int)
+		serve := &http.Server{
+			Addr:         addr.(string),
+			Handler:      s.Router.Loader(this),
+			ReadTimeout:  time.Duration(readTimeout) * time.Second,
+			WriteTimeout: time.Duration(writeTimeout) * time.Second,
+		}
+		if s.Serve == "http" {
+			this.eg.Go(func() error {
+				return serve.ListenAndServe()
+			})
+		}
+		if s.Serve == "https" {
+			this.eg.Go(func() error {
+				return serve.ListenAndServeTLS(SslOut + SslCrt, SslOut + SslKey)
+			})
+		}
+		if s.Serve == "websocket" {
+			this.eg.Go(func() error {
+				return serve.ListenAndServe()
+			})
+		}
+	}
+
 	fmt.Println("启动成功")
+
 	if err := this.eg.Wait(); err != nil {
 		Logrus.Fatal(err)
 	}

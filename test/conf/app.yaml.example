@@ -1,0 +1,47 @@
+# 应用名称
+APP_NAME: higo
+
+# 版本
+VERSION: 0.0.1
+
+# Http服务器
+HTTP_HOST:
+  # IP或者域名，如:192.168.42.131:6122或:6122
+  Addr: :6122
+  # 请求超时时间(秒)
+  ReadTimeout: 5
+  # 响应超时时间(秒)
+  WriteTimeout: 10
+
+# Https服务器
+HTTPS_HOST:
+  # IP或者域名，如:192.168.42.131:6123或:6123
+  Addr: :6123
+  # 请求超时时间(秒)
+  ReadTimeout: 5
+  # 响应超时时间(秒)
+  WriteTimeout: 10
+
+# Websocket服务器
+WEBSOCKET_HOST:
+  # IP或者域名，如:192.168.42.131:6125或:6125
+  Addr: :6125
+  # 请求超时时间(秒)
+  ReadTimeout: 5
+  # 响应超时时间(秒)
+  WriteTimeout: 10
+
+# 项目根目录
+ROOT: .
+
+# ssl证书输出目录(默认拼接跟目录) eg: ssl/higo.crt.pem
+SSL:
+  # 输出目录
+  OUT: ssl
+  # crt 文件名
+  CRT: higo.crt.pem
+  # key 文件名
+  KEY: higo.key.pem
+
+# 日志目录
+LOG_DIR: ./netmond/log
