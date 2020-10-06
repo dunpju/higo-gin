@@ -9,5 +9,6 @@ func main()  {
 	higo.Init().
 		SetRoot(".\\test\\").
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
+		IsAutoGenerateSsl(true).
 		Boot()
 }

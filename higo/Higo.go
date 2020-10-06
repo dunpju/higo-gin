@@ -47,8 +47,9 @@ type Higo struct {
 	currentGroup string
 	root         string
 	containers   *Containers
-	Middle       []*IMiddleware
-	Serve        []*Hse
+	isAutoSsl    bool
+	middle       []*IMiddleware
+	serve        []*Hse
 }
 
 // 初始化
@@ -57,8 +58,8 @@ func Init() *Higo {
 		Engine:     gin.New(),
 		exprData:   map[string]interface{}{},
 		containers: NewContainer(),
-		Middle:     make([]*IMiddleware, 0),
-		Serve:      make([]*Hse, 0),
+		middle:     make([]*IMiddleware, 0),
+		serve:      make([]*Hse, 0),
 	}
 
 	// 全局异常
@@ -71,6 +72,8 @@ func Init() *Higo {
 	} else {
 		PathSeparator = "/"
 	}
+	// 是否使用自带ssl测试https
+	hg.isAutoSsl = false
 
 	return hg
 }
@@ -90,19 +93,15 @@ func (this *Higo) GetRoot() string {
 func (this *Higo) config() *Higo {
 	// 获取主目录
 	root := hg.GetRoot()
-
 	// runtime目录
 	runtimeDir := root + "runtime"
-
 	if _, err := os.Stat(runtimeDir); os.IsNotExist(err) {
 		if os.Mkdir(runtimeDir, os.ModePerm) != nil {}
 	}
-
 	// 日志
 	Log(root)
-
-	confDir := root + "conf"
 	// 装载配置
+	confDir := root + "conf"
 	filepathErr := filepath.Walk(confDir,
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
@@ -124,39 +123,42 @@ func (this *Higo) config() *Higo {
 	if filepathErr != nil {
 		Throw(filepathErr,0)
 	}
-
 	mapSslConf := Container().Config("SSL")
 	SslOut = root + mapSslConf["OUT"].(string) + fmt.Sprintf("%s", PathSeparator)
 	SslCrt = mapSslConf["CRT"].(string)
 	SslKey = mapSslConf["KEY"].(string)
-	// 生成ssl证书
-	utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
 	return this
 }
 
 // 中间件装载器
 func (this *Higo) Middleware(imiddleware ...IMiddleware) *Higo {
 	for _, middleware := range imiddleware {
-		this.Middle = append(this.Middle, &middleware)
+		this.middle = append(this.middle, &middleware)
 	}
 	return this
 }
 
 // http服务
 func (this *Higo) HttpServe(conf string, router IRouterLoader) *Higo {
-	this.Serve = append(this.Serve, &Hse{Config: conf, Router: router, Serve: "http"})
+	this.serve = append(this.serve, &Hse{Config: conf, Router: router, Serve: "http"})
 	return this
 }
 
 // https服务
 func (this *Higo) HttpsServe(conf string, router IRouterLoader) *Higo {
-	this.Serve = append(this.Serve, &Hse{Config: conf, Router: router, Serve: "https"})
+	this.serve = append(this.serve, &Hse{Config: conf, Router: router, Serve: "https"})
 	return this
 }
 
 // websocket服务
 func (this *Higo) WebsocketServe(conf string, router IRouterLoader) *Higo {
-	this.Serve = append(this.Serve, &Hse{Config: conf, Router: router, Serve: "websocket"})
+	this.serve = append(this.serve, &Hse{Config: conf, Router: router, Serve: "websocket"})
+	return this
+}
+
+// 是否自动生成ssl证书
+func (this *Higo) IsAutoGenerateSsl(isAuto bool) *Higo {
+	this.isAutoSsl = isAuto
 	return this
 }
 
@@ -165,12 +167,17 @@ func (this *Higo) Boot() {
 	// 配置
 	this.config()
 	// 中间件
-	for _,m := range this.Middle {
+	for _,m := range this.middle {
 		mp := *m
 		this.Engine.Use(mp.Loader(this))
 	}
+	// 是否使用自带ssl测试https
+	if this.isAutoSsl {
+		// 生成ssl证书
+		utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
+	}
 	// 服务
-	for _, s := range this.Serve {
+	for _, s := range this.serve {
 		config := Container().Config(s.Config)
 		addr, _ := config["Addr"]
 		rt, _ := config["ReadTimeout"]
@@ -185,16 +192,19 @@ func (this *Higo) Boot() {
 		}
 		if s.Serve == "http" {
 			this.eg.Go(func() error {
+				fmt.Println("http 启动成功")
 				return serve.ListenAndServe()
 			})
 		}
 		if s.Serve == "https" {
 			this.eg.Go(func() error {
+				fmt.Println("https 启动成功")
 				return serve.ListenAndServeTLS(SslOut + SslCrt, SslOut + SslKey)
 			})
 		}
 		if s.Serve == "websocket" {
 			this.eg.Go(func() error {
+				fmt.Println("websocket 启动成功")
 				return serve.ListenAndServe()
 			})
 		}

@@ -17,7 +17,7 @@ func NewHttps() *Https  {
 func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 
 	// 静态文件
-	hg.Engine.StaticFile("/", fmt.Sprintf(".%sdist", higo.PathSeparator))
+	hg.Engine.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot()))
 	this.Api(hg)
 
 	return hg
@@ -26,9 +26,16 @@ func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 // api 路由(需要首先在容器中添加Map映射)
 func (this *Https) Api(hg *higo.Higo) {
 	hg.AddRoute(
-		higo.Route{Method: "GET", RelativePath: "/test_get", Handle: test_get, Flag: "AttackList"},
-		higo.Route{Method: "post", RelativePath: "/test_post", Handle: test_post, Flag: "Login"},
+		higo.Route{Method: "GET", RelativePath: "/test_get", Handle: test_get, Flag: "test_get"},
+		higo.Route{Method: "GET", RelativePath: "/test_throw", Handle: test_throw, Flag: "test_throw"},
+		higo.Route{Method: "post", RelativePath: "/test_post", Handle: test_post, Flag: "test_post"},
 	)
+}
+
+// 测试异常
+func test_throw(ctx *gin.Context) string  {
+	higo.Throw("测试异常", 0)
+	return "test_throw"
 }
 
 // 测试get请求

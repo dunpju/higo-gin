@@ -88,7 +88,7 @@ func PrintlnStack()  {
 	dss := strings.Split(ds,"\n")
 	Logrus.Info(fmt.Sprintf("=== DEBUG STACK Bigin goroutine %d ===", utils.GoroutineID()))
 	for _, b := range dss {
-		Logrus.Info(fmt.Sprintf("%s", b))
+		Logrus.Info(strings.TrimRight(strings.TrimLeft(fmt.Sprintf("%s", b), "\t"),"\n"))
 	}
 	Logrus.Info(fmt.Sprintf("=== DEBUG STACK End goroutine %d ===", utils.GoroutineID()))
 }
