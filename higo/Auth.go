@@ -1,6 +1,5 @@
 package higo
 
-
 // 是否空标记
 func IsEmptyFlag(route Route)  {
 	if route.Flag == "" {

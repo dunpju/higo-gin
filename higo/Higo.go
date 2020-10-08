@@ -48,8 +48,8 @@ type Higo struct {
 	root         string
 	containers   *Containers
 	isAutoSsl    bool
-	middle       []*IMiddleware
-	serve        []*Hse
+	middle       []IMiddleware
+	serve        []Hse
 }
 
 // 初始化
@@ -58,8 +58,8 @@ func Init() *Higo {
 		Engine:     gin.New(),
 		exprData:   map[string]interface{}{},
 		containers: NewContainer(),
-		middle:     make([]*IMiddleware, 0),
-		serve:      make([]*Hse, 0),
+		middle:     make([]IMiddleware, 0),
+		serve:      make([]Hse, 0),
 	}
 
 	// 全局异常
@@ -111,9 +111,9 @@ func (this *Higo) config() *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				fmt.Println("yaml file:", filepath.Base(p))
+				fmt.Println("Loader Configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
-				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().Configure)
+				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().C)
 				if yamlFileErr != nil {
 					Throw(yamlFileErr,0)
 				}
@@ -133,26 +133,26 @@ func (this *Higo) config() *Higo {
 // 中间件装载器
 func (this *Higo) Middleware(imiddleware ...IMiddleware) *Higo {
 	for _, middleware := range imiddleware {
-		this.middle = append(this.middle, &middleware)
+		this.middle = append(this.middle, middleware)
 	}
 	return this
 }
 
 // http服务
 func (this *Higo) HttpServe(conf string, router IRouterLoader) *Higo {
-	this.serve = append(this.serve, &Hse{Config: conf, Router: router, Serve: "http"})
+	this.serve = append(this.serve, Hse{Config: conf, Router: router, Serve: "http"})
 	return this
 }
 
 // https服务
 func (this *Higo) HttpsServe(conf string, router IRouterLoader) *Higo {
-	this.serve = append(this.serve, &Hse{Config: conf, Router: router, Serve: "https"})
+	this.serve = append(this.serve, Hse{Config: conf, Router: router, Serve: "https"})
 	return this
 }
 
 // websocket服务
 func (this *Higo) WebsocketServe(conf string, router IRouterLoader) *Higo {
-	this.serve = append(this.serve, &Hse{Config: conf, Router: router, Serve: "websocket"})
+	this.serve = append(this.serve, Hse{Config: conf, Router: router, Serve: "websocket"})
 	return this
 }
 
@@ -164,20 +164,21 @@ func (this *Higo) IsAutoGenerateSsl(isAuto bool) *Higo {
 
 // 启动
 func (this *Higo) Boot() {
-	// 配置
-	this.config()
-	// 中间件
-	for _,m := range this.middle {
-		mp := *m
-		this.Engine.Use(mp.Loader(this))
-	}
-	// 是否使用自带ssl测试https
-	if this.isAutoSsl {
-		// 生成ssl证书
-		utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
-	}
 	// 服务
 	for _, s := range this.serve {
+		// 设置服务根目录
+		higo := Init().SetRoot(this.GetRoot())
+		// 配置
+		higo.config()
+		// 中间件
+		for _, m := range this.middle {
+			higo.Engine.Use(m.Loader(higo))
+		}
+		// 是否使用自带ssl测试https
+		if this.isAutoSsl {
+			// 生成ssl证书
+			utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
+		}
 		config := Container().Config(s.Config)
 		addr, _ := config["Addr"]
 		rt, _ := config["ReadTimeout"]
@@ -186,31 +187,30 @@ func (this *Higo) Boot() {
 		writeTimeout, _ := wt.(int)
 		serve := &http.Server{
 			Addr:         addr.(string),
-			Handler:      s.Router.Loader(this),
+			Handler:      s.Router.Loader(higo),
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
+
 		if s.Serve == "http" {
 			this.eg.Go(func() error {
-				fmt.Println("http 启动成功")
+				fmt.Println("Http Serve" + addr.(string) + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
 		if s.Serve == "https" {
 			this.eg.Go(func() error {
-				fmt.Println("https 启动成功")
+				fmt.Println("Https Serve" + addr.(string) + " 启动成功\n")
 				return serve.ListenAndServeTLS(SslOut + SslCrt, SslOut + SslKey)
 			})
 		}
 		if s.Serve == "websocket" {
 			this.eg.Go(func() error {
-				fmt.Println("websocket 启动成功")
+				fmt.Println("Websocket Serve" + addr.(string) + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
 	}
-
-	fmt.Println("启动成功")
 
 	if err := this.eg.Wait(); err != nil {
 		Logrus.Fatal(err)
@@ -224,7 +224,7 @@ func Container() *Containers {
 
 // 获取路由
 func (this *Higo) GetRoute(relativePath string) (Route, bool) {
-	return Container().GetRoute(relativePath), true
+	return Container().Route(relativePath), true
 }
 
 // 路由组
@@ -234,7 +234,7 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Container().AddRoutes(route.RelativePath, route)
+		Container().AddRoutes("/" + prefix + route.RelativePath, route)
 		method := strings.ToUpper(route.Method)
 		this.GroupHandle(method, route.RelativePath, route.Handle)
 	}
