@@ -8,10 +8,11 @@ import (
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	Exception.NewBusinessException(2,"v3 https 测试异常", struct {
+	Exception.NewBusinessException(2,"v3 https 测试异常")
+	higo.Throw("v3 https 测试异常",2, struct {
 		Id int
 		Name string
-	}{Id:1,Name:"哈哈"})
+	}{Id:1,Name:"哦哦"})
 	return "v3 https_test_throw"
 }
 

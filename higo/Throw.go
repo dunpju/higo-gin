@@ -2,20 +2,29 @@ package higo
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/utils"
 	"github.com/gin-gonic/gin"
 	"runtime"
 )
 
-// 抛出异常
-func Throw(message interface{}, code int, data ...interface{}) {
-	_, file, line, _ := runtime.Caller(1)
+type ServerException struct {
+
+}
+
+func (this *ServerException) Exception(message interface{}, code int, data ...interface{}) {
+	_, file, line, _ := runtime.Caller(2)
 	msg := ErrorToString(message)
 	Logrus.Info(fmt.Sprintf("%s (code: %d) at %s:%d", msg, code, file, line))
 	panic(gin.H{
 		"code": code,
 		"msg":  msg,
-		"data": data[0],
+		"data": utils.Ifindex(data, 0),
 	})
+}
+
+// 抛出异常
+func Throw(message interface{}, code int, data ...interface{}) {
+	new(ServerException).Exception(message, code, utils.Ifindex(data, 0))
 }
 
 // recover 转 string

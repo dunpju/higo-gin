@@ -2,5 +2,5 @@ package higo
 
 // 异常接口
 type IThrowable interface {
-	Throw(message string, code int, data ...interface{})
+	Exception(message interface{}, code int, data ...interface{})
 }
