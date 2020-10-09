@@ -7,7 +7,10 @@ import (
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	higo.Throw("v3 https 测试异常", 0)
+	higo.Throw("v3 https 测试异常", 0, struct {
+		Id int
+		Name string
+	}{Id:1,Name:"哈哈"})
 	return "v3 https_test_throw"
 }
 

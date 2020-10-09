@@ -6,18 +6,15 @@ import (
 	"runtime"
 )
 
-// 响应数据
-var data interface{}
-
 // 抛出异常
-func Throw(message interface{}, code int) {
+func Throw(message interface{}, code int, data ...interface{}) {
 	_, file, line, _ := runtime.Caller(1)
 	msg := ErrorToString(message)
 	Logrus.Info(fmt.Sprintf("%s (code: %d) at %s:%d", msg, code, file, line))
 	panic(gin.H{
 		"code": code,
 		"msg":  msg,
-		"data": data,
+		"data": data[0],
 	})
 }
 
@@ -40,9 +37,4 @@ func B2S(bs []uint8) string {
 		ba = append(ba, byte(b))
 	}
 	return string(ba)
-}
-
-// 设置数据
-func SetData(d interface{})  {
-	data = d
 }

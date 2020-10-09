@@ -12,7 +12,7 @@ type Containers struct {
 func NewContainer() *Containers {
 	return &Containers{
 		C: make(map[interface{}]interface{}),
-		R:         make(map[string]Route),
+		R: make(map[string]Route),
 	}
 }
 
@@ -25,7 +25,7 @@ func (this *Containers) Configure() map[interface{}]interface{} {
 func (this *Containers) Config(key string) map[interface{}]interface{} {
 	v, ok := this.C[key]
 	if !ok {
-		Throw("获取" + key + "配置失败",0)
+		Throw("获取"+key+"配置失败", 0)
 	}
 	return v.(map[interface{}]interface{})
 }
@@ -45,7 +45,7 @@ func (this *Containers) Routes() map[string]Route {
 func (this *Containers) Route(relativePath string) Route {
 	route, ok := this.R[relativePath]
 	if !ok {
-		Throw(relativePath + "未定义", 0)
+		Throw(relativePath+"未定义", 0)
 	}
 	return route
 }

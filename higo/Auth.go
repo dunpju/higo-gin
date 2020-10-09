@@ -13,7 +13,7 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 空配置
-	if nil == Container().Configure {
+	if nil == Container().Configure() {
 		return false
 	}
 	notAuth := Container().Config("NotAuth")
