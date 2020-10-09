@@ -17,7 +17,8 @@ func NewAuth() *Auth {
 func (this Auth) Loader(hg *higo.Higo) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if route, ok := hg.GetRoute(c.Request.URL.Path); ok {
-			if !higo.IsNotAuth(route.Flag) {
+			// TODO::非静态页面需要鉴权
+			if !higo.IsNotAuth(route.Flag) && !route.IsStatic {
 				if "" == c.GetHeader("X-Token") {
 					higo.Throw(higo.Const(Consts.INVALID_TOKEN).Msg, higo.Const(Consts.INVALID_TOKEN).Code)
 				}

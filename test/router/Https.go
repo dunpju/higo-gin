@@ -5,6 +5,7 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V2"
+	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 )
 
 // https api 接口
@@ -18,7 +19,7 @@ func NewHttps() *Https  {
 func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 
 	// 静态文件
-	hg.Engine.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot()))
+	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot()))
 	this.Api(hg)
 
 	return hg
@@ -36,5 +37,11 @@ func (this *Https) Api(hg *higo.Higo) {
 		higo.Route{Method: "GET", RelativePath: "/test_throw", Handle: V2.HttpsTestThrow, Flag: "TestThrow", Desc:"V2 测试异常"},
 		higo.Route{Method: "GET", RelativePath: "/test_get", Handle: V2.HttpsTestGet, Flag: "TestGet", Desc:"V2 测试GET"},
 		higo.Route{Method: "post", RelativePath: "/test_post", Handle: V2.HttpsTestPost, Flag: "TestPost", Desc:"V2 测试POST"},
+	)
+	// 路由组
+	hg.AddGroup("v3",
+		higo.Route{Method: "GET", RelativePath: "/test_throw", Handle: V3.HttpsTestThrow, Flag: "TestThrow", Desc:"V3 测试异常"},
+		higo.Route{Method: "GET", RelativePath: "/test_get", Handle: V3.HttpsTestGet, Flag: "TestGet", Desc:"V3 测试GET"},
+		higo.Route{Method: "post", RelativePath: "/test_post", Handle: V3.HttpsTestPost, Flag: "TestPost", Desc:"V3 测试POST"},
 	)
 }

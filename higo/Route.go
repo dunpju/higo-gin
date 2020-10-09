@@ -6,6 +6,7 @@ type Route struct {
 	Handle       interface{} // 后端控制器函数
 	Flag         string      // 后端控制器函数标记
 	FrontPath    string      // 前端 path(前端菜单路由)
+	IsStatic     bool        // 是否静态文件
 	Desc         string      // 描述
 }
 

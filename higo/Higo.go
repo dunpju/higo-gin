@@ -2,6 +2,7 @@ package higo
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/consts"
 	"github.com/dengpju/higo-gin/higo/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -86,7 +87,7 @@ func (this *Higo) SetRoot(root string) *Higo {
 
 // 获取主目录
 func (this *Higo) GetRoot() string {
-	return utils.If(this.root == "", ROOT, this.root).(string)
+	return utils.If(this.root == "", consts.ROOT, this.root).(string)
 }
 
 // 配置
@@ -102,6 +103,9 @@ func (this *Higo) config() *Higo {
 	Log(root)
 	// 装载配置
 	confDir := root + "conf"
+	if _, err := os.Stat(confDir); os.IsNotExist(err) {
+		if os.Mkdir(confDir, os.ModePerm) != nil {}
+	}
 	filepathErr := filepath.Walk(confDir,
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
@@ -111,7 +115,7 @@ func (this *Higo) config() *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				fmt.Println("Loader Configure file:", filepath.Base(p))
+				fmt.Println("Loader configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
 				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().C)
 				if yamlFileErr != nil {
@@ -167,12 +171,12 @@ func (this *Higo) Boot() {
 	// 服务
 	for _, s := range this.serve {
 		// 设置服务根目录
-		higo := Init().SetRoot(this.GetRoot())
+		hg := Init().SetRoot(this.GetRoot())
 		// 配置
-		higo.config()
+		hg.config()
 		// 中间件
 		for _, m := range this.middle {
-			higo.Engine.Use(m.Loader(higo))
+			hg.Engine.Use(m.Loader(hg))
 		}
 		// 是否使用自带ssl测试https
 		if this.isAutoSsl {
@@ -187,26 +191,26 @@ func (this *Higo) Boot() {
 		writeTimeout, _ := wt.(int)
 		serve := &http.Server{
 			Addr:         addr.(string),
-			Handler:      s.Router.Loader(higo),
+			Handler:      s.Router.Loader(hg),
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
 
 		if s.Serve == "http" {
 			this.eg.Go(func() error {
-				fmt.Println("Http Serve" + addr.(string) + " 启动成功\n")
+				fmt.Println("HTTP Server listening at " + addr.(string) + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
 		if s.Serve == "https" {
 			this.eg.Go(func() error {
-				fmt.Println("Https Serve" + addr.(string) + " 启动成功\n")
+				fmt.Println("HTTPS Server listening at " + addr.(string) + " 启动成功\n")
 				return serve.ListenAndServeTLS(SslOut + SslCrt, SslOut + SslKey)
 			})
 		}
 		if s.Serve == "websocket" {
 			this.eg.Go(func() error {
-				fmt.Println("Websocket Serve" + addr.(string) + " 启动成功\n")
+				fmt.Println("WEBSOCKET Server listening at " + addr.(string) + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
@@ -225,6 +229,14 @@ func Container() *Containers {
 // 获取路由
 func (this *Higo) GetRoute(relativePath string) (Route, bool) {
 	return Container().Route(relativePath), true
+}
+
+// 静态文件
+func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
+	// 添加路由容器
+	Container().AddRoutes(relativePath, Route{IsStatic: true})
+	hg.Engine.StaticFile(relativePath, filepath)
+	return this
 }
 
 // 路由组
