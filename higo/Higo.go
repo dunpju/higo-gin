@@ -64,7 +64,7 @@ func Init() *Higo {
 	}
 
 	// 全局异常
-	hg.Engine.Use(NewRecover().RuntimeException(hg))
+	hg.Engine.Use(NewRecover().Exception(hg))
 	// 系统类型
 	SysType = runtime.GOOS
 	// 初始分隔符

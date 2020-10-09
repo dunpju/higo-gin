@@ -14,7 +14,7 @@ func NewRecover() *Recover {
 	return &Recover{}
 }
 
-func (this *Recover) RuntimeException(hg *Higo) gin.HandlerFunc {
+func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {

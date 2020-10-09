@@ -2,12 +2,13 @@ package V3
 
 import (
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/gin-gonic/gin"
 )
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	higo.Throw("v3 https 测试异常", 0, struct {
+	Exception.NewBusinessException(2,"v3 https 测试异常", struct {
 		Id int
 		Name string
 	}{Id:1,Name:"哈哈"})
