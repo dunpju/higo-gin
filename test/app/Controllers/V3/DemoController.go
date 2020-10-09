@@ -8,7 +8,16 @@ import (
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	Exception.NewBusinessException(2,"v3 https 测试异常")
+	var s []map[string]interface{}
+	m1 := make(map[string]interface{})
+	m1["jj"] = "m1jjj"
+	m1["dd"] = "m1ddd"
+	m2 := make(map[string]interface{})
+	m2["jj"] = "m2jjj"
+	m2["dd"] = "m2ddd"
+	s = append(s, m1)
+	s = append(s, m2)
+	Exception.NewBusinessException(2,"v3 https 测试异常", s)
 	higo.Throw("v3 https 测试异常",2, struct {
 		Id int
 		Name string
