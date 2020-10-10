@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -25,13 +26,8 @@ var (
 	PathSeparator string
 	// ssl 证书
 	SslOut, SslCrt, SslKey string
+	SyncOnce               sync.Once
 )
-
-// 上下文
-type IHiContext interface {
-	OnRequest(*gin.Context) error
-	OnResponse(result interface{}) (interface{}, error)
-}
 
 // http 服务结构体
 type Hse struct {
@@ -276,7 +272,6 @@ func (this *Higo) GroupHandle(httpMethod, relativePath string, handler interface
 
 // 路由Handle
 func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *Higo {
-	fmt.Printf("%T\n",handler)
 	if h := Convert(handler); h != nil {
 		this.Engine.Handle(httpMethod, relativePath, h)
 	}

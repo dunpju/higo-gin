@@ -53,17 +53,16 @@ func Convert(handler interface{}) gin.HandlerFunc {
 }
 
 var syncHandler *SyncHandler
-var syncOnce sync.Once
 
 func getSyncHandler() *SyncHandler {
-	syncOnce.Do(func() {
+	SyncOnce.Do(func() {
 		syncHandler = &SyncHandler{}
 	})
 	return syncHandler
 }
 
 type SyncHandler struct {
-	context []IHiContext
+	context []IContext
 }
 
 func (this *SyncHandler) handler(responder Responder, ctx *gin.Context) interface{} {

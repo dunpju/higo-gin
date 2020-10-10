@@ -18,8 +18,8 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				Logrus.Info(fmt.Sprintf("Value %v\n", r))
-				Logrus.Info(fmt.Sprintf("Type %T\n", r))
+				Logrus.Info(fmt.Sprintf("Recover Value %v", r))
+				Logrus.Info(fmt.Sprintf("Recover Type %T", r))
 				//打印错误堆栈信息
 				//debug.PrintStack()
 				// 输出换行debug调用栈
