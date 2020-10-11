@@ -9,6 +9,7 @@ import (
 
 type DemoController struct {
 	*higo.HgController
+	Age *higo.Value `prefix:"user.age"`
 }
 
 func (this *DemoController) Controller(hg *higo.Higo) interface{} {
@@ -28,6 +29,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
 	fmt.Printf("%p\n",NewDemoController())
 	fmt.Printf("%p\n",NewDemoController())
+	fmt.Println(this.Age.String())
 	higo.NewController(&higo.Higo{}, NewDemoController())
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})

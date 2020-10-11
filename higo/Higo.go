@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"sync"
@@ -38,22 +39,20 @@ type Hse struct {
 
 type Higo struct {
 	*gin.Engine
-	g            *gin.RouterGroup
-	eg           errgroup.Group
-	exprData     map[string]interface{}
-	currentGroup string
-	root         string
-	containers   *Containers
-	isAutoSsl    bool
-	middle       []IMiddleware
-	serve        []Hse
+	g          *gin.RouterGroup
+	eg         errgroup.Group
+	root       string
+	containers *Containers
+	isAutoSsl  bool
+	middle     []IMiddleware
+	serve      []Hse
+	props      []interface{}
 }
 
 // 初始化
 func Init() *Higo {
 	hg = &Higo{
 		Engine:     gin.New(),
-		exprData:   map[string]interface{}{},
 		containers: NewContainer(),
 		middle:     make([]IMiddleware, 0),
 		serve:      make([]Hse, 0),
@@ -281,8 +280,32 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 	this.g = this.Engine.Group(group)
 	for _, controller := range icontroller {
-		this.currentGroup = group
 		controller.Controller(this)
 	}
 	return this
+}
+
+//获取属性
+func (this *Higo) getProp(t reflect.Type) interface{} {
+	for _, p := range this.props {
+		if t == reflect.TypeOf(p) {
+			return p
+		}
+	}
+	return nil
+}
+
+func (this *Higo) setProp(controller IController) {
+	vClass := reflect.ValueOf(controller).Elem()
+	for i := 0; i < vClass.NumField(); i++ {
+		f := vClass.Field(i)
+		if !f.IsNil() || f.Kind() != reflect.Ptr {
+			continue
+		}
+		if p := this.getProp(f.Type()); p != nil {
+			f.Set(reflect.New(f.Type().Elem()))
+			f.Elem().Set(reflect.ValueOf(p).Elem())
+		}
+
+	}
 }
