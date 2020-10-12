@@ -46,7 +46,7 @@ type Higo struct {
 	isAutoSsl  bool
 	middle     []IMiddleware
 	serve      []Hse
-	props      []interface{}
+	attribute  []interface{}
 }
 
 // 初始化
@@ -281,14 +281,14 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 	this.g = this.Engine.Group(group)
 	for _, controller := range icontroller {
-		controller.Controller(this)
+		controller.Controller()
 	}
 	return this
 }
 
 //获取属性
-func (this *Higo) getProp(t reflect.Type) interface{} {
-	for _, p := range this.props {
+func (this *Higo) GetAttribute(t reflect.Type) interface{} {
+	for _, p := range this.attribute {
 		if t == reflect.TypeOf(p) {
 			return p
 		}
@@ -296,14 +296,15 @@ func (this *Higo) getProp(t reflect.Type) interface{} {
 	return nil
 }
 
-func (this *Higo) setProp(controller IController) {
+// 设置属性
+func (this *Higo) SetAttribute(controller IController) {
 	vClass := reflect.ValueOf(controller).Elem()
 	for i := 0; i < vClass.NumField(); i++ {
 		f := vClass.Field(i)
 		if !f.IsNil() || f.Kind() != reflect.Ptr {
 			continue
 		}
-		if p := this.getProp(f.Type()); p != nil {
+		if p := this.GetAttribute(f.Type()); p != nil {
 			f.Set(reflect.New(f.Type().Elem()))
 			f.Elem().Set(reflect.ValueOf(p).Elem())
 		}

@@ -8,7 +8,6 @@ import (
 )
 
 type DemoController struct {
-	*higo.HgController
 	Age *higo.Value `prefix:"user.age"`
 }
 
@@ -20,13 +19,15 @@ func NewDemoController() *DemoController {
 	return demoController
 }
 
+func (this *DemoController) Controller() interface{} {
+	return ""
+}
+
 // 测试异常
 func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
-	fmt.Printf("%p\n", NewDemoController())
-	fmt.Printf("%p\n", NewDemoController())
-	fmt.Println(this.Age.String())
-	higo.NewController(&higo.Higo{}, NewDemoController())
+	fmt.Println(111)
+	//fmt.Println(this.Age.String())
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})
 	m1["jj"] = "m1jjj"
@@ -46,6 +47,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) string  {
+	fmt.Printf("%p\n", this)
 	return "v3 https_test_get"
 }
 
