@@ -55,7 +55,7 @@ func Convert(handler interface{}) gin.HandlerFunc {
 var syncHandler *SyncHandler
 
 func getSyncHandler() *SyncHandler {
-	SyncOnce.Do(func() {
+	Once.Do(func() {
 		syncHandler = &SyncHandler{}
 	})
 	return syncHandler

@@ -27,7 +27,7 @@ var (
 	PathSeparator string
 	// ssl 证书
 	SslOut, SslCrt, SslKey string
-	SyncOnce               sync.Once
+	Once                   sync.Once
 )
 
 // http 服务结构体
@@ -238,6 +238,7 @@ func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 	this.g = this.Engine.Group(prefix)
 	for _, route := range routes {
+		fmt.Printf("%T\n", route.Handle);
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器

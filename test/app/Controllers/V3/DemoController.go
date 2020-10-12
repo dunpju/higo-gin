@@ -12,13 +12,9 @@ type DemoController struct {
 	Age *higo.Value `prefix:"user.age"`
 }
 
-func (this *DemoController) Controller(hg *higo.Higo) interface{} {
-	return this
-}
-
 func NewDemoController() *DemoController {
 	var demoController *DemoController
-	higo.SyncOnce.Do(func() {
+	higo.Once.Do(func() {
 		demoController = &DemoController{}
 	})
 	return demoController
@@ -27,8 +23,8 @@ func NewDemoController() *DemoController {
 // 测试异常
 func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
-	fmt.Printf("%p\n",NewDemoController())
-	fmt.Printf("%p\n",NewDemoController())
+	fmt.Printf("%p\n", NewDemoController())
+	fmt.Printf("%p\n", NewDemoController())
 	fmt.Println(this.Age.String())
 	higo.NewController(&higo.Higo{}, NewDemoController())
 	var s []map[string]interface{}
@@ -40,11 +36,11 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	m2["dd"] = "m2ddd"
 	s = append(s, m1)
 	s = append(s, m2)
-	Exception.NewBusinessException(2,"v3 https 测试异常", s)
-	higo.Throw("v3 https 测试异常",2, struct {
-		Id int
+	Exception.NewBusinessException(2, "v3 https 测试异常", s)
+	higo.Throw("v3 https 测试异常", 2, struct {
+		Id   int
 		Name string
-	}{Id:1,Name:"哦哦"})
+	}{Id: 1, Name: "哦哦"})
 	return "v3 https_test_throw"
 }
 
