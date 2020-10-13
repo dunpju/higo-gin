@@ -8,6 +8,7 @@ import (
 )
 
 type DemoController struct {
+	higo.Director
 	Age *higo.Value `prefix:"user.age"`
 }
 
@@ -17,10 +18,6 @@ func NewDemoController() *DemoController {
 		demoController = &DemoController{}
 	})
 	return demoController
-}
-
-func (this *DemoController) Controller() interface{} {
-	return ""
 }
 
 // 测试异常

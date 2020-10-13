@@ -6,13 +6,16 @@ type Containers struct {
 	C map[interface{}]interface{}
 	// 路由
 	R map[string]Route
+	// Di
+	Di map[string]IBuilder
 }
 
 // 构造函数
 func NewContainer() *Containers {
 	return &Containers{
-		C: make(map[interface{}]interface{}),
-		R: make(map[string]Route),
+		C:  make(map[interface{}]interface{}),
+		R:  make(map[string]Route),
+		Di: make(map[string]IBuilder),
 	}
 }
 
@@ -48,4 +51,9 @@ func (this *Containers) Route(relativePath string) Route {
 		Throw(relativePath+"未定义", 0)
 	}
 	return route
+}
+
+// 获取依赖
+func Di(name string) IBuilder {
+	return Container().Di[name]
 }

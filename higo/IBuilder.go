@@ -1,22 +1,24 @@
 package higo
 
+import "fmt"
+
 //生成器接口
-type Builder interface {
-	Controller() interface{}
+type IBuilder interface {
+	Construct()
 }
 
 type Director struct {
-	builder Builder
+	builder IBuilder
 }
 
-// NewDirector ...
-func NewDirector(builder Builder) *Director {
+func NewDirector(builder IBuilder) *Director {
 	return &Director{
 		builder: builder,
 	}
 }
 
-func (d *Director) Construct() {
-	d.builder.Controller()
+func (d *Director) Construct()  {
+	fmt.Printf("%p\n", d)
+	fmt.Printf("%p\n", d.builder)
 }
 

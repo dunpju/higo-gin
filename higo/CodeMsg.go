@@ -11,7 +11,7 @@ type CodeMsg struct {
 	Msg  string
 }
 
-var container = map[int]*CodeMsg{}
+var codeMsg = map[int]*CodeMsg{}
 
 // 常量函数
 func Const(constCode string) *CodeMsg {
@@ -28,15 +28,15 @@ func separate(constCode string) *CodeMsg {
 		code, _ = strconv.Atoi(constSlice[0])
 		msg = codeError[1]
 	}
-	var codeMsg *CodeMsg
-	if len(container) > 0 {
+	var cm *CodeMsg
+	if len(codeMsg) > 0 {
 		// 存在容器中
-		codeMsg, ok := container[code]
+		cm, ok := codeMsg[code]
 		if ok {
-			return codeMsg
+			return cm
 		}
 	}
-	codeMsg = &CodeMsg{code, msg}
-	container[code] = codeMsg
-	return codeMsg
+	cm = &CodeMsg{code, msg}
+	codeMsg[code] = cm
+	return cm
 }

@@ -239,12 +239,13 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 	this.g = this.Engine.Group(prefix)
 	for _, route := range routes {
 		fmt.Printf("%T\n", route.Handle);
+		method := strings.ToUpper(route.Method)
+		this.GroupHandle(method, route.RelativePath, route.Handle)
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Container().AddRoutes("/" + prefix + route.RelativePath, route)
-		method := strings.ToUpper(route.Method)
-		this.GroupHandle(method, route.RelativePath, route.Handle)
+		Container().AddRoutes("/" + strings.TrimLeft(prefix, "/") + strings.TrimLeft(route.RelativePath, "/"), route)
+		//RegisterDependencies(this)
 	}
 	return this
 }
@@ -252,12 +253,12 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 // 路由
 func (this *Higo) AddRoute(routes ...Route) *Higo {
 	for _, route := range routes {
+		method := strings.ToUpper(route.Method)
+		this.Handle(method, route.RelativePath, route.Handle)
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
 		Container().AddRoutes(route.RelativePath, route)
-		method := strings.ToUpper(route.Method)
-		this.Handle(method, route.RelativePath, route.Handle)
 	}
 	return this
 }
@@ -278,13 +279,14 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 	return this
 }
 
+/**
 func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 	this.g = this.Engine.Group(group)
 	for _, controller := range icontroller {
 		controller.Controller()
 	}
 	return this
-}
+}*/
 
 //获取属性
 func (this *Higo) GetAttribute(t reflect.Type) interface{} {
@@ -296,6 +298,7 @@ func (this *Higo) GetAttribute(t reflect.Type) interface{} {
 	return nil
 }
 
+/**
 // 设置属性
 func (this *Higo) SetAttribute(controller IController) {
 	vClass := reflect.ValueOf(controller).Elem()
@@ -310,4 +313,13 @@ func (this *Higo) SetAttribute(controller IController) {
 		}
 
 	}
+}*/
+
+// 注册依赖
+func (this *Higo) RegisterDependencies(builders ...IBuilder) *Higo {
+	for _, builder := range builders {
+		name := reflect.ValueOf(builder).Type().Name()
+		Container().Di[name] = builder
+	}
+	return this
 }
