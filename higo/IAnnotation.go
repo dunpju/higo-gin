@@ -8,6 +8,7 @@ type Annotation interface {
 
 var AnnotationList []Annotation
 
+// 是否是注解
 func IsAnnotation(t reflect.Type) bool {
 	for _,item := range AnnotationList{
 		if reflect.TypeOf(item) == t {

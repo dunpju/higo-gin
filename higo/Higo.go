@@ -239,12 +239,12 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 	this.g = this.Engine.Group(prefix)
 	for _, route := range routes {
 		fmt.Printf("%T\n", route.Handle);
-		method := strings.ToUpper(route.Method)
-		this.GroupHandle(method, route.RelativePath, route.Handle)
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Container().AddRoutes("/" + strings.TrimLeft(prefix, "/") + strings.TrimLeft(route.RelativePath, "/"), route)
+		Container().AddRoutes("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(route.RelativePath, "/"), route)
+		method := strings.ToUpper(route.Method)
+		this.GroupHandle(method, route.RelativePath, route.Handle)
 		//RegisterDependencies(this)
 	}
 	return this
@@ -253,12 +253,12 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 // 路由
 func (this *Higo) AddRoute(routes ...Route) *Higo {
 	for _, route := range routes {
-		method := strings.ToUpper(route.Method)
-		this.Handle(method, route.RelativePath, route.Handle)
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
 		Container().AddRoutes(route.RelativePath, route)
+		method := strings.ToUpper(route.Method)
+		this.Handle(method, route.RelativePath, route.Handle)
 	}
 	return this
 }
@@ -289,8 +289,10 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 }*/
 
 //获取属性
-func (this *Higo) GetAttribute(t reflect.Type) interface{} {
+func (this *Higo) getAttribute(t reflect.Type) interface{} {
 	for _, p := range this.attribute {
+		fmt.Println(t)
+		fmt.Println(reflect.TypeOf(p))
 		if t == reflect.TypeOf(p) {
 			return p
 		}
@@ -298,28 +300,43 @@ func (this *Higo) GetAttribute(t reflect.Type) interface{} {
 	return nil
 }
 
-/**
+
 // 设置属性
-func (this *Higo) SetAttribute(controller IController) {
-	vClass := reflect.ValueOf(controller).Elem()
+func (this *Higo) setAttribute(builder IBuilder) {
+	vClass := reflect.ValueOf(builder)
+	vClassT := reflect.TypeOf(builder)
+	if vClass.Kind() == reflect.Ptr {
+		vClass = vClass.Elem()
+	}
+	vt := reflect.TypeOf(&Value{})
+	fmt.Println(vt)
 	for i := 0; i < vClass.NumField(); i++ {
 		f := vClass.Field(i)
+		fmt.Println(f)
+		fmt.Println(f.Type())
+		if vt != f.Type() {
+			continue
+		}
 		if !f.IsNil() || f.Kind() != reflect.Ptr {
 			continue
 		}
-		if p := this.GetAttribute(f.Type()); p != nil {
+		if p := this.getAttribute(f.Type()); p != nil {
+			fmt.Println(111)
 			f.Set(reflect.New(f.Type().Elem()))
 			f.Elem().Set(reflect.ValueOf(p).Elem())
+			if IsAnnotation(f.Type()) {
+				p.(Annotation).SetTag(vClassT.Field(i).Tag)
+			}
 		}
-
 	}
-}*/
+}
 
 // 注册依赖
 func (this *Higo) RegisterDependencies(builders ...IBuilder) *Higo {
 	for _, builder := range builders {
 		name := reflect.ValueOf(builder).Type().Name()
 		Container().Di[name] = builder
+		this.setAttribute(builder)
 	}
 	return this
 }

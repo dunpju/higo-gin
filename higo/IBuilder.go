@@ -11,9 +11,9 @@ type Director struct {
 	builder IBuilder
 }
 
-func NewDirector(builder IBuilder) *Director {
-	return &Director{
-		builder: builder,
+func NewDirector(builders ...IBuilder) {
+	for _,builder := range builders{
+		builder.Construct()
 	}
 }
 

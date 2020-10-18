@@ -45,3 +45,9 @@ SSL:
 
 # 日志目录
 LOG_DIR: ./netmond/log
+
+# 用户配置
+CONFIG:
+  user:
+    score: 100
+    age: 19

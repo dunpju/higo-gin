@@ -9,8 +9,7 @@ import (
 
 func main()  {
 	d := &V3.DemoController{}
-	higo.NewDirector(d).Construct();
-	d.HttpsTestGet()
+	higo.NewDirector(d);
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		SetRoot(".\\test\\").
