@@ -8,14 +8,20 @@ import (
 )
 
 func main()  {
-	d := &V3.DemoController{}
-	higo.NewDirector(d);
+
+	//d := &V3.DemoController{}
+	//higo.NewDirector(d);
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		SetRoot(".\\test\\").
 		HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).
-		RegisterDependencies(V3.NewDemoController()).
+		Beans(V3.NewDemoController()).
 		Boot()
+	/*
+	goft.Ignite().
+		DB(goft.NewGormAdapter()).
+		Launch()
+	 */
 }

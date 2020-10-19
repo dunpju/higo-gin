@@ -8,7 +8,7 @@ import (
 )
 
 type DemoController struct {
-	higo.Director
+	//higo.Director
 	Age *higo.Value `prefix:"user.age"`
 }
 
