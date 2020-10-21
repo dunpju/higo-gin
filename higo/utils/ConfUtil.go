@@ -3,6 +3,8 @@ package utils
 import (
 	"bufio"
 	"io"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 )
@@ -44,4 +46,17 @@ func InitConfig(path string) map[string]string {
 		config[key] = value
 	}
 	return config
+}
+
+//读取配置文件
+func LoadConfigFile()  []byte  {
+	//dir, _ := os.Executable()
+	dir, _ := os.Getwd()
+	file:=dir+"/application.yaml"
+	b,err:=ioutil.ReadFile(file)
+	if err!=nil{
+		log.Println(err)
+		return nil
+	}
+	return b
 }

@@ -8,23 +8,19 @@ import (
 )
 
 type DemoController struct {
-	//higo.Director
+	*higo.Director
 	Age *higo.Value `prefix:"user.age"`
 }
 
 func NewDemoController() *DemoController {
-	var demoController *DemoController
-	higo.Once.Do(func() {
-		demoController = &DemoController{}
-	})
-	return demoController
+	return &DemoController{}
 }
 
 // 测试异常
 func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
 	fmt.Println(111)
-	//fmt.Println(this.Age.String())
+	fmt.Println(this.Age.String())
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})
 	m1["jj"] = "m1jjj"

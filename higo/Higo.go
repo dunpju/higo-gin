@@ -46,7 +46,7 @@ type Higo struct {
 	isAutoSsl  bool
 	middle     []IMiddleware
 	serve      []Hse
-	attribute  []interface{}
+	beans      []interface{}
 }
 
 // 初始化
@@ -56,7 +56,7 @@ func Init() *Higo {
 		containers: NewContainer(),
 		middle:     make([]IMiddleware, 0),
 		serve:      make([]Hse, 0),
-		attribute:  make([]interface{}, 0),
+		beans:  make([]interface{}, 0),
 	}
 
 	// 全局异常
@@ -290,10 +290,8 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 }*/
 
 //获取属性
-func (this *Higo) getAttribute(t reflect.Type) interface{} {
-	for _, p := range this.attribute {
-		fmt.Println("==",t)
-		fmt.Println(reflect.TypeOf(p),"==")
+func (this *Higo) getBeans(t reflect.Type) interface{} {
+	for _, p := range this.beans {
 		if t == reflect.TypeOf(p) {
 			return p
 		}
@@ -303,21 +301,18 @@ func (this *Higo) getAttribute(t reflect.Type) interface{} {
 
 
 // 设置属性
-func (this *Higo) setAttribute(class interface{}) {
-	vClass := reflect.ValueOf(class)
-	vClassT := reflect.TypeOf(class)
+func (this *Higo) setBeans(bean interface{}) {
+	vClass := reflect.ValueOf(bean).Elem()
+	vClassT := reflect.TypeOf(bean)
 	if vClass.Kind() == reflect.Ptr {
 		vClass = vClass.Elem()
 	}
 	for i := 0; i < vClass.NumField(); i++ {
 		f := vClass.Field(i)
-		fmt.Println(f)
-		fmt.Println(f.Type())
 		if !f.IsNil() || f.Kind() != reflect.Ptr {
 			continue
 		}
-		if p := this.getAttribute(vClass.Type()); p != nil {
-			fmt.Println(111)
+		if p := this.getBeans(f.Type()); p != nil {
 			f.Set(reflect.New(f.Type().Elem()))
 			f.Elem().Set(reflect.ValueOf(p).Elem())
 			if IsAnnotation(f.Type()) {
@@ -330,11 +325,8 @@ func (this *Higo) setAttribute(class interface{}) {
 // 注册依赖
 func (this *Higo) Beans(beans ...interface{}) *Higo {
 	for _, bean := range beans {
-		//name := reflect.ValueOf(bean).Type().Name()
-		//Container().Di[name] = bean
-		//this.setAttribute(bean)
-		this.attribute = append(this.attribute, bean)
-		this.setAttribute(bean)
+		this.beans = append(this.beans, bean)
+		this.setBeans(bean)
 	}
 	return this
 }
