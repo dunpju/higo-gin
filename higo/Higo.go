@@ -3,6 +3,7 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/consts"
+	"github.com/dengpju/higo-gin/higo/injector"
 	"github.com/dengpju/higo-gin/higo/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -12,7 +13,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"reflect"
 	"runtime"
 	"strings"
 	"sync"
@@ -39,24 +39,24 @@ type Hse struct {
 
 type Higo struct {
 	*gin.Engine
-	g          *gin.RouterGroup
-	eg         errgroup.Group
-	root       string
-	containers *Containers
-	isAutoSsl  bool
-	middle     []IMiddleware
-	serve      []Hse
-	beans      []interface{}
+	g           *gin.RouterGroup
+	eg          errgroup.Group
+	root        string
+	containers  *Containers
+	isAutoSsl   bool
+	middle      []IMiddleware
+	serve       []Hse
+	beanFactory *injector.BeanFactory
 }
 
 // 初始化
 func Init() *Higo {
 	hg = &Higo{
-		Engine:     gin.New(),
-		containers: NewContainer(),
-		middle:     make([]IMiddleware, 0),
-		serve:      make([]Hse, 0),
-		beans:  make([]interface{}, 0),
+		Engine:      gin.New(),
+		containers:  NewContainer(),
+		middle:      make([]IMiddleware, 0),
+		serve:       make([]Hse, 0),
+		beanFactory: injector.NewBeanFactory(),
 	}
 
 	// 全局异常
@@ -289,44 +289,11 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 	return this
 }*/
 
-//获取属性
-func (this *Higo) getBeans(t reflect.Type) interface{} {
-	for _, p := range this.beans {
-		if t == reflect.TypeOf(p) {
-			return p
-		}
-	}
-	return nil
-}
-
-
-// 设置属性
-func (this *Higo) setBeans(bean interface{}) {
-	vClass := reflect.ValueOf(bean).Elem()
-	vClassT := reflect.TypeOf(bean)
-	if vClass.Kind() == reflect.Ptr {
-		vClass = vClass.Elem()
-	}
-	for i := 0; i < vClass.NumField(); i++ {
-		f := vClass.Field(i)
-		if !f.IsNil() || f.Kind() != reflect.Ptr {
-			continue
-		}
-		if p := this.getBeans(f.Type()); p != nil {
-			f.Set(reflect.New(f.Type().Elem()))
-			f.Elem().Set(reflect.ValueOf(p).Elem())
-			if IsAnnotation(f.Type()) {
-				p.(Annotation).SetTag(vClassT.Field(i).Tag)
-			}
-		}
-	}
-}
-
 // 注册依赖
 func (this *Higo) Beans(beans ...interface{}) *Higo {
+	this.beanFactory.SetBean(beans)
 	for _, bean := range beans {
-		this.beans = append(this.beans, bean)
-		this.setBeans(bean)
+		this.beanFactory.Inject(bean)
 	}
 	return this
 }

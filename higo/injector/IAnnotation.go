@@ -1,4 +1,4 @@
-package higo
+package injector
 
 import "reflect"
 

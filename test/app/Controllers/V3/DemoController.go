@@ -3,13 +3,14 @@ package V3
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/injector"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/gin-gonic/gin"
 )
 
 type DemoController struct {
 	*higo.Director
-	Age *higo.Value `prefix:"user.age"`
+	Age *injector.Value `prefix:"user.age"`
 }
 
 func NewDemoController() *DemoController {

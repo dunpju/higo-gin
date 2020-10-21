@@ -1,59 +1,70 @@
 package injector
 
-import "reflect"
+import (
+	"reflect"
+)
 
-var BeanFactory *BeanFactoryImpl
-
-func init()  {
-	BeanFactory=NewBeanFactory()
+type BeanFactory struct {
+	beans []interface{}
 }
 
-type BeanFactoryImpl struct {
-	beanMapper BeanMapper
+func NewBeanFactory() *BeanFactory {
+	bf := &BeanFactory{beans: make([]interface{}, 0)}
+	bf.beans = append(bf.beans, bf)
+	return &BeanFactory{}
 }
 
-func (this *BeanFactoryImpl)Set(value ...interface{})  {
-	if value == nil || len(value)==0{
-		return
-	}
-	for _,v := range value{
-		this.beanMapper.add(v)
-	}
-}
-
-func (this *BeanFactoryImpl)Get(v interface{}) interface{} {
-	if v == nil{
-		return nil
-	}
-	value := this.beanMapper.get(v)
-	if value.IsValid() {
-		return value.Interface()
+func (this *BeanFactory) getBean(t reflect.Type) interface{} {
+	for _, p := range this.beans {
+		if t == reflect.TypeOf(p) {
+			return p
+		}
 	}
 	return nil
 }
 
-// 处理依赖注入
-func (this *BeanFactoryImpl)Apply(bean interface{})  {
-	if bean==nil {
-		return
-	}
-	v:=reflect.ValueOf(bean)
-	if v.Kind()==reflect.Ptr {
-		v=v.Elem()
-	}
-	if v.Kind()!= reflect.Struct {
-		return
-	}
-	for i:=0;i<v.NumField() ;i++  {
-		field:=v.Type().Field(i)
-		if v.Field(i).CanSet() && field.Tag.Get("inject") != ""{
-			if value:=this.Get(field.Type);value!=nil{
-				v.Field(i).Set(reflect.ValueOf(value))
-			}
+func (this *BeanFactory) iniect(bean interface{}) {
+	bv := reflect.ValueOf(bean).Elem()
+	bt := reflect.TypeOf(bean).Elem()
+	for i := 0; i < bv.NumField(); i++ {
+		f := bv.Field(i)
+		if f.Kind() != reflect.Ptr || !f.IsNil() {
+			continue
+		}
+		if IsAnnotation(f.Type()) {
+			f.Set(reflect.New(f.Type().Elem()))
+			f.Interface().(Annotation).SetTag(bt.Field(i).Tag)
+			this.iniect(f.Interface())
+			continue
+		}
+		if p := this.getBean(f.Type()); p != nil {
+			f.Set(reflect.New(f.Type().Elem()))
+			f.Elem().Set(reflect.ValueOf(p).Elem())
 		}
 	}
 }
 
-func NewBeanFactory() *BeanFactoryImpl {
-	return &BeanFactoryImpl{beanMapper: make(BeanMapper)}
+func (this *BeanFactory) SetBean(bean ...interface{}) {
+	this.beans = append(this.beans, bean...)
+}
+
+func (this *BeanFactory) GetBean(bean interface{}) interface{} {
+	return this.getBean(reflect.TypeOf(bean))
+}
+
+func (this *BeanFactory) Inject(object interface{}) {
+	vObject := reflect.ValueOf(object)
+	if vObject.Kind() == reflect.Ptr {
+		vObject = vObject.Elem()
+	}
+	for i := 0; i < vObject.NumField(); i++ {
+		f := vObject.Field(i)
+		if f.Kind() != reflect.Ptr || !f.IsNil() {
+			continue
+		}
+		if p := this.getBean(f.Type()); p != nil && f.CanInterface() {
+			f.Set(reflect.New(f.Type().Elem()))
+			f.Elem().Set(reflect.ValueOf(p).Elem())
+		}
+	}
 }
