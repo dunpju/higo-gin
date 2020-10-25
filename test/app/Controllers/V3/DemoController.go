@@ -9,20 +9,27 @@ import (
 )
 
 type DemoController struct {
-	*higo.HgController
-	Age *injector.Value `prefix:"user.age"`
+	HgController *higo.HgController
+	Age          *injector.Value `prefix:"user.age"`
 }
 
-func NewDemoController(hg *higo.Higo) *DemoController {
-	return &DemoController{}
+var dem *DemoController
+
+func NewDemoController() *DemoController {
+	higo.Once.Do(func() {
+		dem = &DemoController{}
+	})
+	fmt.Println("dem ptr:", &dem)
+	return dem
 }
 
 // 测试异常
 func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
 	fmt.Println(111)
-	fmt.Println(this.Higo.ApplicationContext())
+	fmt.Println(&this)
 	fmt.Println(this.Age.String())
+	fmt.Println(this.HgController.Hg)
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})
 	m1["jj"] = "m1jjj"

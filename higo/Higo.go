@@ -289,8 +289,8 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 
 // 注册依赖
 func (this *Higo) Beans(beans ...interface{}) *Higo {
-	this.beanFactory.SetBean(beans)
 	for _, bean := range beans {
+		this.beanFactory.SetBean(bean)
 		this.beanFactory.Inject(bean)
 	}
 	return this

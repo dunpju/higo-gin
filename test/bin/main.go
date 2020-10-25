@@ -12,9 +12,9 @@ func main()  {
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		SetRoot(".\\test\\").
-		HttpServe("HTTP_HOST", router.NewHttp()).
+		//HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).
-		Beans(V3.NewDemoController()).
+		Beans(higo.NewHgController(),V3.NewDemoController()).
 		Boot()
 }
