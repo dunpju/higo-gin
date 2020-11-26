@@ -9,6 +9,7 @@ import (
 )
 
 type DemoController struct {
+	Higo         *higo.Higo
 	HgController *higo.HgController
 	Age          *injector.Value `prefix:"user.age"`
 }
@@ -30,6 +31,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(&this)
 	fmt.Println(this.Age.String())
 	fmt.Println(this.HgController.Hg)
+	fmt.Println(this.Higo)
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})
 	m1["jj"] = "m1jjj"
