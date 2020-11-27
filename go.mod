@@ -3,7 +3,7 @@ module github.com/dengpju/higo-gin
 go 1.14
 
 require (
-	github.com/dengpju/higo-ioc v0.0.0-20201123143714-ed0847deeac3 // indirect
+	github.com/dengpju/higo-ioc v0.0.0-20201127090526-c5c4a29b918e // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/gin-gonic/gin v1.6.3
@@ -16,6 +16,5 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/tebeka/strftime v0.1.5 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )

@@ -5,6 +5,7 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/injector"
 	"github.com/dengpju/higo-gin/test/app/Exception"
+	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +13,7 @@ type DemoController struct {
 	Higo         *higo.Higo
 	HgController *higo.HgController
 	Age          *injector.Value `prefix:"user.age"`
+	DemoService  *Services.DemoService `inject:"Provider.DemoService()"`
 }
 
 var dem *DemoController
@@ -20,7 +22,6 @@ func NewDemoController() *DemoController {
 	higo.Once.Do(func() {
 		dem = &DemoController{}
 	})
-	fmt.Println("dem ptr:", &dem)
 	return dem
 }
 

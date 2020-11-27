@@ -5,22 +5,17 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
+	"github.com/dengpju/higo-gin/test/providers"
 	"github.com/dengpju/higo-gin/test/router"
-	"github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
-	"github.com/dengpju/higo-ioc/test/services"
 )
 
 func main()  {
-	serviceConfig:=config.NewServiceConfig()
-	injector.BeanFactory.Config(serviceConfig)
-	userService:=services.NewUserService()
-	injector.BeanFactory.Apply(userService)
-	fmt.Println(userService.Order)
-	adminService:=services.NewAdminService()
-	injector.BeanFactory.Apply(adminService)
-	fmt.Println(adminService.Order)
-	fmt.Println(adminService.Order.Db)
+	provider := providers.NewProvider()
+	injector.BeanFactory.Config(provider)
+	demoController := V3.NewDemoController()
+	injector.BeanFactory.Apply(demoController)
+	fmt.Println(demoController.DemoService)
 
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).

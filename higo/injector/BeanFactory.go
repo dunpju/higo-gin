@@ -18,10 +18,7 @@ func NewBeanFactory() *BeanFactory {
 func (this *BeanFactory) getBean(t reflect.Type) interface{} {
 	fmt.Println(this.beans)
 	for _, p := range this.beans {
-		fmt.Println("t:",t)
-		fmt.Println("pt:",reflect.TypeOf(p))
 		if t == reflect.TypeOf(p) {
-			fmt.Println("find")
 			return p
 		}
 	}
@@ -56,7 +53,6 @@ func (this *BeanFactory) inject(object interface{}) {
 func (this *BeanFactory) Inject(bean interface{}) {
 	bv := reflect.ValueOf(bean).Elem()
 	bt := reflect.TypeOf(bean).Elem()
-	fmt.Printf("%T\n",bean)
 	for i := 0; i < bv.NumField(); i++ {
 		f := bv.Field(i)
 		if f.Kind() != reflect.Ptr || !f.IsNil() {
