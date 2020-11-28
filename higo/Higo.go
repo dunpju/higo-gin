@@ -94,8 +94,8 @@ func (this *Higo) config() *Higo {
 	}
 	// 日志
 	Log(root)
-	// 装载配置
-	confDir := root + "conf"
+	// 装载env配置
+	confDir := root + "env"
 	if _, err := os.Stat(confDir); os.IsNotExist(err) {
 		if os.Mkdir(confDir, os.ModePerm) != nil {}
 	}

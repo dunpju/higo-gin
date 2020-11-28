@@ -2,8 +2,8 @@ package V3
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-annotation/annotation"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/annotation"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gin-gonic/gin"

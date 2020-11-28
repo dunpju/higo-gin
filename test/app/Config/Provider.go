@@ -1,4 +1,4 @@
-package providers
+package Config
 
 import (
 	"github.com/dengpju/higo-gin/test/app/Services"

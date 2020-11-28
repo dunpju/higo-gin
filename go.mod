@@ -3,6 +3,7 @@ module github.com/dengpju/higo-gin
 go 1.14
 
 require (
+	github.com/dengpju/higo-annotation v0.0.0-20201128150601-25a35cd53358
 	github.com/dengpju/higo-ioc v0.0.0-20201127090526-c5c4a29b918e // indirect
 	github.com/dengpju/higo-utils v0.0.0-20201128143226-0d83b781389a
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
