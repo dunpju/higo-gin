@@ -3,7 +3,7 @@ package V3
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/injector"
+	"github.com/dengpju/higo-gin/higo/annotation"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ import (
 type DemoController struct {
 	Higo         *higo.Higo
 	HgController *higo.HgController
-	Age          *injector.Value `prefix:"user.age"`
+	Age          *annotation.Value     `prefix:"user.age"`
 	DemoService  *Services.DemoService `inject:"Provider.DemoService()"`
 }
 

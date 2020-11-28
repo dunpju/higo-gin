@@ -2,7 +2,7 @@ package Exception
 
 import (
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/utils"
+	"github.com/dengpju/higo-utils/utils"
 )
 
 type BusinessException struct {

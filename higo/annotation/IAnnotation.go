@@ -1,4 +1,4 @@
-package injector
+package annotation
 
 import "reflect"
 

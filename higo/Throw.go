@@ -2,7 +2,7 @@ package higo
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo/utils"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"runtime"
 )

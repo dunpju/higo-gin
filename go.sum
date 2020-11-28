@@ -6,10 +6,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dengpju/higo-express v0.0.0-20201121150030-24a58c8b8b36 h1:Lz/N4nDOwxuszMdQXHCJtYfJ31NGrPsnqHOWOFQrINo=
 github.com/dengpju/higo-express v0.0.0-20201121150030-24a58c8b8b36/go.mod h1:zh0mkZfiPaJgpBu4K9f0KbhSB/8Oc8ZW4Lihd8Ya7Vs=
-github.com/dengpju/higo-ioc v0.0.0-20201126153007-b003188ecb09 h1:RdQO/pBbWtIVegkF/OpGlX+MQ0Yn8wz0gUAKUBf6Jwo=
-github.com/dengpju/higo-ioc v0.0.0-20201126153007-b003188ecb09/go.mod h1:YBka5pNOuIC25Q8YCMcHLgFyn7UPLg3bpjbt7lnr+qg=
 github.com/dengpju/higo-ioc v0.0.0-20201127090526-c5c4a29b918e h1:rpxn9QIpvhwYZv44tq86GAVzPAQtSpSXysN8TmpQEyA=
 github.com/dengpju/higo-ioc v0.0.0-20201127090526-c5c4a29b918e/go.mod h1:YBka5pNOuIC25Q8YCMcHLgFyn7UPLg3bpjbt7lnr+qg=
+github.com/dengpju/higo-utils v0.0.0-20201128143226-0d83b781389a h1:p5J5gGZFhpOTDIWtXus6ZVZ/6hFbJKIUbbHiDbhTuDE=
+github.com/dengpju/higo-utils v0.0.0-20201128143226-0d83b781389a/go.mod h1:XIu/uZYKdmPPUHR6A5O3336a+nsFR1Wrwc23KtE3EIM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 h1:Ghm4eQYC0nEPnSJdVkTrXpu9KtoVCSo1hg7mtI7G9KU=

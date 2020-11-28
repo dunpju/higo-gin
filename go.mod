@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/dengpju/higo-ioc v0.0.0-20201127090526-c5c4a29b918e // indirect
+	github.com/dengpju/higo-utils v0.0.0-20201128143226-0d83b781389a
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/gin-gonic/gin v1.6.3

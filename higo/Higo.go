@@ -3,8 +3,7 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/consts"
-	"github.com/dengpju/higo-gin/higo/injector"
-	"github.com/dengpju/higo-gin/higo/utils"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -46,7 +45,6 @@ type Higo struct {
 	isAutoSsl   bool
 	middle      []IMiddleware
 	serve       []Hse
-	beanFactory *injector.BeanFactory
 }
 
 // 初始化
@@ -56,7 +54,6 @@ func Init() *Higo {
 		containers:  NewContainer(),
 		middle:      make([]IMiddleware, 0),
 		serve:       make([]Hse, 0),
-		beanFactory: injector.NewBeanFactory(),
 	}
 
 	// 全局异常
@@ -289,13 +286,5 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 
 // 注册依赖
 func (this *Higo) Beans(beans ...interface{}) *Higo {
-	for _, bean := range beans {
-		this.beanFactory.SetBean(bean)
-		this.beanFactory.Inject(bean)
-	}
 	return this
-}
-
-func (this *Higo) ApplicationContext() *injector.BeanFactory {
-	return this.beanFactory
 }

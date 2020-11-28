@@ -2,7 +2,7 @@ package higo
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo/utils"
+	"github.com/dengpju/higo-utils/utils"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
