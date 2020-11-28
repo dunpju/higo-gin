@@ -1,2 +1,3 @@
 /test/conf/*.yaml
 /.idea
+/*.sum
