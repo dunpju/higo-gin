@@ -1,13 +1,13 @@
 package Controllers
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
 )
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	higo.Throw("https 测试异常", 0)
+	throw.Throw("https 测试异常", 0)
 	return "https_test_throw"
 }
 
@@ -23,7 +23,7 @@ func HttpsTestPost(ctx *gin.Context) string {
 
 // 测试异常
 func HttpTestThrow(ctx *gin.Context) string  {
-	higo.Throw("http 测试异常", 0)
+	throw.Throw("http 测试异常", 0)
 	return "http_test_throw"
 }
 

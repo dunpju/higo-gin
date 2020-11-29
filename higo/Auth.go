@@ -1,9 +1,11 @@
 package higo
 
+import "github.com/dengpju/higo-throw/throw"
+
 // 是否空标记
 func IsEmptyFlag(route Route)  {
 	if route.Flag == "" {
-		Throw(route.RelativePath + "未设置标记",0)
+		throw.Throw(route.RelativePath + "未设置标记",0)
 	}
 }
 

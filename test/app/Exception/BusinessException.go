@@ -1,12 +1,12 @@
 package Exception
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-throw/throw"
 	"github.com/dengpju/higo-utils/utils"
 )
 
 type BusinessException struct {
-	higo.ServerException // 继承
+	throw.ServerException // 继承
 }
 
 func NewBusinessException(code int, msg string, data ...interface{}) {

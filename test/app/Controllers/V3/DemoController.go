@@ -6,6 +6,7 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Services"
+	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,7 +44,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	s = append(s, m1)
 	s = append(s, m2)
 	Exception.NewBusinessException(2, "v3 https 测试异常", s)
-	higo.Throw("v3 https 测试异常", 2, struct {
+	throw.Throw("v3 https 测试异常", 2, struct {
 		Id   int
 		Name string
 	}{Id: 1, Name: "哦哦"})
@@ -63,7 +64,7 @@ func (this *DemoController) HttpsTestPost(ctx *gin.Context) string {
 
 // 测试异常
 func (this *DemoController) HttpTestThrow(ctx *gin.Context) string  {
-	higo.Throw("v3 http 测试异常", 0)
+	throw.Throw("v3 http 测试异常", 0)
 	return "v3 http_test_throw"
 }
 

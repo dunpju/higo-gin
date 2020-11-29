@@ -3,6 +3,8 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/consts"
+	"github.com/dengpju/higo-logger/logger"
+	"github.com/dengpju/higo-throw/throw"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -93,7 +95,7 @@ func (this *Higo) config() *Higo {
 		if os.Mkdir(runtimeDir, os.ModePerm) != nil {}
 	}
 	// 日志
-	Log(root)
+	logger.Log(root, PathSeparator)
 	// 装载env配置
 	confDir := root + "env"
 	if _, err := os.Stat(confDir); os.IsNotExist(err) {
@@ -112,13 +114,13 @@ func (this *Higo) config() *Higo {
 				yamlFile, _ := ioutil.ReadFile(p)
 				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().C)
 				if yamlFileErr != nil {
-					Throw(yamlFileErr,0)
+					throw.Throw(yamlFileErr,0)
 				}
 			}
 			return nil
 		})
 	if filepathErr != nil {
-		Throw(filepathErr,0)
+		throw.Throw(filepathErr,0)
 	}
 	mapSslConf := Container().Config("SSL")
 	SslOut = root + mapSslConf["OUT"].(string) + fmt.Sprintf("%s", PathSeparator)
@@ -210,7 +212,7 @@ func (this *Higo) Boot() {
 	}
 
 	if err := this.eg.Wait(); err != nil {
-		Logrus.Fatal(err)
+		logger.Logrus.Fatal(err)
 	}
 }
 

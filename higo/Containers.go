@@ -1,5 +1,7 @@
 package higo
 
+import "github.com/dengpju/higo-throw/throw"
+
 // 容器
 type Containers struct {
 	// 配置
@@ -28,7 +30,7 @@ func (this *Containers) Configure() map[interface{}]interface{} {
 func (this *Containers) Config(key string) map[interface{}]interface{} {
 	v, ok := this.C[key]
 	if !ok {
-		Throw("获取"+key+"配置失败", 0)
+		throw.Throw("获取"+key+"配置失败", 0)
 	}
 	return v.(map[interface{}]interface{})
 }
@@ -48,7 +50,7 @@ func (this *Containers) Routes() map[string]Route {
 func (this *Containers) Route(relativePath string) Route {
 	route, ok := this.R[relativePath]
 	if !ok {
-		Throw(relativePath+"未定义", 0)
+		throw.Throw(relativePath+"未定义", 0)
 	}
 	return route
 }

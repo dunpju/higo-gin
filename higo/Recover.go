@@ -2,6 +2,8 @@ package higo
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-logger/logger"
+	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,12 +20,12 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				Logrus.Info(fmt.Sprintf("Recover Value %v", r))
-				Logrus.Info(fmt.Sprintf("Recover Type %T", r))
+				logger.Logrus.Info(fmt.Sprintf("Recover Value %v", r))
+				logger.Logrus.Info(fmt.Sprintf("Recover Type %T", r))
 				//打印错误堆栈信息
 				//debug.PrintStack()
 				// 输出换行debug调用栈
-				PrintlnStack()
+				logger.PrintlnStack()
 				//封装通用json返回
 				if _, ok := r.(gin.H); ok {// 断言类型
 					c.JSON(http.StatusOK, r)
@@ -38,7 +40,7 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 					} else {
 						c.JSON(http.StatusOK, gin.H{
 							"code": 0,
-							"msg":  ErrorToString(r),
+							"msg":  throw.ErrorToString(r),
 							"data": nil,
 						})
 					}

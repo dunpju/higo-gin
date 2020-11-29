@@ -1,13 +1,13 @@
 package V2
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
 )
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	higo.Throw("v2 https 测试异常", 0)
+	throw.Throw("v2 https 测试异常", 0)
 	return "v2 https_test_throw"
 }
 
@@ -23,7 +23,7 @@ func HttpsTestPost(ctx *gin.Context) string {
 
 // 测试异常
 func HttpTestThrow(ctx *gin.Context) string  {
-	higo.Throw("v2 http 测试异常", 0)
+	throw.Throw("v2 http 测试异常", 0)
 	return "v2 http_test_throw"
 }
 
