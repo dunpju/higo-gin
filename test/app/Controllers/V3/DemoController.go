@@ -14,7 +14,7 @@ type DemoController struct {
 	Higo         *higo.Higo
 	HgController *higo.HgController
 	Age          *annotation.Value     `prefix:"user.age"`
-	DemoService  *Services.DemoService `inject:"Provider.DemoService()"`
+	DemoService  *Services.DemoService `inject:"Bean.DemoService()"`
 }
 
 var dem *DemoController
