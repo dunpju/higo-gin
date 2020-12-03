@@ -8,9 +8,14 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
 	"github.com/dengpju/higo-ioc/injector"
+	"os/exec"
 )
 
 func main()  {
+	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)
+	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
+	fmt.Printf("%s",output)
+
 	provider := Config.NewProvider()
 	injector.BeanFactory.Config(provider)
 	demoController := V3.NewDemoController()
