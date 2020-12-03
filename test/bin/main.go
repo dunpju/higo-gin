@@ -8,7 +8,6 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
 	"github.com/dengpju/higo-ioc/injector"
-	"os/exec"
 )
 
 func main()  {
@@ -16,8 +15,9 @@ func main()  {
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
 	fmt.Printf("%s",output)
 
-	provider := Config.NewProvider()
-	injector.BeanFactory.Config(provider)
+
+	beanConfig := Config.NewBean()
+	injector.BeanFactory.Config(beanConfig)
 	demoController := V3.NewDemoController()
 	injector.BeanFactory.Apply(demoController)
 	fmt.Println(demoController.DemoService)
@@ -28,6 +28,6 @@ func main()  {
 		//HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).
-		Beans(higo.NewHgController(),V3.NewDemoController()).
+		Beans(beanConfig).
 		Boot()
 }

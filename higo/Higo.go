@@ -3,6 +3,8 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/consts"
+	"github.com/dengpju/higo-ioc/config"
+	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/dengpju/higo-utils/utils"
@@ -287,6 +289,9 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 }*/
 
 // 注册依赖
-func (this *Higo) Beans(beans ...interface{}) *Higo {
+func (this *Higo) Beans(configs ...config.IBean) *Higo {
+	for _,conf :=range configs{
+		injector.BeanFactory.Config(conf)
+	}
 	return this
 }
