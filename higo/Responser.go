@@ -18,6 +18,8 @@ func getResponderList() []Responder {
 		responderList = []Responder{
 			(StringResponder)(nil),
 			(JsonResponder)(nil),
+			(ModelResponder)(nil),
+			(ModelsResponder)(nil),
 		}
 	})
 	return responderList
@@ -74,4 +76,21 @@ func (this *SyncHandler) handler(responder Responder, ctx *gin.Context) interfac
 		ret = s2(ctx)
 	}
 	return ret
+}
+
+type ModelResponder func(*gin.Context) Model
+
+func (this ModelResponder) RespondTo() gin.HandlerFunc  {
+	return func(context *gin.Context) {
+		context.JSON(200, this(context))
+	}
+}
+
+type ModelsResponder func(*gin.Context) Models
+
+func (this ModelsResponder) RespondTo() gin.HandlerFunc  {
+	return func(context *gin.Context) {
+		context.Writer.Header().Set("Content-typ","application/json")
+		_, _ = context.Writer.WriteString(string(this(context)))
+	}
 }

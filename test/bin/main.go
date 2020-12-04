@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Config"
-	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
-	"github.com/dengpju/higo-ioc/injector"
+	"os/exec"
 )
 
 func main()  {
@@ -17,10 +16,11 @@ func main()  {
 
 
 	beanConfig := Config.NewBean()
-	injector.BeanFactory.Config(beanConfig)
-	demoController := V3.NewDemoController()
-	injector.BeanFactory.Apply(demoController)
-	fmt.Println(demoController.DemoService)
+
+	//injector.BeanFactory.Config(beanConfig)
+	//demoController := V3.NewDemoController()
+	//injector.BeanFactory.Apply(demoController)
+	//fmt.Println(demoController.DB)
 
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).

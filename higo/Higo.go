@@ -288,7 +288,6 @@ func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
 	return this
 }*/
 
-// 注册依赖
 func (this *Higo) Beans(configs ...config.IBean) *Higo {
 	for _,conf :=range configs{
 		injector.BeanFactory.Config(conf)

@@ -5,9 +5,12 @@ import (
 	"github.com/dengpju/higo-annotation/annotation"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Exception"
+	"github.com/dengpju/higo-gin/test/app/Models"
 	"github.com/dengpju/higo-gin/test/app/Services"
+	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 type DemoController struct {
@@ -15,6 +18,7 @@ type DemoController struct {
 	HgController *higo.HgController
 	Age          *annotation.Value     `prefix:"user.age"`
 	DemoService  *Services.DemoService `inject:"Bean.DemoService()"`
+	*higo.Gorm   `inject:"Bean.NewGorm()"`
 }
 
 var dem *DemoController
@@ -22,6 +26,7 @@ var dem *DemoController
 func NewDemoController() *DemoController {
 	higo.Once.Do(func() {
 		dem = &DemoController{}
+		injector.BeanFactory.Apply(dem)
 	})
 	return dem
 }
@@ -52,9 +57,17 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 }
 
 // 测试get请求
-func (this *DemoController) HttpsTestGet(ctx *gin.Context) string  {
-	fmt.Printf("%p\n", this)
-	return "v3 https_test_get"
+func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
+	fmt.Println(this.DB)
+	user:=Models.NewUserModel()
+	err:=ctx.ShouldBindUri(user)
+	if err != nil {
+		log.Fatal("映射错误")
+	}
+	this.Table("ts_user").
+		Where("id=?",3).
+		Find(user)
+	return user
 }
 
 // 测试post请求
@@ -69,8 +82,8 @@ func (this *DemoController) HttpTestThrow(ctx *gin.Context) string  {
 }
 
 // 测试get请求
-func (this *DemoController) HttpTestGet(ctx *gin.Context) string  {
-	return "v3 http_test_get"
+func (this *DemoController) HttpTestGet(ctx *gin.Context) string {
+	return "HttpTestGet"
 }
 
 // 测试post请求
