@@ -180,10 +180,10 @@ func (this *Higo) Boot() {
 			// 生成ssl证书
 			utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
 		}
-		config := Container().Config(s.Config)
-		addr, _ := config["Addr"]
-		rt, _ := config["ReadTimeout"]
-		wt, _ := config["WriteTimeout"]
+		configs := Container().Config(s.Config)
+		addr, _ := configs["Addr"]
+		rt, _ := configs["ReadTimeout"]
+		wt, _ := configs["WriteTimeout"]
 		readTimeout, _ := rt.(int)
 		writeTimeout, _ := wt.(int)
 		serve := &http.Server{

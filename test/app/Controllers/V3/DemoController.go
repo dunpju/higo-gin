@@ -27,6 +27,8 @@ func NewDemoController() *DemoController {
 	higo.Once.Do(func() {
 		dem = &DemoController{}
 		injector.BeanFactory.Apply(dem)
+		injector.BeanFactory.Set(dem)
+		fmt.Println(injector.BeanFactory.Get(dem))
 	})
 	return dem
 }
@@ -58,6 +60,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
+	fmt.Println(injector.BeanFactory.Get(dem))
 	fmt.Println(this.DB)
 	user:=Models.NewUserModel()
 	err:=ctx.ShouldBindUri(user)
