@@ -7,7 +7,6 @@ require (
 	github.com/dengpju/higo-ioc v0.0.0-20201201151832-424f8ce46fee
 	github.com/dengpju/higo-logger v1.0.0
 	github.com/dengpju/higo-throw v0.0.0-20201129144528-4dd6e4c4d6b1
-	github.com/dengpju/higo-utils v0.0.0-20201128143226-0d83b781389a
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/gin-gonic/gin v1.6.3
