@@ -21,6 +21,10 @@ type DemoController struct {
 	*higo.Gorm   `inject:"Bean.NewGorm()"`
 }
 
+type DemoController2 struct {
+	Ttt string
+}
+
 var dem *DemoController
 
 func NewDemoController() *DemoController {
