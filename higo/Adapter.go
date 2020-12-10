@@ -13,13 +13,12 @@ type Gorm struct {
 
 func NewGorm() *Gorm {
 	config := Container().Config("DB")
-	fmt.Println(config["DEFAULT"])
 	conf := config["DEFAULT"].(map[interface {}]interface{})
-	args := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
+	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		conf["USERNAME"].(string),
 		conf["PASSWORD"].(string),
 		conf["HOST"].(string),
-		conf["PORT"].(int),
+		conf["PORT"].(string),
 		conf["DATABASE"].(string),
 		conf["CHARSET"].(string),
 		)
