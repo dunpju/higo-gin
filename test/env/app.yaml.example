@@ -51,3 +51,16 @@ CONFIG:
   user:
     score: 100
     age: 19
+
+# 数据库
+DB:
+  DEFAULT:
+    DRIVER: "mysql"
+    HOST: "192.168.42.131"
+    PORT: "3306"
+    DATABASE: "education_live_active"
+    USERNAME: "root"
+    PASSWORD: "1qaz2wsx"
+    CHARSET: "utf8mb4"
+    COLLATION: "utf8mb4_unicode_ci"
+    PREFIX:

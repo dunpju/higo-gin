@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Config"
-	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
-	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-utils/utils"
 	"go/ast"
 	"go/parser"
@@ -42,6 +40,7 @@ func main()  {
 		fmt.Println(s)
 		tank := fmt.Sprintf("New%s",structName)
 		fmt.Println(tank)
+		//reflect.New(structName).Elem().Interface()
 		return false
 	})
 
@@ -50,8 +49,6 @@ func main()  {
 	//_ = ast.Print(fset, f)
 
 
-	return
-
 	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
 	fmt.Printf("%s",output)
@@ -59,14 +56,14 @@ func main()  {
 
 	beanConfig := Config.NewBean()
 
-	injector.BeanFactory.Config(beanConfig)
-	demoController := V3.NewDemoController()
-	injector.BeanFactory.Apply(demoController)
-	fmt.Println(demoController.DB)
+	//injector.BeanFactory.Config(beanConfig)
+	//demoController := V3.NewDemoController()
+	//injector.BeanFactory.Apply(demoController)
+	//fmt.Println(demoController.DB)
 
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
-		SetRoot(".\\test\\").
+		LoadConfigur(".\\test\\").
 		//HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).

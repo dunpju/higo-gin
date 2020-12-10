@@ -16,7 +16,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -24,8 +23,6 @@ import (
 
 var (
 	hg *Higo
-	// 系统类型 Windows Or Linux
-	SysType string
 	// 路径分隔符
 	PathSeparator string
 	// ssl 证书
@@ -62,14 +59,8 @@ func Init() *Higo {
 
 	// 全局异常
 	hg.Engine.Use(NewRecover().Exception(hg))
-	// 系统类型
-	SysType = runtime.GOOS
 	// 初始分隔符
-	if SysType == "windows" {
-		PathSeparator = "\\"
-	} else {
-		PathSeparator = "/"
-	}
+	PathSeparator = string(os.PathSeparator)
 	// 是否使用自带ssl测试https
 	hg.isAutoSsl = false
 
@@ -77,7 +68,7 @@ func Init() *Higo {
 }
 
 // 设置主目录
-func (this *Higo) SetRoot(root string) *Higo {
+func (this *Higo) setRoot(root string) *Higo {
 	this.root = root
 	return this
 }
@@ -87,10 +78,10 @@ func (this *Higo) GetRoot() string {
 	return utils.If(this.root == "", consts.ROOT, this.root).(string)
 }
 
-// 配置
-func (this *Higo) config() *Higo {
-	// 获取主目录
-	root := hg.GetRoot()
+// 加载配置
+func (this *Higo) LoadConfigur(root string) *Higo {
+	// 设置主目录
+	this.setRoot(root)
 	// runtime目录
 	runtimeDir := root + "runtime"
 	if _, err := os.Stat(runtimeDir); os.IsNotExist(err) {
@@ -114,7 +105,7 @@ func (this *Higo) config() *Higo {
 			if path.Ext(p) == ".yaml" {
 				fmt.Println("Loader configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
-				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().C)
+				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().Conf)
 				if yamlFileErr != nil {
 					throw.Throw(yamlFileErr,0)
 				}
@@ -168,9 +159,7 @@ func (this *Higo) Boot() {
 	// 服务
 	for _, s := range this.serve {
 		// 设置服务根目录
-		hg := Init().SetRoot(this.GetRoot())
-		// 配置
-		hg.config()
+		hg := Init().LoadConfigur(this.GetRoot())
 		// 中间件
 		for _, m := range this.middle {
 			hg.Engine.Use(m.Loader(hg))
@@ -279,15 +268,7 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 	return this
 }
 
-/**
-func (this *Higo) Mount(group string, icontroller ...IController) *Higo {
-	this.g = this.Engine.Group(group)
-	for _, controller := range icontroller {
-		controller.Controller()
-	}
-	return this
-}*/
-
+// 添加到Bean
 func (this *Higo) Beans(configs ...config.IBean) *Higo {
 	for _,conf :=range configs{
 		injector.BeanFactory.Config(conf)

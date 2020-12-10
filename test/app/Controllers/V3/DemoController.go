@@ -11,18 +11,22 @@ import (
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
 	"log"
+	"reflect"
 )
 
 type DemoController struct {
-	Higo         *higo.Higo
-	HgController *higo.HgController
-	Age          *annotation.Value     `prefix:"user.age"`
-	DemoService  *Services.DemoService `inject:"Bean.DemoService()"`
-	*higo.Gorm   `inject:"Bean.NewGorm()"`
+	Higo        *higo.Higo
+	Age         *annotation.Value     `prefix:"user.age"`
+	DemoService *Services.DemoService `inject:"Bean.DemoService()"`
+	*higo.Gorm  `inject:"Bean.NewGorm()"`
 }
 
 type DemoController2 struct {
 	Ttt string
+}
+
+func (this *DemoController) Class() (reflect.Type, reflect.Value) {
+	return reflect.TypeOf(this), reflect.ValueOf(this)
 }
 
 var dem *DemoController
@@ -43,7 +47,6 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(111)
 	fmt.Println(&this)
 	fmt.Println(this.Age.String())
-	fmt.Println(this.HgController.Hg)
 	fmt.Println(this.Higo)
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})

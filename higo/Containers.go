@@ -5,30 +5,30 @@ import "github.com/dengpju/higo-throw/throw"
 // 容器
 type Containers struct {
 	// 配置
-	C map[interface{}]interface{}
+	Conf map[interface{}]interface{}
 	// 路由
-	R map[string]Route
+	Rout map[string]Route
 	// Di
-	Di map[string]IBuilder
+	Di map[string]IClass
 }
 
 // 构造函数
 func NewContainer() *Containers {
 	return &Containers{
-		C:  make(map[interface{}]interface{}),
-		R:  make(map[string]Route),
-		Di: make(map[string]IBuilder),
+		Conf: make(map[interface{}]interface{}),
+		Rout: make(map[string]Route),
+		Di:   make(map[string]IClass),
 	}
 }
 
 // 获取所有配置
 func (this *Containers) Configure() map[interface{}]interface{} {
-	return this.C
+	return this.Conf
 }
 
 // 获取配置
 func (this *Containers) Config(key string) map[interface{}]interface{} {
-	v, ok := this.C[key]
+	v, ok := this.Conf[key]
 	if !ok {
 		throw.Throw("获取"+key+"配置失败", 0)
 	}
@@ -37,18 +37,18 @@ func (this *Containers) Config(key string) map[interface{}]interface{} {
 
 // 添加路由容器
 func (this *Containers) AddRoutes(relativePath string, route Route) *Containers {
-	this.R[relativePath] = route
+	this.Rout[relativePath] = route
 	return this
 }
 
 // 获取所有路由
 func (this *Containers) Routes() map[string]Route {
-	return this.R
+	return this.Rout
 }
 
 // 获取路由
 func (this *Containers) Route(relativePath string) Route {
-	route, ok := this.R[relativePath]
+	route, ok := this.Rout[relativePath]
 	if !ok {
 		throw.Throw(relativePath+"未定义", 0)
 	}
@@ -56,6 +56,6 @@ func (this *Containers) Route(relativePath string) Route {
 }
 
 // 获取依赖
-func Di(name string) IBuilder {
+func Di(name string) IClass {
 	return Container().Di[name]
 }

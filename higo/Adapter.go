@@ -12,8 +12,18 @@ type Gorm struct {
 }
 
 func NewGorm() *Gorm {
-	db, err := gorm.Open("mysql",
-		"root:1qaz2wsx@tcp(192.168.8.99:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
+	config := Container().Config("DB")
+	fmt.Println(config["DEFAULT"])
+	conf := config["DEFAULT"].(map[interface {}]interface{})
+	args := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
+		conf["USERNAME"].(string),
+		conf["PASSWORD"].(string),
+		conf["HOST"].(string),
+		conf["PORT"].(int),
+		conf["DATABASE"].(string),
+		conf["CHARSET"].(string),
+		)
+	db, err := gorm.Open(conf["DRIVER"].(string), args)
 	if err != nil {
 		log.Fatal(err)
 	}
