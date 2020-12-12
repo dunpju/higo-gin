@@ -14,6 +14,10 @@ import (
 	"reflect"
 )
 
+func init() {
+	higo.AddDiToContainer(&DemoController{})
+}
+
 type DemoController struct {
 	Higo        *higo.Higo
 	Age         *annotation.Value     `prefix:"user.age"`
@@ -25,7 +29,7 @@ type DemoController2 struct {
 	Ttt string
 }
 
-func (this *DemoController) Class() (reflect.Type, reflect.Value) {
+func (this *DemoController) Reflection() (reflect.Type, reflect.Value) {
 	return reflect.TypeOf(this), reflect.ValueOf(this)
 }
 
