@@ -3,7 +3,7 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/consts"
-	"github.com/dengpju/higo-ioc/config"
+	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/throw"
@@ -42,7 +42,6 @@ type Higo struct {
 	g           *gin.RouterGroup
 	eg          errgroup.Group
 	root        string
-	containers  *Containers
 	isAutoSsl   bool
 	middle      []IMiddleware
 	serve       []Hse
@@ -52,7 +51,6 @@ type Higo struct {
 func Init() *Higo {
 	hg = &Higo{
 		Engine:      gin.New(),
-		containers:  NewContainer(),
 		middle:      make([]IMiddleware, 0),
 		serve:       make([]Hse, 0),
 	}
@@ -105,7 +103,7 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 			if path.Ext(p) == ".yaml" {
 				fmt.Println("Loader configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
-				yamlFileErr := yaml.Unmarshal(yamlFile, &Container().Conf)
+				yamlFileErr := yaml.Unmarshal(yamlFile, NewConfigure())
 				if yamlFileErr != nil {
 					throw.Throw(yamlFileErr,0)
 				}
@@ -115,7 +113,9 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	if filepathErr != nil {
 		throw.Throw(filepathErr,0)
 	}
-	mapSslConf := Container().Config("SSL")
+	fmt.Printf("%T\n",Config("SSL"))
+	mapSslConf := Config("SSL").(map[string]interface{})
+	fmt.Println(mapSslConf)
 	SslOut = root + mapSslConf["OUT"].(string) + fmt.Sprintf("%s", PathSeparator)
 	SslCrt = mapSslConf["CRT"].(string)
 	SslKey = mapSslConf["KEY"].(string)
@@ -169,7 +169,7 @@ func (this *Higo) Boot() {
 			// 生成ssl证书
 			utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
 		}
-		configs := Container().Config(s.Config)
+		configs := Config(s.Config).(map[string]interface{})
 		addr, _ := configs["Addr"]
 		rt, _ := configs["ReadTimeout"]
 		wt, _ := configs["WriteTimeout"]
@@ -207,20 +207,15 @@ func (this *Higo) Boot() {
 	}
 }
 
-// 容器
-func Container() *Containers {
-	return hg.containers
-}
-
 // 获取路由
 func (this *Higo) GetRoute(relativePath string) (Route, bool) {
-	return Container().Route(relativePath), true
+	return Router.Get(relativePath), true
 }
 
 // 静态文件
 func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	// 添加路由容器
-	Container().AddRoutes(relativePath, Route{IsStatic: true})
+	Router.Add(relativePath, Route{IsStatic: true})
 	hg.Engine.StaticFile(relativePath, filepath)
 	return this
 }
@@ -232,7 +227,7 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Container().AddRoutes("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(route.RelativePath, "/"), route)
+		Router.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(route.RelativePath, "/"), route)
 		method := strings.ToUpper(route.Method)
 		this.GroupHandle(method, route.RelativePath, route.Handle)
 	}
@@ -245,7 +240,7 @@ func (this *Higo) AddRoute(routes ...Route) *Higo {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Container().AddRoutes(route.RelativePath, route)
+		Router.Add(route.RelativePath, route)
 		method := strings.ToUpper(route.Method)
 		this.Handle(method, route.RelativePath, route.Handle)
 	}
@@ -269,7 +264,7 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 }
 
 // 添加到Bean
-func (this *Higo) Beans(configs ...config.IBean) *Higo {
+func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
 	for _,conf :=range configs{
 		injector.BeanFactory.Config(conf)
 	}

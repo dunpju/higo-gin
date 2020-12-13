@@ -12,15 +12,15 @@ type Gorm struct {
 }
 
 func NewGorm() *Gorm {
-	config := Container().Config("DB")
-	conf := config["DEFAULT"].(map[interface {}]interface{})
+	config := Config("DB").(map[string]interface{})
+	conf := config["DEFAULT"].(map[string]interface{})
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-		conf["USERNAME"].(string),
-		conf["PASSWORD"].(string),
-		conf["HOST"].(string),
-		conf["PORT"].(string),
-		conf["DATABASE"].(string),
-		conf["CHARSET"].(string),
+		conf["USERNAME"],
+		conf["PASSWORD"],
+		conf["HOST"],
+		conf["PORT"],
+		conf["DATABASE"],
+		conf["CHARSET"],
 		)
 	db, err := gorm.Open(conf["DRIVER"].(string), args)
 	if err != nil {

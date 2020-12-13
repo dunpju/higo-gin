@@ -14,6 +14,7 @@ require (
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
+	github.com/kr/pretty v0.2.1 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

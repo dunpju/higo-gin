@@ -15,10 +15,13 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 空配置
-	if nil == Container().Configure() {
+	if nil == Configures() {
 		return false
 	}
-	notAuth := Container().Config("NotAuth")
-	_, ok := notAuth[flag]
-	return ok
+	// 判断是否不需要鉴权
+	if nil != Config("NotAuth") {
+		_, ok := Config("NotAuth").(map[string]interface{})[flag]
+		return ok
+	}
+	return false
 }
