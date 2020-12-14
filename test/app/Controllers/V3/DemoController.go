@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	higo.AddDiToContainer(&DemoController{})
+	higo.AddContainer(&DemoController{})
 }
 
 type DemoController struct {

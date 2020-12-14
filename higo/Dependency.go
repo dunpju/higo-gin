@@ -1,18 +1,69 @@
 package higo
 
+import (
+	"fmt"
+	"github.com/dengpju/higo-utils/utils"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"reflect"
+)
+
 var container Dependency
 
 type Dependency map[string]IClass
 
 func init() {
-	container = make(Dependency)
+	fmt.Println(container)
+}
+
+func Scan()  {
+	scanFiles := utils.Dir("./test/app/Controllers").Suffix("go").Scan().List()
+	fmt.Println(scanFiles)
+
+	// 通过解析src来创建AST。
+	fset := token.NewFileSet() // 职位相对于fset
+	f, err := parser.ParseFile(fset, "./test/app/Controllers\\V3\\DemoController.go", nil, 0)
+	if err != nil {
+		panic(err)
+	}
+
+	ast.Inspect(f, func(x ast.Node) bool {
+		ts, ok := x.(*ast.TypeSpec)
+		if !ok || ts.Type == nil {
+			return true
+		}
+
+		// 获取结构体名称
+		structName := ts.Name.Name
+		s, ok := ts.Type.(*ast.StructType)
+		if !ok {
+			return true
+		}
+		fmt.Println(structName)
+		fmt.Println(s)
+		tank := fmt.Sprintf("New%s",structName)
+		fmt.Println(tank)
+		//reflect.New(structName).Elem().Interface()
+		return false
+	})
+
+
+	// 打印AST。
+	//_ = ast.Print(fset, f)
+}
+
+func Test()  {
+	t := "*V3.DemoController"
+	typ,_ := Di(t).Reflection()
+	i := reflect.New(typ).Interface()
+	fmt.Println(i)
 }
 
 // 注册到Di容器
-func AddDiToContainer(class IClass)  {
+func AddContainer(class IClass)  {
 	rt, _ := class.Reflection()
-	typ := rt.Name()
-	container[typ] = class
+	container[rt.String()] = class
 }
 
 // 获取依赖

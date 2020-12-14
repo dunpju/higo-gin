@@ -120,12 +120,6 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	return this
 }
 
-// 初始化Router
-func (this *Higo) initRouter() *Higo {
-	NewRouter()
-	return this
-}
-
 // 中间件装载器
 func (this *Higo) Middleware(imiddleware ...IMiddleware) *Higo {
 	for _, middleware := range imiddleware {
@@ -163,7 +157,7 @@ func (this *Higo) Boot() {
 	// 服务
 	for _, s := range this.serve {
 		// 初始化、加载配置、路由
-		hg := Init().LoadConfigur(this.GetRoot()).initRouter()
+		hg := Init().LoadConfigur(this.GetRoot())
 		// 中间件
 		for _, m := range this.middle {
 			hg.Engine.Use(m.Loader(hg))

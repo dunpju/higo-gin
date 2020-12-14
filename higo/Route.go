@@ -19,7 +19,6 @@ var Router RouterCollect
 type RouterCollect map[string]Route
 
 func NewRouter() *RouterCollect {
-	Router = make(RouterCollect)
 	return &Router
 }
 

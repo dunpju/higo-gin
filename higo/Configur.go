@@ -8,17 +8,6 @@ var config Configure
 
 type Configure map[interface{}]interface{}
 
-func init() {
-	initConfig()
-}
-
-// 初始化
-func initConfig() {
-	Once.Do(func() {
-		config = make(Configure)
-	})
-}
-
 func NewConfigure() *Configure {
 	return &config
 }
