@@ -14,10 +14,6 @@ import (
 	"reflect"
 )
 
-func init() {
-	higo.AddContainer(&DemoController{})
-}
-
 type DemoController struct {
 	Higo        *higo.Higo
 	Age         *annotation.Value     `prefix:"user.age"`
@@ -38,9 +34,6 @@ var dem *DemoController
 func NewDemoController() *DemoController {
 	higo.Once.Do(func() {
 		dem = &DemoController{}
-		injector.BeanFactory.Apply(dem)
-		injector.BeanFactory.Set(dem)
-		fmt.Println(injector.BeanFactory.Get(dem))
 	})
 	return dem
 }
