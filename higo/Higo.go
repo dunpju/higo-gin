@@ -113,12 +113,16 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	if filepathErr != nil {
 		throw.Throw(filepathErr,0)
 	}
-	fmt.Printf("%T\n",Config("SSL"))
-	mapSslConf := Config("SSL").(map[string]interface{})
-	fmt.Println(mapSslConf)
-	SslOut = root + mapSslConf["OUT"].(string) + fmt.Sprintf("%s", PathSeparator)
-	SslCrt = mapSslConf["CRT"].(string)
-	SslKey = mapSslConf["KEY"].(string)
+	mapSslConf := Config("SSL")
+	SslOut = root + mapSslConf.Value("OUT") + fmt.Sprintf("%s", PathSeparator)
+	SslCrt = mapSslConf.Value("CRT")
+	SslKey = mapSslConf.Value("KEY")
+	return this
+}
+
+// 初始化Router
+func (this *Higo) initRouter() *Higo {
+	NewRouter()
 	return this
 }
 
@@ -158,8 +162,8 @@ func (this *Higo) IsAutoGenerateSsl(isAuto bool) *Higo {
 func (this *Higo) Boot() {
 	// 服务
 	for _, s := range this.serve {
-		// 设置服务根目录
-		hg := Init().LoadConfigur(this.GetRoot())
+		// 初始化、加载配置、路由
+		hg := Init().LoadConfigur(this.GetRoot()).initRouter()
 		// 中间件
 		for _, m := range this.middle {
 			hg.Engine.Use(m.Loader(hg))
@@ -169,7 +173,7 @@ func (this *Higo) Boot() {
 			// 生成ssl证书
 			utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
 		}
-		configs := Config(s.Config).(map[string]interface{})
+		configs := Config(s.Config)
 		addr, _ := configs["Addr"]
 		rt, _ := configs["ReadTimeout"]
 		wt, _ := configs["WriteTimeout"]

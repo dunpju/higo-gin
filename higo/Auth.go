@@ -15,12 +15,12 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 空配置
-	if nil == Configures() {
+	if nil == Configs() {
 		return false
 	}
 	// 判断是否不需要鉴权
 	if nil != Config("NotAuth") {
-		_, ok := Config("NotAuth").(map[string]interface{})[flag]
+		_, ok := Config("NotAuth")[flag]
 		return ok
 	}
 	return false

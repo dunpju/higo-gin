@@ -1,6 +1,8 @@
 package higo
 
-import "github.com/dengpju/higo-throw/throw"
+import (
+	"github.com/dengpju/higo-throw/throw"
+)
 
 type Route struct {
 	Method       string      // 请求方法 GET/POST/DELETE/PATCH/OPTIONS/HEAD
@@ -16,20 +18,10 @@ var Router RouterCollect
 
 type RouterCollect map[string]Route
 
-func init()  {
-	initRouterCollect()
-}
-
-func initRouterCollect()  {
-	Once.Do(func() {
-		Router = make(map[string]Route)
-	})
-}
-
-func NewRouterCollect() *RouterCollect {
+func NewRouter() *RouterCollect {
+	Router = make(RouterCollect)
 	return &Router
 }
-
 
 // 添加路由容器
 func (this RouterCollect) Add(relativePath string, route Route) *RouterCollect {
@@ -46,7 +38,7 @@ func (this RouterCollect) All() map[string]Route {
 func (this RouterCollect) Get(relativePath string) Route {
 	route, ok := this[relativePath]
 	if !ok {
-		throw.Throw(relativePath+"未定义", 0)
+		throw.Throw(relativePath+"未定义路由", 0)
 	}
 	return route
 }
