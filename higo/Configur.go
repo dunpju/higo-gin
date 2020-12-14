@@ -25,16 +25,24 @@ func NewConfigure() *Configure {
 
 // 外部获取配置值
 func ConfigValue(key string) string {
-	return config.Get(key).(string)
+	configure := config.Get(key)
+	if nil == configure {
+		return ""
+	}
+	return configure.(string)
 }
 
 // 外部获取配置
 func Config(key string) Configure {
-	return config.Get(key).(Configure)
+	configure := config.Get(key)
+	if nil == configure {
+		return nil
+	}
+	return configure.(Configure)
 }
 
 // 外部获取所有配置
-func Configs() Configure {
+func ConfigAll() Configure {
 	return config.All()
 }
 

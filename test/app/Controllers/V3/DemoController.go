@@ -104,3 +104,7 @@ func (this *DemoController) HttpTestGet(ctx *gin.Context) string {
 func (this *DemoController) HttpTestPost(ctx *gin.Context) string {
 	return "v3 http_test_post"
 }
+
+func (this *DemoController) Login (ctx *gin.Context) string {
+	return "登录成功"
+}

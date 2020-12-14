@@ -1,6 +1,8 @@
 package higo
 
-import "github.com/dengpju/higo-throw/throw"
+import (
+	"github.com/dengpju/higo-throw/throw"
+)
 
 // 是否空标记
 func IsEmptyFlag(route Route)  {
@@ -15,7 +17,7 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 空配置
-	if nil == Configs() {
+	if nil == ConfigAll() {
 		return false
 	}
 	// 判断是否不需要鉴权
