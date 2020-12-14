@@ -29,13 +29,11 @@ func (this *DemoController) Reflection() (reflect.Type, reflect.Value) {
 	return reflect.TypeOf(this), reflect.ValueOf(this)
 }
 
-var dem *DemoController
-
 func NewDemoController() *DemoController {
-	higo.Once.Do(func() {
-		dem = &DemoController{}
-	})
-	return dem
+	class := &DemoController{}
+	injector.BeanFactory.Apply(class)
+	injector.BeanFactory.Set(class)
+	return class
 }
 
 // 测试异常
@@ -64,7 +62,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
-	fmt.Println(injector.BeanFactory.Get(dem))
+	fmt.Println(injector.BeanFactory.Get(this))
 	fmt.Println(this.DB)
 	user:=Models.NewUserModel()
 	err:=ctx.ShouldBindUri(user)
@@ -74,6 +72,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
 	this.Table("ts_user").
 		Where("id=?",3).
 		Find(user)
+	higo.Task(this.TestTask, user.Id)
 	return user
 }
 
@@ -100,4 +99,9 @@ func (this *DemoController) HttpTestPost(ctx *gin.Context) string {
 
 func (this *DemoController) Login (ctx *gin.Context) string {
 	return "登录成功"
+}
+
+func (this *DemoController) TestTask(params ...interface{})  {
+	fmt.Println("测试task")
+	fmt.Println(params)
 }

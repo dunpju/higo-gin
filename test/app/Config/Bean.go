@@ -13,7 +13,7 @@ func NewBean() *Bean {
 	return &Bean{}
 }
 
-func (this *Bean)Provider()  {
+func (this *Bean) Provider() {
 
 }
 
