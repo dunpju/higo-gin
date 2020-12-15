@@ -200,6 +200,9 @@ func (this *Higo) Boot() {
 		}
 	}
 
+	// 启动定时任务
+	getCronTask().Start()
+
 	if err := this.eg.Wait(); err != nil {
 		logger.Logrus.Fatal(err)
 	}
@@ -265,6 +268,15 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
 	for _,conf :=range configs{
 		injector.BeanFactory.Config(conf)
+	}
+	return this
+}
+
+// 定时任务
+func (this *Higo) Cron(expr string, fn func()) *Higo {
+	_, err := getCronTask().AddFunc(expr, fn)
+	if err != nil {
+		throw.Throw(err, 0)
 	}
 	return this
 }

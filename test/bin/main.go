@@ -6,6 +6,7 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Config"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
+	"log"
 	"os/exec"
 )
 
@@ -30,5 +31,8 @@ func main()  {
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).
 		Beans(beanConfig).
+		Cron("0/3 * * * * *", func() {
+			log.Println("3秒执行一次")
+		}).
 		Boot()
 }

@@ -19,6 +19,7 @@ require (
 	github.com/lestrrat-go/strftime v1.0.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/tebeka/strftime v0.1.5 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
