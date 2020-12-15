@@ -12,16 +12,35 @@ func getTaskList() chan *TaskExecutor{
 type TaskExecutor struct {
 	fn TaskFunc
 	params []interface{}
+	callback func()
+}
+
+func NewTaskExecutor(fn TaskFunc, params []interface{}, callback func()) *TaskExecutor {
+	return &TaskExecutor{fn: fn, params: params, callback: callback}
 }
 
 func (this *TaskExecutor) Exec()  {
 	this.fn(this.params...)
 }
 
-func NewTaskExecutor(fn TaskFunc, params []interface{}) *TaskExecutor {
-	return &TaskExecutor{fn: fn, params: params}
+
+
+func Task(fn TaskFunc, callback func(), params ...interface{})  {
+	if fn == nil {
+		return
+	}
+	go func() {
+		getTaskList() <- NewTaskExecutor(fn, params, callback)
+	}()
 }
 
-func Task(fn TaskFunc, params ...interface{})  {
-	getTaskList() <- NewTaskExecutor(fn, params)
+func doTask(t * TaskExecutor)  {
+	go func() {
+		defer func() {
+			if t.callback != nil {
+				t.callback()
+			}
+		}()
+		t.Exec()
+	}()
 }

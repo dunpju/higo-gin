@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"reflect"
+	"time"
 )
 
 type DemoController struct {
@@ -72,7 +73,9 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
 	this.Table("ts_user").
 		Where("id=?",3).
 		Find(user)
-	higo.Task(this.TestTask, user.Id)
+	higo.Task(this.TestTask, func() {
+		this.TestTaskDone(3)
+	}, user.Id)
 	return user
 }
 
@@ -102,6 +105,11 @@ func (this *DemoController) Login (ctx *gin.Context) string {
 }
 
 func (this *DemoController) TestTask(params ...interface{})  {
+	time.Sleep(time.Second * 5)
 	fmt.Println("测试task")
 	fmt.Println(params)
+}
+
+func (this *DemoController) TestTaskDone(id int)  {
+	fmt.Println("测试task执行结束", id)
 }

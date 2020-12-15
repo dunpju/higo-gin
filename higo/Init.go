@@ -11,7 +11,7 @@ func init() {
 	chlist := getTaskList()
 	go func() {
 		for t := range chlist{
-			t.Exec()
+			doTask(t)
 		}
 	}()
 }
