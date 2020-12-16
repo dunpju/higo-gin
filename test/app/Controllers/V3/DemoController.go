@@ -10,6 +10,7 @@ import (
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
+	"github.com/gomodule/redigo/redis"
 	"log"
 	"reflect"
 	"time"
@@ -20,6 +21,7 @@ type DemoController struct {
 	Age         *annotation.Value     `prefix:"user.age"`
 	DemoService *Services.DemoService `inject:"Bean.DemoService()"`
 	*higo.Gorm  `inject:"Bean.NewGorm()"`
+	*higo.Redis  `inject:"Bean.NewRedis()"`
 }
 
 type DemoController2 struct {
@@ -76,6 +78,8 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
 	higo.Task(this.TestTask, func() {
 		this.TestTaskDone(3)
 	}, user.Id)
+	redisConn := this.Redis.Get()
+	fmt.Println(redis.String(redisConn.Do("get","name")))
 	return user
 }
 

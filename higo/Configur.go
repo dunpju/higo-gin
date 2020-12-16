@@ -50,8 +50,12 @@ func (this Configure) Get(key string) interface{} {
 }
 
 // 获取值
-func (this Configure) Value (key string) string {
+func (this Configure) StrValue (key string) string {
 	return this.Get(key).(string)
+}
+
+func (this Configure) IntValue (key string) int {
+	return this.Get(key).(int)
 }
 
 // 第一个元素

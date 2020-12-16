@@ -24,3 +24,7 @@ func (this *Bean) DemoService() *Services.DemoService {
 func (this *Bean)NewGorm() *higo.Gorm {
 	return higo.NewGorm()
 }
+
+func (this *Bean)NewRedis() *higo.Redis {
+	return higo.NewRedis()
+}

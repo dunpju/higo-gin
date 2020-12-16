@@ -24,6 +24,7 @@ func main()  {
 	//injector.BeanFactory.Apply(demoController)
 	//fmt.Println(demoController.DB)
 
+
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		LoadConfigur(".\\test\\").

@@ -114,9 +114,9 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 		throw.Throw(filepathErr,0)
 	}
 	mapSslConf := Config("SSL")
-	SslOut = root + mapSslConf.Value("OUT") + fmt.Sprintf("%s", PathSeparator)
-	SslCrt = mapSslConf.Value("CRT")
-	SslKey = mapSslConf.Value("KEY")
+	SslOut = root + mapSslConf.StrValue("OUT") + fmt.Sprintf("%s", PathSeparator)
+	SslCrt = mapSslConf.StrValue("CRT")
+	SslKey = mapSslConf.StrValue("KEY")
 	return this
 }
 
