@@ -44,5 +44,6 @@ func (this *Https) Api(hg *higo.Higo) {
 		higo.Route{Method: "GET", RelativePath: "/test_throw", Handle: V3.NewDemoController().HttpsTestThrow, Flag: "TestThrow", Desc:"V3 测试异常"},
 		higo.Route{Method: "GET", RelativePath: "/test_get", Handle: V3.NewDemoController().HttpsTestGet, Flag: "TestGet", Desc:"V3 测试GET"},
 		higo.Route{Method: "post", RelativePath: "/test_post", Handle: V3.NewDemoController().HttpsTestPost, Flag: "TestPost", Desc:"V3 测试POST"},
+		higo.Route{Method: "get", RelativePath: "/test_get_redis", Handle: V3.NewRedisController().Test, Flag: "test_get_redis", Desc:"V3 测试redis"},
 	)
 }

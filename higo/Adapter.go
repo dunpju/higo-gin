@@ -35,15 +35,17 @@ func NewGorm() *Gorm {
 	return &Gorm{DB: db}
 }
 
+var RedisPool *redis.Pool
+
 type Redis struct {
 	*redis.Pool
 }
 
-func NewRedis() *Redis {
+func NewRedisPool() *redis.Pool {
 	_redis := Config("REDIS")
 	confDefault := _redis.Configure("DEFAULT")
 	pool := confDefault.Configure("POOL")
-	return &Redis{Pool: &redis.Pool{
+	return &redis.Pool{
 		MaxIdle: pool.IntValue("MAX_IDLE"),
 		IdleTimeout: time.Duration(pool.IntValue("MAX_IDLE_TIME")) * time.Second,
 		Dial: func() (conn redis.Conn, e error) {
@@ -53,7 +55,7 @@ func NewRedis() *Redis {
 				redis.DialPassword(confDefault.StrValue("AUTH")),
 				)
 		},
-	}}
+	}
 } 
 
 

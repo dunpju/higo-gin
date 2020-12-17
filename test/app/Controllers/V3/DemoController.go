@@ -13,6 +13,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -21,7 +22,7 @@ type DemoController struct {
 	Age         *annotation.Value     `prefix:"user.age"`
 	DemoService *Services.DemoService `inject:"Bean.DemoService()"`
 	*higo.Gorm  `inject:"Bean.NewGorm()"`
-	*higo.Redis  `inject:"Bean.NewRedis()"`
+	*redis.Pool `inject:"Bean.NewRedisPool()"`
 }
 
 type DemoController2 struct {
@@ -32,11 +33,16 @@ func (this *DemoController) Reflection() (reflect.Type, reflect.Value) {
 	return reflect.TypeOf(this), reflect.ValueOf(this)
 }
 
+var demoControllerOnce sync.Once
+var demoControllerPointer *DemoController
+
 func NewDemoController() *DemoController {
-	class := &DemoController{}
-	injector.BeanFactory.Apply(class)
-	injector.BeanFactory.Set(class)
-	return class
+	demoControllerOnce.Do(func() {
+		demoControllerPointer = &DemoController{}
+		injector.BeanFactory.Apply(demoControllerPointer)
+		injector.BeanFactory.Set(demoControllerPointer)
+	})
+	return demoControllerPointer
 }
 
 // 测试异常
@@ -78,7 +84,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model  {
 	higo.Task(this.TestTask, func() {
 		this.TestTaskDone(3)
 	}, user.Id)
-	redisConn := this.Redis.Get()
+	redisConn := this.Pool.Get()
 	fmt.Println(redis.String(redisConn.Do("get","name")))
 	return user
 }
