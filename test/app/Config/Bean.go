@@ -27,5 +27,5 @@ func (this *Bean)NewGorm() *higo.Gorm {
 }
 
 func (this *Bean)NewRedisPool() *redis.Pool {
-	return higo.NewRedisPool()
+	return higo.RedisPool
 }

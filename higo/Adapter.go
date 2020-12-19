@@ -2,11 +2,9 @@ package higo
 
 import (
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
-	"time"
 )
 
 type Gorm struct {
@@ -34,29 +32,6 @@ func NewGorm() *Gorm {
 	db.DB().SetMaxOpenConns(10)
 	return &Gorm{DB: db}
 }
-
-var RedisPool *redis.Pool
-
-type Redis struct {
-	*redis.Pool
-}
-
-func NewRedisPool() *redis.Pool {
-	_redis := Config("REDIS")
-	confDefault := _redis.Configure("DEFAULT")
-	pool := confDefault.Configure("POOL")
-	return &redis.Pool{
-		MaxIdle: pool.IntValue("MAX_IDLE"),
-		IdleTimeout: time.Duration(pool.IntValue("MAX_IDLE_TIME")) * time.Second,
-		Dial: func() (conn redis.Conn, e error) {
-			return redis.Dial("tcp",
-				fmt.Sprintf("%s:%s",confDefault.StrValue("HOST"),confDefault.StrValue("PORT")),
-				redis.DialDatabase(confDefault.IntValue("DB")),
-				redis.DialPassword(confDefault.StrValue("AUTH")),
-				)
-		},
-	}
-} 
 
 
 

@@ -30,6 +30,7 @@ func main()  {
 		HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).
+		IsRedisPool().
 		Beans(beanConfig).
 		//Cron("0/3 * * * * *", func() {
 		//	log.Println("3秒执行一次")

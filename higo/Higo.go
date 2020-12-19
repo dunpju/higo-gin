@@ -43,6 +43,7 @@ type Higo struct {
 	eg          errgroup.Group
 	root        string
 	isAutoSsl   bool
+	isRedisPool bool
 	middle      []IMiddleware
 	serve       []Hse
 }
@@ -152,6 +153,12 @@ func (this *Higo) IsAutoGenerateSsl(isAuto bool) *Higo {
 	return this
 }
 
+// 使用redis连接池
+func (this *Higo) IsRedisPool() *Higo {
+	this.isRedisPool = true
+	return this
+}
+
 // 启动
 func (this *Higo) Boot() {
 	// 服务
@@ -166,6 +173,10 @@ func (this *Higo) Boot() {
 		if this.isAutoSsl {
 			// 生成ssl证书
 			utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
+		}
+		// 是否使用redis pool
+		if this.isRedisPool {
+			InitRedisPool()
 		}
 		configs := Config(s.Config)
 		addr, _ := configs["Addr"]

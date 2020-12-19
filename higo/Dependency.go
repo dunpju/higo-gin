@@ -52,8 +52,8 @@ func Scan()  {
 
 func Test()  {
 	t := "*V3.DemoController"
-	typ,_ := Di(t).Reflection()
-	i := reflect.New(typ).Interface()
+	self := Di(t).Self()
+	i := self
 	fmt.Println(i)
 }
 
@@ -61,8 +61,8 @@ func Test()  {
 func AddContainer(class IClass)  {
 	injector.BeanFactory.Apply(class)
 	injector.BeanFactory.Set(class)
-	rt, _ := class.Reflection()
-	container[rt.String()] = class
+	v := reflect.ValueOf(class)
+	container[v.Type().String()]=class
 }
 
 // 获取依赖

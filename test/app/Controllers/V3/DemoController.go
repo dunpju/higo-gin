@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"log"
-	"reflect"
 	"sync"
 	"time"
 )
@@ -29,8 +28,8 @@ type DemoController2 struct {
 	Ttt string
 }
 
-func (this *DemoController) Reflection() (reflect.Type, reflect.Value) {
-	return reflect.TypeOf(this), reflect.ValueOf(this)
+func (this *DemoController) Self() higo.IClass {
+	return this
 }
 
 var demoControllerOnce sync.Once
