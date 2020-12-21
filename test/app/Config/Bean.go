@@ -7,7 +7,6 @@ import (
 )
 
 type Bean struct {
-
 }
 
 func NewBean() *Bean {
@@ -22,10 +21,14 @@ func (this *Bean) DemoService() *Services.DemoService {
 	return Services.NewDemoService()
 }
 
-func (this *Bean)NewGorm() *higo.Gorm {
+func (this *Bean) NewGorm() *higo.Gorm {
 	return higo.NewGorm()
 }
 
-func (this *Bean)NewRedisPool() *redis.Pool {
+func (this *Bean) NewRedisPool() *redis.Pool {
 	return higo.RedisPool
+}
+
+func (this *Bean) NewRedisAdapter() *higo.RedisAdapter {
+	return higo.NewRedisAdapter()
 }
