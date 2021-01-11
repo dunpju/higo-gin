@@ -87,7 +87,7 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 		if os.Mkdir(runtimeDir, os.ModePerm) != nil {}
 	}
 	// 日志
-	logger.Log(root, PathSeparator)
+	logger.Logrus.Root(root).File("higo").Init()
 	// 装载env配置
 	confDir := root + "env"
 	if _, err := os.Stat(confDir); os.IsNotExist(err) {

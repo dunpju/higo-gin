@@ -6,7 +6,7 @@ import (
 )
 
 type BusinessException struct {
-	throw.ServerException // 继承
+	throw.Throwable // 继承
 }
 
 func NewBusinessException(code int, msg string, data ...interface{}) {

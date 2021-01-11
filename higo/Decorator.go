@@ -22,7 +22,7 @@ func CacheDecorator(h gin.HandlerFunc, param string, format string, empty interf
 			Redis.Setex(key, 20, retData)
 			context.JSON(200, retData)
 		} else {
-			ffjson.Unmarshal(ret, &empty)
+			_ = ffjson.Unmarshal(ret, &empty)
 			context.JSON(200, empty)
 		}
 	}
