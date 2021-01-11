@@ -1,12 +1,7 @@
 package higo
 
 import (
-	"fmt"
 	"github.com/dengpju/higo-ioc/injector"
-	"github.com/dengpju/higo-utils/utils"
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"reflect"
 )
 
@@ -14,6 +9,7 @@ var container Dependency
 
 type Dependency map[string]IClass
 
+/**
 func Scan()  {
 	scanFiles := utils.Dir("./test/app/Controllers").Suffix("go").Scan().List()
 	fmt.Println(scanFiles)
@@ -56,6 +52,8 @@ func Test()  {
 	i := self
 	fmt.Println(i)
 }
+
+ */
 
 // 注册到Di容器
 func AddContainer(class IClass)  {
