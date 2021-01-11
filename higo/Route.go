@@ -14,6 +14,10 @@ type Route struct {
 	Desc         string      // 描述
 }
 
+func NewRoute() *Route {
+	return &Route{}
+}
+
 var Router RouterCollect
 
 type RouterCollect map[string]Route
@@ -40,4 +44,12 @@ func (this RouterCollect) Get(relativePath string) Route {
 		throw.Throw(relativePath+"未定义路由", 0)
 	}
 	return route
+}
+
+func (this Route) Get(relativePath string, handle interface{}) Route {
+	this.Method = "Get"
+	this.RelativePath = relativePath
+	this.Handle = handle
+	this.Handle = handle
+	return this
 }

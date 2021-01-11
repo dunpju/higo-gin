@@ -27,6 +27,7 @@ func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 
 // api 路由
 func (this *Https) Api(hg *higo.Higo) {
+	higo.NewRoute().Get()
 	hg.AddRoute(
 		higo.Route{Method: "GET", RelativePath: "/test_throw", Handle: Controllers.HttpsTestThrow, Flag: "TestThrow", Desc:"测试异常"},
 		higo.Route{Method: "GET", RelativePath: "/test_get", Handle: Controllers.HttpsTestGet, Flag: "TestGet", Desc:"测试GET"},
