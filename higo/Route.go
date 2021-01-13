@@ -17,20 +17,31 @@ const (
 type Route struct {
 	method       string      // 请求方法 GET/POST/DELETE/PATCH/OPTIONS/HEAD
 	relativePath string      // 后端 api relativePath
-	handle       interface{} // 后端控制器函数
+	Handle       interface{} // 后端控制器函数
 	flag         string      // 后端控制器函数标记
 	frontPath    string      // 前端 path(前端菜单路由)
 	isStatic     bool        // 是否静态文件
 	desc         string      // 描述
 }
 
-func NewRoute(args ...RouteAttribute) *Route {
+func NewRoute(args ...*RouteAttribute) Route {
 	route := &Route{}
 	for _, attribute := range args {
-		
-		route.{attribute.name} = attribute.value
+		if attribute.name == ROUTE_METHOD {
+			route.method = attribute.value.(string)
+		} else if attribute.name == ROUTE_RELATIVE_PATH {
+			route.relativePath = attribute.value.(string)
+		} else if attribute.name == ROUTE_HANDLE {
+			route.Handle = attribute.value
+		} else if attribute.name == ROUTE_FLAG {
+			route.flag = attribute.value.(string)
+		} else if attribute.name == ROUTE_FRONTPATH {
+			route.frontPath = attribute.value.(string)
+		} else if attribute.name == ROUTE_DESC {
+			route.desc = attribute.value.(string)
+		}
 	}
-	return route
+	return *route
 }
 
 type RouteAttribute struct {
@@ -42,31 +53,31 @@ func NewRouteAttribute(name string, value interface{}) *RouteAttribute {
 	return &RouteAttribute{name: name, value: value}
 }
 
-func RouteMethod(value string) *RouteAttribute {
+func Method(value string) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_METHOD, value)
 }
 
-func RouteRelativePath(value string) *RouteAttribute {
+func RelativePath(value string) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_RELATIVE_PATH, value)
 }
 
-func RouteHandle(value interface{}) *RouteAttribute {
+func Handle(value interface{}) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_HANDLE, value)
 }
 
-func RouteFlag(value string) *RouteAttribute {
+func Flag(value string) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_FLAG, value)
 }
 
-func RouteFrontPath(value string) *RouteAttribute {
+func FrontPath(value string) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_FRONTPATH, value)
 }
 
-func RouteIsStatic(value bool) *RouteAttribute {
+func IsStatic(value bool) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_IS_STATIC, value)
 }
 
-func RouteDesc(value string) *RouteAttribute {
+func Desc(value string) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_DESC, value)
 }
 
@@ -106,10 +117,6 @@ func (this Route) RelativePath() string {
 	return this.relativePath
 }
 
-func (this Route) Handle() interface{} {
-	return this.handle
-}
-
 func (this Route) Flag() string {
 	return this.flag
 }
@@ -129,7 +136,7 @@ func (this Route) Desc() string {
 func (this Route) Get(relativePath string, handle interface{}) Route {
 	this.method = "GET"
 	this.relativePath = relativePath
-	this.handle = handle
-	this.handle = handle
+	this.Handle = handle
+	this.Handle = handle
 	return this
 }

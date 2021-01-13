@@ -227,7 +227,7 @@ func (this *Higo) GetRoute(relativePath string) (Route, bool) {
 // 静态文件
 func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	// 添加路由容器
-	Router.Add(relativePath, Route{IsStatic: true})
+	Router.Add(relativePath, NewRoute(IsStatic(true)))
 	hg.Engine.StaticFile(relativePath, filepath)
 	return this
 }
@@ -239,9 +239,9 @@ func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Router.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(route.RelativePath, "/"), route)
-		method := strings.ToUpper(route.Method)
-		this.GroupHandle(method, route.RelativePath, route.Handle)
+		Router.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(route.RelativePath(), "/"), route)
+		method := strings.ToUpper(route.Method())
+		this.GroupHandle(method, route.RelativePath(), route.Handle)
 	}
 	return this
 }
@@ -252,9 +252,9 @@ func (this *Higo) AddRoute(routes ...Route) *Higo {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		Router.Add(route.RelativePath, route)
-		method := strings.ToUpper(route.Method)
-		this.Handle(method, route.RelativePath, route.Handle)
+		Router.Add(route.RelativePath(), route)
+		method := strings.ToUpper(route.Method())
+		this.Handle(method, route.RelativePath(), route.Handle)
 	}
 	return this
 }
