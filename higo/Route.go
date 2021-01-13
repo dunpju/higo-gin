@@ -14,7 +14,7 @@ const (
 	ROUTE_DESC          = "desc"
 )
 
-type Route struct {
+type Router struct {
 	method       string      // 请求方法 GET/POST/DELETE/PATCH/OPTIONS/HEAD
 	relativePath string      // 后端 api relativePath
 	Handle       interface{} // 后端控制器函数
@@ -24,24 +24,24 @@ type Route struct {
 	desc         string      // 描述
 }
 
-func NewRoute(args ...*RouteAttribute) Route {
-	route := &Route{}
+func Route(args ...*RouteAttribute) Router {
+	router := &Router{}
 	for _, attribute := range args {
 		if attribute.name == ROUTE_METHOD {
-			route.method = attribute.value.(string)
+			router.method = attribute.value.(string)
 		} else if attribute.name == ROUTE_RELATIVE_PATH {
-			route.relativePath = attribute.value.(string)
+			router.relativePath = attribute.value.(string)
 		} else if attribute.name == ROUTE_HANDLE {
-			route.Handle = attribute.value
+			router.Handle = attribute.value
 		} else if attribute.name == ROUTE_FLAG {
-			route.flag = attribute.value.(string)
+			router.flag = attribute.value.(string)
 		} else if attribute.name == ROUTE_FRONTPATH {
-			route.frontPath = attribute.value.(string)
+			router.frontPath = attribute.value.(string)
 		} else if attribute.name == ROUTE_DESC {
-			route.desc = attribute.value.(string)
+			router.desc = attribute.value.(string)
 		}
 	}
-	return *route
+	return *router
 }
 
 type RouteAttribute struct {
@@ -81,59 +81,55 @@ func Desc(value string) *RouteAttribute {
 	return NewRouteAttribute(ROUTE_DESC, value)
 }
 
-var Router RouterCollect
+var RouterContainer RouterCollect
 
-type RouterCollect map[string]Route
-
-func NewRouter() *RouterCollect {
-	return &Router
-}
+type RouterCollect map[string]Router
 
 // 添加路由容器
-func (this RouterCollect) Add(relativePath string, route Route) *RouterCollect {
-	this[relativePath] = route
+func (this RouterCollect) Add(relativePath string, router Router) *RouterCollect {
+	this[relativePath] = router
 	return &this
 }
 
 // 所有路由
-func (this RouterCollect) All() map[string]Route {
+func (this RouterCollect) All() RouterCollect {
 	return this
 }
 
 // 获取路由
-func (this RouterCollect) Get(relativePath string) Route {
-	route, ok := this[relativePath]
+func (this RouterCollect) Get(relativePath string) Router {
+	router, ok := this[relativePath]
 	if !ok {
 		throw.Throw(relativePath+"未定义路由", 0)
 	}
-	return route
+	return router
 }
 
-func (this Route) Method() string {
+func (this Router) Method() string {
 	return this.method
 }
 
-func (this Route) RelativePath() string {
+func (this Router) RelativePath() string {
 	return this.relativePath
 }
 
-func (this Route) Flag() string {
+func (this Router) Flag() string {
 	return this.flag
 }
 
-func (this Route) FrontPath() string {
+func (this Router) FrontPath() string {
 	return this.frontPath
 }
 
-func (this Route) IsStatic() bool {
+func (this Router) IsStatic() bool {
 	return this.isStatic
 }
 
-func (this Route) Desc() string {
+func (this Router) Desc() string {
 	return this.desc
 }
 
-func (this Route) Get(relativePath string, handle interface{}) Route {
+func (this Router) Get(relativePath string, handle interface{}) Router {
 	this.method = "GET"
 	this.relativePath = relativePath
 	this.Handle = handle

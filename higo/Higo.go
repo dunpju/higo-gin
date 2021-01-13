@@ -220,41 +220,41 @@ func (this *Higo) Boot() {
 }
 
 // 获取路由
-func (this *Higo) GetRoute(relativePath string) (Route, bool) {
-	return Router.Get(relativePath), true
+func (this *Higo) GetRoute(relativePath string) (Router, bool) {
+	return RouterContainer.Get(relativePath), true
 }
 
 // 静态文件
 func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	// 添加路由容器
-	Router.Add(relativePath, NewRoute(IsStatic(true)))
+	RouterContainer.Add(relativePath, Route(IsStatic(true)))
 	hg.Engine.StaticFile(relativePath, filepath)
 	return this
 }
 
 // 路由组
-func (this *Higo) AddGroup(prefix string, routes ...Route) *Higo {
+func (this *Higo) AddGroup(prefix string, routers ...Router) *Higo {
 	this.g = this.Engine.Group(prefix)
-	for _, route := range routes {
+	for _, router := range routers {
 		// 判断空标记
-		IsEmptyFlag(route)
+		IsEmptyFlag(router)
 		// 添加路由容器
-		Router.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(route.RelativePath(), "/"), route)
-		method := strings.ToUpper(route.Method())
-		this.GroupHandle(method, route.RelativePath(), route.Handle)
+		RouterContainer.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(router.RelativePath(), "/"), router)
+		method := strings.ToUpper(router.Method())
+		this.GroupHandle(method, router.RelativePath(), router.Handle)
 	}
 	return this
 }
 
 // 路由
-func (this *Higo) AddRoute(routes ...Route) *Higo {
-	for _, route := range routes {
+func (this *Higo) AddRoute(routers ...Router) *Higo {
+	for _, router := range routers {
 		// 判断空标记
-		IsEmptyFlag(route)
+		IsEmptyFlag(router)
 		// 添加路由容器
-		Router.Add(route.RelativePath(), route)
-		method := strings.ToUpper(route.Method())
-		this.Handle(method, route.RelativePath(), route.Handle)
+		RouterContainer.Add(router.RelativePath(), router)
+		method := strings.ToUpper(router.Method())
+		this.Handle(method, router.RelativePath(), router.Handle)
 	}
 	return this
 }

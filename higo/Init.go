@@ -8,7 +8,7 @@ func init() {
 	Once.Do(func() {
 		config = make(Configure)
 		container = make(Dependency)
-		Router = make(RouterCollect)
+		RouterContainer = make(RouterCollect)
 		taskList = make(chan *TaskExecutor)
 		taskCron = cron.New(cron.WithSeconds())
 	})
