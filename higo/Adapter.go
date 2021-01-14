@@ -15,14 +15,14 @@ func NewGorm() *Gorm {
 	_db := Config("DB")
 	confDefault := _db.Configure("DEFAULT")
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-		confDefault.StrValue("USERNAME"),
-		confDefault.StrValue("PASSWORD"),
-		confDefault.StrValue("HOST"),
-		confDefault.StrValue("PORT"),
-		confDefault.StrValue("DATABASE"),
-		confDefault.StrValue("CHARSET"),
+		confDefault.Str("USERNAME"),
+		confDefault.Str("PASSWORD"),
+		confDefault.Str("HOST"),
+		confDefault.Str("PORT"),
+		confDefault.Str("DATABASE"),
+		confDefault.Str("CHARSET"),
 		)
-	db, err := gorm.Open(confDefault.StrValue("DRIVER"), args)
+	db, err := gorm.Open(confDefault.Str("DRIVER"), args)
 	if err != nil {
 		log.Fatal(err)
 	}

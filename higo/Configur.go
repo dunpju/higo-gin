@@ -57,11 +57,11 @@ func (this Configure) Get(key string) interface{} {
 }
 
 // 获取值
-func (this Configure) StrValue(key string) string {
+func (this Configure) Str(key string) string {
 	return this.Get(key).(string)
 }
 
-func (this Configure) IntValue(key string) int {
+func (this Configure) Int(key string) int {
 	return this.Get(key).(int)
 }
 

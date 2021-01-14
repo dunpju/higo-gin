@@ -51,9 +51,9 @@ type Higo struct {
 // 初始化
 func Init() *Higo {
 	hg = &Higo{
-		Engine:      gin.New(),
-		middle:      make([]IMiddleware, 0),
-		serve:       make([]Hse, 0),
+		Engine: gin.New(),
+		middle: make([]IMiddleware, 0),
+		serve:  make([]Hse, 0),
 	}
 
 	// 全局异常
@@ -84,14 +84,16 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	// runtime目录
 	runtimeDir := root + "runtime"
 	if _, err := os.Stat(runtimeDir); os.IsNotExist(err) {
-		if os.Mkdir(runtimeDir, os.ModePerm) != nil {}
+		if os.Mkdir(runtimeDir, os.ModePerm) != nil {
+		}
 	}
 	// 日志
 	logger.Logrus.Root(root).File("higo").Init()
 	// 装载env配置
 	confDir := root + "env"
 	if _, err := os.Stat(confDir); os.IsNotExist(err) {
-		if os.Mkdir(confDir, os.ModePerm) != nil {}
+		if os.Mkdir(confDir, os.ModePerm) != nil {
+		}
 	}
 	filepathErr := filepath.Walk(confDir,
 		func(p string, f os.FileInfo, err error) error {
@@ -106,18 +108,18 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 				yamlFile, _ := ioutil.ReadFile(p)
 				yamlFileErr := yaml.Unmarshal(yamlFile, NewConfigure())
 				if yamlFileErr != nil {
-					throw.Throw(yamlFileErr,0)
+					throw.Throw(yamlFileErr, 0)
 				}
 			}
 			return nil
 		})
 	if filepathErr != nil {
-		throw.Throw(filepathErr,0)
+		throw.Throw(filepathErr, 0)
 	}
 	mapSslConf := Config("SSL")
-	SslOut = root + mapSslConf.StrValue("OUT") + fmt.Sprintf("%s", PathSeparator)
-	SslCrt = mapSslConf.StrValue("CRT")
-	SslKey = mapSslConf.StrValue("KEY")
+	SslOut = root + mapSslConf.Str("OUT") + fmt.Sprintf("%s", PathSeparator)
+	SslCrt = mapSslConf.Str("CRT")
+	SslKey = mapSslConf.Str("KEY")
 	return this
 }
 
@@ -184,13 +186,11 @@ func (this *Higo) Boot() {
 		}
 
 		configs := Config(s.Config)
-		addr, _ := configs["Addr"]
-		rt, _ := configs["ReadTimeout"]
-		wt, _ := configs["WriteTimeout"]
-		readTimeout, _ := rt.(int)
-		writeTimeout, _ := wt.(int)
+		addr := configs.Str("Addr")
+		readTimeout := configs.Int("ReadTimeout")
+		writeTimeout := configs.Int("WriteTimeout")
 		serve := &http.Server{
-			Addr:         addr.(string),
+			Addr:         configs.Str("Addr"),
 			Handler:      s.Router.Loader(hg),
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
@@ -198,19 +198,19 @@ func (this *Higo) Boot() {
 
 		if s.Serve == "http" {
 			this.eg.Go(func() error {
-				fmt.Println("HTTP Server listening at " + addr.(string) + " 启动成功\n")
+				fmt.Println("HTTP Server listening at " + addr + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
 		if s.Serve == "https" {
 			this.eg.Go(func() error {
-				fmt.Println("HTTPS Server listening at " + addr.(string) + " 启动成功\n")
-				return serve.ListenAndServeTLS(SslOut + SslCrt, SslOut + SslKey)
+				fmt.Println("HTTPS Server listening at " + addr + " 启动成功\n")
+				return serve.ListenAndServeTLS(SslOut+SslCrt, SslOut+SslKey)
 			})
 		}
 		if s.Serve == "websocket" {
 			this.eg.Go(func() error {
-				fmt.Println("WEBSOCKET Server listening at " + addr.(string) + " 启动成功\n")
+				fmt.Println("WEBSOCKET Server listening at " + addr + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
@@ -244,7 +244,7 @@ func (this *Higo) AddGroup(prefix string, routers ...Router) *Higo {
 		// 判断空标记
 		IsEmptyFlag(router)
 		// 添加路由容器
-		RouterContainer.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(router.RelativePath(), "/"), router)
+		RouterContainer.Add("/"+strings.TrimLeft(prefix, "/")+"/"+strings.TrimLeft(router.RelativePath(), "/"), router)
 		method := strings.ToUpper(router.Method())
 		this.GroupHandle(method, router.RelativePath(), router.handle)
 	}
@@ -282,7 +282,7 @@ func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *
 
 // 添加到Bean
 func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
-	for _,conf :=range configs{
+	for _, conf := range configs {
 		injector.BeanFactory.Config(conf)
 	}
 	return this
