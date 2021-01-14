@@ -11,7 +11,7 @@ func getTaskList() chan *TaskExecutor{
 	return taskList
 }
 
-func getCronTask() *cron.Cron {
+func CronTask() *cron.Cron {
 	return taskCron
 }
 

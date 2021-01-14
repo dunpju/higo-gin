@@ -217,7 +217,7 @@ func (this *Higo) Boot() {
 	}
 
 	// 启动定时任务
-	getCronTask().Start()
+	CronTask().Start()
 
 	if err := this.eg.Wait(); err != nil {
 		logger.Logrus.Fatal(err)
@@ -290,7 +290,7 @@ func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
 
 // 定时任务
 func (this *Higo) Cron(expr string, fn func()) *Higo {
-	_, err := getCronTask().AddFunc(expr, fn)
+	_, err := CronTask().AddFunc(expr, fn)
 	if err != nil {
 		throw.Throw(err, 0)
 	}
