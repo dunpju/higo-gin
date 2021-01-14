@@ -178,6 +178,11 @@ func (this *Higo) Boot() {
 		if this.isRedisPool {
 			InitRedisPool()
 		}
+		// 运行模式debug/release
+		if gin.ReleaseMode == ValueToStr("MODE") {
+			gin.SetMode(gin.ReleaseMode)
+		}
+
 		configs := Config(s.Config)
 		addr, _ := configs["Addr"]
 		rt, _ := configs["ReadTimeout"]
@@ -241,7 +246,7 @@ func (this *Higo) AddGroup(prefix string, routers ...Router) *Higo {
 		// 添加路由容器
 		RouterContainer.Add("/" + strings.TrimLeft(prefix, "/") + "/" + strings.TrimLeft(router.RelativePath(), "/"), router)
 		method := strings.ToUpper(router.Method())
-		this.GroupHandle(method, router.RelativePath(), router.Handle)
+		this.GroupHandle(method, router.RelativePath(), router.handle)
 	}
 	return this
 }
@@ -254,7 +259,7 @@ func (this *Higo) AddRoute(routers ...Router) *Higo {
 		// 添加路由容器
 		RouterContainer.Add(router.RelativePath(), router)
 		method := strings.ToUpper(router.Method())
-		this.Handle(method, router.RelativePath(), router.Handle)
+		this.Handle(method, router.RelativePath(), router.handle)
 	}
 	return this
 }

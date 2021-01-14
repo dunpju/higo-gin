@@ -4,6 +4,9 @@ APP_NAME: higo
 # 版本
 VERSION: 0.0.1
 
+# 运行模式debug/release
+MODE: debug
+
 # Http服务器
 HTTP_HOST:
   # IP或者域名，如:192.168.42.131:6122或:6122

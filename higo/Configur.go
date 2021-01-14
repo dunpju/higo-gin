@@ -12,13 +12,20 @@ func NewConfigure() *Configure {
 	return &config
 }
 
-// 外部获取配置值
-func ConfigValue(key string) string {
+func ValueToStr(key string) string {
 	configure := config.Get(key)
 	if nil == configure {
 		return ""
 	}
 	return configure.(string)
+}
+
+func ValueToInt(key string) int {
+	configure := config.Get(key)
+	if nil == configure {
+		return 0
+	}
+	return configure.(int)
 }
 
 // 外部获取配置
@@ -50,18 +57,18 @@ func (this Configure) Get(key string) interface{} {
 }
 
 // 获取值
-func (this Configure) StrValue (key string) string {
+func (this Configure) StrValue(key string) string {
 	return this.Get(key).(string)
 }
 
-func (this Configure) IntValue (key string) int {
+func (this Configure) IntValue(key string) int {
 	return this.Get(key).(int)
 }
 
 // 第一个元素
-func (this Configure) First () string {
+func (this Configure) First() string {
 	var first string
-	for _,v := range this {
+	for _, v := range this {
 		first = v.(string)
 		break
 	}
@@ -69,6 +76,6 @@ func (this Configure) First () string {
 }
 
 // 获取Configure对象
-func (this Configure) Configure (key string) Configure {
+func (this Configure) Configure(key string) Configure {
 	return this.Get(key).(Configure)
 }

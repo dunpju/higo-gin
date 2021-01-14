@@ -17,7 +17,7 @@ const (
 type Router struct {
 	method       string      // 请求方法 GET/POST/DELETE/PATCH/OPTIONS/HEAD
 	relativePath string      // 后端 api relativePath
-	Handle       interface{} // 后端控制器函数
+	handle       interface{} // 后端控制器函数
 	flag         string      // 后端控制器函数标记
 	frontPath    string      // 前端 path(前端菜单路由)
 	isStatic     bool        // 是否静态文件
@@ -32,7 +32,7 @@ func Route(args ...*RouteAttribute) Router {
 		} else if attribute.name == ROUTE_RELATIVE_PATH {
 			router.relativePath = attribute.value.(string)
 		} else if attribute.name == ROUTE_HANDLE {
-			router.Handle = attribute.value
+			router.handle = attribute.value
 		} else if attribute.name == ROUTE_FLAG {
 			router.flag = attribute.value.(string)
 		} else if attribute.name == ROUTE_FRONTPATH {
@@ -121,6 +121,10 @@ func (this Router) FrontPath() string {
 	return this.frontPath
 }
 
+func (this Router) Handle() interface{} {
+	return this.handle
+}
+
 func (this Router) IsStatic() bool {
 	return this.isStatic
 }
@@ -132,7 +136,7 @@ func (this Router) Desc() string {
 func (this Router) Get(relativePath string, handle interface{}) Router {
 	this.method = "GET"
 	this.relativePath = relativePath
-	this.Handle = handle
-	this.Handle = handle
+	this.handle = handle
+	this.handle = handle
 	return this
 }
