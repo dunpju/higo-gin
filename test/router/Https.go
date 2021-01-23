@@ -46,4 +46,5 @@ func (this *Https) Api(hg *higo.Higo) {
 		higo.Route(higo.Method("post"), higo.RelativePath("/test_post"), higo.Handle(V3.NewDemoController().HttpsTestPost), higo.Flag("TestPost"), higo.Desc("V3 测试POST")),
 		higo.Route(higo.Method("get"), higo.RelativePath("/test_get_redis"), higo.Handle(V3.NewRedisController().Test), higo.Flag("test_get_redis"), higo.Desc("V3 测试redis")),
 	)
+	V3.NewRedisController().Route(hg)
 }
