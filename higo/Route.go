@@ -39,6 +39,8 @@ func Route(args ...*RouteAttribute) Router {
 			router.frontPath = attribute.value.(string)
 		} else if attribute.name == ROUTE_DESC {
 			router.desc = attribute.value.(string)
+		} else if attribute.name == ROUTE_IS_STATIC {
+			router.isStatic = attribute.value.(bool)
 		}
 	}
 	return *router
