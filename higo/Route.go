@@ -27,32 +27,43 @@ type Router struct {
 func Route(args ...*RouteAttribute) Router {
 	router := &Router{}
 	for _, attribute := range args {
-		if attribute.name == ROUTE_METHOD {
-			router.method = attribute.value.(string)
-		} else if attribute.name == ROUTE_RELATIVE_PATH {
-			router.relativePath = attribute.value.(string)
-		} else if attribute.name == ROUTE_HANDLE {
-			router.handle = attribute.value
-		} else if attribute.name == ROUTE_FLAG {
-			router.flag = attribute.value.(string)
-		} else if attribute.name == ROUTE_FRONTPATH {
-			router.frontPath = attribute.value.(string)
-		} else if attribute.name == ROUTE_DESC {
-			router.desc = attribute.value.(string)
-		} else if attribute.name == ROUTE_IS_STATIC {
-			router.isStatic = attribute.value.(bool)
+		if attribute.Name == ROUTE_METHOD {
+			router.method = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_RELATIVE_PATH {
+			router.relativePath = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_HANDLE {
+			router.handle = attribute.Value
+		} else if attribute.Name == ROUTE_FLAG {
+			router.flag = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_FRONTPATH {
+			router.frontPath = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_DESC {
+			router.desc = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_IS_STATIC {
+			router.isStatic = attribute.Value.(bool)
 		}
 	}
 	return *router
 }
 
+type RouteAttributes []*RouteAttribute
+
+func (this RouteAttributes) Find(name string) interface{} {
+	for _, p := range this {
+		if p.Name == name {
+			return p.Value
+		}
+	}
+	return nil
+}
+
 type RouteAttribute struct {
-	name  string
-	value interface{}
+	Name  string
+	Value interface{}
 }
 
 func NewRouteAttribute(name string, value interface{}) *RouteAttribute {
-	return &RouteAttribute{name: name, value: value}
+	return &RouteAttribute{Name: name, Value: value}
 }
 
 func Method(value string) *RouteAttribute {
@@ -135,10 +146,48 @@ func (this Router) Desc() string {
 	return this.desc
 }
 
-func (this Router) Get(relativePath string, handle interface{}) Router {
+func (this *Router) attribute(args ...*RouteAttribute)  {
+	for _, attribute := range args {
+		if attribute.Name == ROUTE_FLAG {
+			this.flag = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_FRONTPATH {
+			this.frontPath = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_DESC {
+			this.desc = attribute.Value.(string)
+		} else if attribute.Name == ROUTE_IS_STATIC {
+			this.isStatic = attribute.Value.(bool)
+		}
+	}
+}
+
+func (this Router) Get(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
 	this.method = "GET"
 	this.relativePath = relativePath
 	this.handle = handle
+	this.attribute(args...)
+	return this
+}
+
+func (this Router) Post(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+	this.method = "POST"
+	this.relativePath = relativePath
 	this.handle = handle
+	this.attribute(args...)
+	return this
+}
+
+func (this Router) Put(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+	this.method = "PUT"
+	this.relativePath = relativePath
+	this.handle = handle
+	this.attribute(args...)
+	return this
+}
+
+func (this Router) Delete(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+	this.method = "DELETE"
+	this.relativePath = relativePath
+	this.handle = handle
+	this.attribute(args...)
 	return this
 }

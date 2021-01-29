@@ -41,6 +41,7 @@ func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
 	// 路由组
 	hg.AddGroup("v4",
 		higo.Route(higo.Method("GET"), higo.RelativePath("/test_redis"), higo.Handle(this.Test), higo.Flag("TestThrow"), higo.Desc("V4 测试redis")),
+		higo.Route().Get("/get_test_redis", this.Test, higo.Flag("get_test_redis")),
 	)
 	return hg
 }
