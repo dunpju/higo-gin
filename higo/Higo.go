@@ -42,10 +42,15 @@ type Higo struct {
 	g           *gin.RouterGroup
 	eg          errgroup.Group
 	root        string
+	prefix      string
 	isAutoSsl   bool
 	isRedisPool bool
 	middle      []IMiddleware
 	serve       []Hse
+}
+
+func (this *Higo) This() interface{} {
+	return this
 }
 
 // 初始化
@@ -225,7 +230,7 @@ func (this *Higo) Boot() {
 }
 
 // 获取路由
-func (this *Higo) GetRoute(relativePath string) (Router, bool) {
+func (this *Higo) GetRoute(relativePath string) (*Router, bool) {
 	return RouterContainer.Get(relativePath), true
 }
 
@@ -238,21 +243,28 @@ func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 }
 
 // 路由组
-func (this *Higo) AddGroup(prefix string, routers ...Router) *Higo {
-	this.g = this.Engine.Group(prefix)
+func (this *Higo) AddGroup(prefix string, routers ...GroupRouter) *Higo {
+	this.g = this.Engine.Group(strings.Trim(prefix, "/"))
 	for _, router := range routers {
-		// 判断空标记
-		IsEmptyFlag(router)
-		// 添加路由容器
-		RouterContainer.Add("/"+strings.TrimLeft(prefix, "/")+"/"+strings.TrimLeft(router.RelativePath(), "/"), router)
-		method := strings.ToUpper(router.Method())
-		this.GroupHandle(method, router.RelativePath(), router.handle)
+		// 如果是路由
+		if route, ok := router.This().(*Router); ok {
+			//this.g = this.Engine.Group(strings.Trim(prefix, "/")+ "/" +this.g.BasePath())
+			//fmt.Println(this.g.BasePath())
+			// 判断空标记
+			IsEmptyFlag(router.This().(*Router))
+			// 添加路由容器
+			RouterContainer.Add("/"+strings.Trim(prefix, "/")+"/"+strings.Trim(route.RelativePath(), "/"), route)
+			method := strings.ToUpper(route.Method())
+			this.GroupHandle(method, route.RelativePath(), route.handle)
+		} else {
+			this.g = this.Engine.Group(strings.Trim(prefix, "/")+ "/" +this.g.BasePath())
+		}
 	}
 	return this
 }
 
 // 路由
-func (this *Higo) AddRoute(routers ...Router) *Higo {
+func (this *Higo) AddRoute(routers ...*Router) *Higo {
 	for _, router := range routers {
 		// 判断空标记
 		IsEmptyFlag(router)

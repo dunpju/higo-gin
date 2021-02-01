@@ -14,6 +14,10 @@ const (
 	ROUTE_DESC          = "desc"
 )
 
+type GroupRouter interface {
+	This() interface{}
+}
+
 type Router struct {
 	method       string      // 请求方法 GET/POST/DELETE/PATCH/OPTIONS/HEAD
 	relativePath string      // 后端 api relativePath
@@ -24,7 +28,11 @@ type Router struct {
 	desc         string      // 描述
 }
 
-func Route(args ...*RouteAttribute) Router {
+func (this *Router) This() interface{} {
+	return this
+}
+
+func Route(args ...*RouteAttribute) *Router {
 	router := &Router{}
 	for _, attribute := range args {
 		if attribute.Name == ROUTE_METHOD {
@@ -43,7 +51,7 @@ func Route(args ...*RouteAttribute) Router {
 			router.isStatic = attribute.Value.(bool)
 		}
 	}
-	return *router
+	return router
 }
 
 type RouteAttributes []*RouteAttribute
@@ -96,10 +104,10 @@ func Desc(value string) *RouteAttribute {
 
 var RouterContainer RouterCollect
 
-type RouterCollect map[string]Router
+type RouterCollect map[string]*Router
 
 // 添加路由容器
-func (this RouterCollect) Add(relativePath string, router Router) *RouterCollect {
+func (this RouterCollect) Add(relativePath string, router *Router) *RouterCollect {
 	this[relativePath] = router
 	return &this
 }
@@ -110,7 +118,7 @@ func (this RouterCollect) All() RouterCollect {
 }
 
 // 获取路由
-func (this RouterCollect) Get(relativePath string) Router {
+func (this RouterCollect) Get(relativePath string) *Router {
 	router, ok := this[relativePath]
 	if !ok {
 		throw.Throw(relativePath+"未定义路由", 0)
@@ -118,31 +126,31 @@ func (this RouterCollect) Get(relativePath string) Router {
 	return router
 }
 
-func (this Router) Method() string {
+func (this *Router) Method() string {
 	return this.method
 }
 
-func (this Router) RelativePath() string {
+func (this *Router) RelativePath() string {
 	return this.relativePath
 }
 
-func (this Router) Flag() string {
+func (this *Router) Flag() string {
 	return this.flag
 }
 
-func (this Router) FrontPath() string {
+func (this *Router) FrontPath() string {
 	return this.frontPath
 }
 
-func (this Router) Handle() interface{} {
+func (this *Router) Handle() interface{} {
 	return this.handle
 }
 
-func (this Router) IsStatic() bool {
+func (this *Router) IsStatic() bool {
 	return this.isStatic
 }
 
-func (this Router) Desc() string {
+func (this *Router) Desc() string {
 	return this.desc
 }
 
@@ -160,7 +168,7 @@ func (this *Router) attribute(args ...*RouteAttribute)  {
 	}
 }
 
-func (this Router) Get(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+func (this *Router) Get(relativePath string, handle interface{}, args ...*RouteAttribute) *Router {
 	this.method = "GET"
 	this.relativePath = relativePath
 	this.handle = handle
@@ -168,7 +176,7 @@ func (this Router) Get(relativePath string, handle interface{}, args ...*RouteAt
 	return this
 }
 
-func (this Router) Post(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+func (this *Router) Post(relativePath string, handle interface{}, args ...*RouteAttribute) *Router {
 	this.method = "POST"
 	this.relativePath = relativePath
 	this.handle = handle
@@ -176,7 +184,7 @@ func (this Router) Post(relativePath string, handle interface{}, args ...*RouteA
 	return this
 }
 
-func (this Router) Put(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+func (this *Router) Put(relativePath string, handle interface{}, args ...*RouteAttribute) *Router {
 	this.method = "PUT"
 	this.relativePath = relativePath
 	this.handle = handle
@@ -184,7 +192,7 @@ func (this Router) Put(relativePath string, handle interface{}, args ...*RouteAt
 	return this
 }
 
-func (this Router) Delete(relativePath string, handle interface{}, args ...*RouteAttribute) Router {
+func (this *Router) Delete(relativePath string, handle interface{}, args ...*RouteAttribute) *Router {
 	this.method = "DELETE"
 	this.relativePath = relativePath
 	this.handle = handle

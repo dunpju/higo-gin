@@ -34,6 +34,9 @@ func (this *Https) Api(hg *higo.Higo) {
 	)
 	// 路由组
 	hg.AddGroup("v2",
+		hg.AddGroup("user",
+			higo.Route(higo.Method("GET"), higo.RelativePath("/test_throw"), higo.Handle(V2.HttpsTestThrow), higo.Flag("TestThrow"), higo.Desc("V2 测试异常")),
+			),
 		higo.Route(higo.Method("GET"), higo.RelativePath("/test_throw"), higo.Handle(V2.HttpsTestThrow), higo.Flag("TestThrow"), higo.Desc("V2 测试异常")),
 		higo.Route(higo.Method("GET"), higo.RelativePath("/test_get"), higo.Handle(V2.HttpsTestGet), higo.Flag("TestGet"), higo.Desc("V2 测试GET")),
 		higo.Route(higo.Method("post"), higo.RelativePath("/test_post"), higo.Handle(V2.HttpsTestPost), higo.Flag("TestPost"), higo.Desc("V2 测试POST")),
