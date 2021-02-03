@@ -14,10 +14,6 @@ const (
 	ROUTE_DESC          = "desc"
 )
 
-type GroupRouter interface {
-	This() interface{}
-}
-
 type Router struct {
 	method       string      // 请求方法 GET/POST/DELETE/PATCH/OPTIONS/HEAD
 	relativePath string      // 后端 api relativePath
@@ -26,10 +22,6 @@ type Router struct {
 	frontPath    string      // 前端 path(前端菜单路由)
 	isStatic     bool        // 是否静态文件
 	desc         string      // 描述
-}
-
-func (this *Router) This() interface{} {
-	return this
 }
 
 func Route(args ...*RouteAttribute) *Router {
