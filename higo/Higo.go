@@ -39,7 +39,7 @@ type Hse struct {
 
 type Higo struct {
 	*gin.Engine
-	g           *gin.RouterGroup
+	group       *gin.RouterGroup
 	eg          errgroup.Group
 	root        string
 	prefix      string
@@ -240,7 +240,7 @@ func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 
 // 路由组
 func (this *Higo) AddGroup(prefix string, routers ...*Router) *Higo {
-	this.g = this.Engine.Group(prefix)
+	this.group = this.Engine.Group(prefix)
 	for _, router := range routers {
 		// 判断空标记
 		IsEmptyFlag(router)
@@ -268,7 +268,7 @@ func (this *Higo) AddRoute(routers ...*Router) *Higo {
 // 路由组Handle
 func (this *Higo) GroupHandle(httpMethod, relativePath string, handler interface{}) *Higo {
 	if h := Convert(handler); h != nil {
-		this.g.Handle(httpMethod, relativePath, h)
+		this.group.Handle(httpMethod, relativePath, h)
 	}
 	return this
 }
