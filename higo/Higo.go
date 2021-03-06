@@ -200,7 +200,7 @@ func (this *Higo) Boot() {
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
-		
+
 		router.Clear()//初始化路由容器
 
 		if s.Serve == "http" {
