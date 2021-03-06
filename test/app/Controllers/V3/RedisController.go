@@ -3,6 +3,7 @@ package V3
 import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-ioc/injector"
+	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"sync"
@@ -39,9 +40,11 @@ func (this *RedisController) Test(ctx *gin.Context) string {
 
 func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
 	// 路由组
-	hg.AddGroup("v4",
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_redis"), higo.Handle(this.Test), higo.Flag("TestThrow"), higo.Desc("V4 测试redis")),
-		higo.Route().Get("/get_test_redis", this.Test, higo.Flag("get_test_redis")),
-	)
+	router.AddGroup("/v4", func() {
+		router.Get("/test_redis", this.Test, router.Flag("TestThrow"), router.Desc("V4 测试redis"))
+		router.AddGroup("/v5", func() {
+			router.Get("/get_test_redis", this.Test, router.Flag("get_test_redis"))
+		})
+	})
 	return hg
 }

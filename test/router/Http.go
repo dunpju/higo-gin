@@ -5,6 +5,8 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V2"
+	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
+	"github.com/dengpju/higo-router/router"
 )
 
 // https api 接口
@@ -25,21 +27,23 @@ func (this *Http) Loader(hg *higo.Higo) *higo.Higo {
 
 // api 路由
 func (this *Http) http(hg *higo.Higo) {
-	hg.AddRoute(
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_throw"), higo.Handle(Controllers.HttpTestThrow), higo.Flag("TestThrow"), higo.Desc("测试异常")),
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_get"), higo.Handle(Controllers.HttpTestGet), higo.Flag("TestGet"), higo.Desc("测试GET")),
-		higo.Route(higo.Method("post"), higo.RelativePath("/test_post"), higo.Handle(Controllers.HttpTestPost), higo.Flag("TestPost"), higo.Desc("测试POST")),
-	)
+	router.Get("/test_throw", Controllers.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("测试异常"))
+	router.Get("/test_get", Controllers.HttpsTestGet, router.Flag("TestGet"), router.Desc("测试GET"))
+	router.Post("/test_post", Controllers.HttpsTestPost, router.Flag("TestPost"), router.Desc("测试POST"))
 	// 路由组
-	hg.AddGroup("v2",
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_throw"), higo.Handle(V2.HttpTestThrow), higo.Flag("TestThrow"), higo.Desc("V2 测试异常")),
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_get"), higo.Handle(V2.HttpTestGet), higo.Flag("TestGet"), higo.Desc("V2 测试GET")),
-		higo.Route(higo.Method("post"), higo.RelativePath("/test_post"), higo.Handle(V2.HttpTestPost), higo.Flag("TestPost"), higo.Desc("V2 测试POST")),
-	)
-	// 路由组
-	hg.AddGroup("v3",
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_throw"), higo.Handle(V2.HttpTestThrow), higo.Flag("TestThrow"), higo.Desc("V3 测试异常")),
-		higo.Route(higo.Method("GET"), higo.RelativePath("/test_get"), higo.Handle(V2.HttpTestGet), higo.Flag("TestGet"), higo.Desc("V3 测试GET")),
-		higo.Route(higo.Method("post"), higo.RelativePath("/test_post"), higo.Handle(V2.HttpTestPost), higo.Flag("TestPost"), higo.Desc("V3 测试POST")),
-	)
+	router.AddGroup("/v2", func() {
+		router.Get("/test_throw", V2.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("v2 测试异常"))
+		router.Get("/test_get", V2.HttpsTestGet, router.Flag("TestGet"), router.Desc("v2 测试GET"))
+		router.Post("/test_post", V2.HttpsTestPost, router.Flag("TestPost"), router.Desc("v2 测试POST"))
+	})
+	router.AddGroup("/v3", func() {
+		router.AddGroup("/user", func() {
+			router.Post("/login", V3.NewDemoController().Login, router.Flag("Login"), router.Desc("V3 登录"))
+		})
+		router.Get("/test_throw", V3.NewDemoController().HttpsTestThrow, router.Flag("TestThrow"), router.Desc("V3 测试异常"))
+		router.Get("/test_get", V3.NewDemoController().HttpsTestGet, router.Flag("TestGet"), router.Desc("V3 测试GET"))
+		router.Post("/test_post", V3.NewDemoController().HttpsTestPost, router.Flag("TestPost"), router.Desc("V3 测试POST"))
+		router.Get("/test_get_redis", V3.NewRedisController().Test, router.Flag("test_get_redis"), router.Desc("V3 测试redis"))
+
+	})
 }

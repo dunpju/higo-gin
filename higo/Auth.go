@@ -1,13 +1,14 @@
 package higo
 
 import (
+	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/throw"
 )
 
 // 是否空标记
-func IsEmptyFlag(router Router)  {
-	if router.Flag() == "" {
-		throw.Throw(router.RelativePath() + "未设置标记",0)
+func IsEmptyFlag(route *router.Route)  {
+	if route.Flag() == "" && !route.IsStatic(){
+		throw.Throw(route.RelativePath() + "未设置标记",0)
 	}
 }
 

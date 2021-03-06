@@ -6,6 +6,7 @@ import (
 	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-logger/logger"
+	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
@@ -189,12 +190,18 @@ func (this *Higo) Boot() {
 		addr := configs.Str("Addr")
 		readTimeout := configs.Int("ReadTimeout")
 		writeTimeout := configs.Int("WriteTimeout")
+
+		handler := s.Router.Loader(hg)
+		hg.loadRoute()
+
 		serve := &http.Server{
 			Addr:         configs.Str("Addr"),
-			Handler:      s.Router.Loader(hg),
+			Handler:      handler,
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
+		
+		router.Clear()//初始化路由容器
 
 		if s.Serve == "http" {
 			this.eg.Go(func() error {
@@ -225,41 +232,32 @@ func (this *Higo) Boot() {
 }
 
 // 获取路由
-func (this *Higo) GetRoute(relativePath string) (Router, bool) {
+func (this *Higo) GetRoute(relativePath string) (*router.Route, bool) {
 	return RouterContainer.Get(relativePath), true
 }
 
 // 静态文件
 func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	// 添加路由容器
-	RouterContainer.Add(relativePath, Route(IsStatic(true)))
+	router.AddRoute("", relativePath, "", router.IsStatic(true))
 	hg.Engine.StaticFile(relativePath, filepath)
 	return this
 }
 
-// 路由组
-func (this *Higo) AddGroup(prefix string, routers ...Router) *Higo {
-	this.g = this.Engine.Group(prefix)
-	for _, router := range routers {
+// 装载路由
+func (this *Higo) loadRoute() *Higo {
+	for _, route := range router.GetRoutes() {
 		// 判断空标记
-		IsEmptyFlag(router)
+		IsEmptyFlag(route)
 		// 添加路由容器
-		RouterContainer.Add("/"+strings.TrimLeft(prefix, "/")+"/"+strings.TrimLeft(router.RelativePath(), "/"), router)
-		method := strings.ToUpper(router.Method())
-		this.GroupHandle(method, router.RelativePath(), router.handle)
-	}
-	return this
-}
-
-// 路由
-func (this *Higo) AddRoute(routers ...Router) *Higo {
-	for _, router := range routers {
-		// 判断空标记
-		IsEmptyFlag(router)
-		// 添加路由容器
-		RouterContainer.Add(router.RelativePath(), router)
-		method := strings.ToUpper(router.Method())
-		this.Handle(method, router.RelativePath(), router.handle)
+		RouterContainer.Add(route.Prefix()+route.RelativePath(), route)
+		method := strings.ToUpper(route.Method())
+		if route.Prefix() != "" {
+			this.g = this.Engine.Group(route.Prefix())
+			this.GroupHandle(method, route.RelativePath(), route.Handle())
+		} else {
+			this.Handle(method, route.RelativePath(), route.Handle())
+		}
 	}
 	return this
 }
