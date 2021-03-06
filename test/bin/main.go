@@ -27,7 +27,7 @@ func main()  {
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		LoadConfigur(".\\test\\").
-		HttpServe("HTTP_HOST", router.NewHttp()).
+		//HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
 		IsAutoGenerateSsl(true).
 		IsRedisPool().
