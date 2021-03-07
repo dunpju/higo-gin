@@ -40,8 +40,8 @@ type Hse struct {
 
 type Higo struct {
 	*gin.Engine
-	g           *gin.RouterGroup
-	eg          errgroup.Group
+	group       *gin.RouterGroup
+	errgroup    errgroup.Group
 	root        string
 	isAutoSsl   bool
 	isRedisPool bool
@@ -201,22 +201,22 @@ func (this *Higo) Boot() {
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
 
-		router.Clear()//初始化路由容器
+		router.Clear() //初始化路由容器
 
 		if s.Serve == "http" {
-			this.eg.Go(func() error {
+			this.errgroup.Go(func() error {
 				fmt.Println("HTTP Server listening at " + addr + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
 		}
 		if s.Serve == "https" {
-			this.eg.Go(func() error {
+			this.errgroup.Go(func() error {
 				fmt.Println("HTTPS Server listening at " + addr + " 启动成功\n")
 				return serve.ListenAndServeTLS(SslOut+SslCrt, SslOut+SslKey)
 			})
 		}
 		if s.Serve == "websocket" {
-			this.eg.Go(func() error {
+			this.errgroup.Go(func() error {
 				fmt.Println("WEBSOCKET Server listening at " + addr + " 启动成功\n")
 				return serve.ListenAndServe()
 			})
@@ -226,7 +226,7 @@ func (this *Higo) Boot() {
 	// 启动定时任务
 	CronTask().Start()
 
-	if err := this.eg.Wait(); err != nil {
+	if err := this.errgroup.Wait(); err != nil {
 		logger.Logrus.Fatal(err)
 	}
 }
@@ -251,31 +251,45 @@ func (this *Higo) loadRoute() *Higo {
 		IsEmptyFlag(route)
 		// 添加路由容器
 		RouterContainer.Add(route.Prefix()+route.RelativePath(), route)
-		method := strings.ToUpper(route.Method())
 		if route.Prefix() != "" {
-			this.g = this.Engine.Group(route.Prefix())
-			this.GroupHandle(method, route.RelativePath(), route.Handle())
+			this.group = this.Engine.Group(route.Prefix())
+			this.GroupHandle(route)
 		} else {
-			this.Handle(method, route.RelativePath(), route.Handle())
+			this.Handle(route)
 		}
 	}
 	return this
 }
 
 // 路由组Handle
-func (this *Higo) GroupHandle(httpMethod, relativePath string, handler interface{}) *Higo {
-	if h := Convert(handler); h != nil {
-		this.g.Handle(httpMethod, relativePath, h)
+func (this *Higo) GroupHandle(route *router.Route) *Higo {
+	if handle := Convert(route.Handle()); handle != nil {
+		handles := handleSlice(route)
+		handles = append(handles, handle)
+		this.group.Handle(strings.ToUpper(route.Method()), route.RelativePath(), handles...)
 	}
 	return this
 }
 
 // 路由Handle
-func (this *Higo) Handle(httpMethod, relativePath string, handler interface{}) *Higo {
-	if h := Convert(handler); h != nil {
-		this.Engine.Handle(httpMethod, relativePath, h)
+func (this *Higo) Handle(route *router.Route) *Higo {
+	if handle := Convert(route.Handle()); handle != nil {
+		handles := handleSlice(route)
+		handles = append(handles, handle)
+		this.Engine.Handle(strings.ToUpper(route.Method()), route.RelativePath(), handles...)
 	}
 	return this
+}
+
+func handleSlice(route *router.Route) []gin.HandlerFunc {
+	handles := make([]gin.HandlerFunc,0)
+	if groupMiddle, ok := route.GroupMiddle().(gin.HandlerFunc); ok {
+		handles = append(handles, groupMiddle)
+	}
+	if middleware, ok := route.Middleware().(gin.HandlerFunc); ok {
+		handles = append(handles, middleware)
+	}
+	return handles
 }
 
 // 添加到Bean

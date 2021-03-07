@@ -6,7 +6,7 @@ require (
 	github.com/dengpju/higo-annotation v0.0.0-20201128150601-25a35cd53358
 	github.com/dengpju/higo-ioc v0.0.0-20201201151832-424f8ce46fee
 	github.com/dengpju/higo-logger v1.0.3
-	github.com/dengpju/higo-router v1.0.4
+	github.com/dengpju/higo-router v1.0.5
 	github.com/dengpju/higo-throw v1.0.0
 	github.com/dengpju/higo-utils v0.0.0-20201208065328-f85f957e5e5d
 	github.com/gin-gonic/gin v1.6.3
