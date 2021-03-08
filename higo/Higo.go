@@ -282,13 +282,23 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 }
 
 func handleSlice(route *router.Route) []gin.HandlerFunc {
-	handles := make([]gin.HandlerFunc,0)
-	if groupMiddle, ok := route.GroupMiddle().(gin.HandlerFunc); ok {
-		handles = append(handles, groupMiddle)
+	handles := make([]gin.HandlerFunc, 0)
+	if groupMiddles, ok := route.GroupMiddle().([]interface{}); ok {
+		for _, groupMiddle := range groupMiddles {
+			if middle, ok := groupMiddle.(gin.HandlerFunc); ok {
+				handles = append(handles, middle)
+			}
+		}
 	}
-	if middleware, ok := route.Middleware().(gin.HandlerFunc); ok {
-		handles = append(handles, middleware)
+
+	if middlewares, ok := route.Middleware().([]interface{}); ok {
+		for _, middleware := range middlewares {
+			if middle, ok := middleware.(gin.HandlerFunc); ok {
+				handles = append(handles, middle)
+			}
+		}
 	}
+
 	return handles
 }
 
