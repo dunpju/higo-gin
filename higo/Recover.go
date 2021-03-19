@@ -2,6 +2,7 @@ package higo
 
 import (
 	"fmt"
+	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,7 @@ import (
 )
 
 // 全局异常
-type Recover struct {}
+type Recover struct{}
 
 // 构造函数
 func NewRecover() *Recover {
@@ -27,14 +28,13 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 				// 输出换行debug调用栈
 				logger.PrintlnStack()
 				//封装通用json返回
-				if _, ok := r.(gin.H); ok {// 断言类型
-					c.JSON(http.StatusOK, r)
+				if h, ok := r.(gin.H); ok {
+					c.JSON(http.StatusOK, h)
 				} else {
-					// 指针类型所以必须加指针才能取出值
-					if _, ok := r.(*CodeMsg); ok {
+					if msg, ok := r.(*code.Code); ok {
 						c.JSON(http.StatusOK, gin.H{
-							"code": (r.(*CodeMsg)).Code,
-							"msg":  (r.(*CodeMsg)).Msg,
+							"code": msg.Code,
+							"msg":  msg.Message,
 							"data": nil,
 						})
 					} else {
@@ -45,12 +45,11 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 						})
 					}
 				}
-				//终止后续接口调用，不加的话recover到异常后，还会继续执行接口里后续代码
+				//终止
 				c.Abort()
 			}
 		}()
-		//加载完 defer recover，继续后续接口调用
+		//继续
 		c.Next()
 	}
 }
-

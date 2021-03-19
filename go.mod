@@ -3,6 +3,7 @@ module github.com/dengpju/higo-gin
 go 1.14
 
 require (
+	gitee.com/dengpju/higo-code v1.0.0 // indirect
 	github.com/dengpju/higo-annotation v0.0.0-20201128150601-25a35cd53358
 	github.com/dengpju/higo-ioc v0.0.0-20201201151832-424f8ce46fee
 	github.com/dengpju/higo-logger v1.0.3
