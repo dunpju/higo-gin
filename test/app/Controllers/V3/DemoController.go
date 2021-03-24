@@ -68,7 +68,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 			throw.MapString.Put(p.Name, p.Value)
 		}
 	}
-	Exception.BusinessException(throw.Code(2), throw.Message("v3 https 测试异常"), throw.Data(s))
+	Exception.BusinessException(throw.Code(2), throw.Message("v3 https 测试异常"))
 	throw.Throw(throw.Message("v3 https 测试异常"), throw.Code(2), throw.Data(struct {
 		Id   int
 		Name string
