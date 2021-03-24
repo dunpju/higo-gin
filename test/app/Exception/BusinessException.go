@@ -1,14 +1,14 @@
 package Exception
 
 import (
+	"gitee.com/dengpju/higo-parameter/parameter"
 	"github.com/dengpju/higo-throw/throw"
-	"github.com/dengpju/higo-utils/utils"
 )
 
-type BusinessException struct {
+type Business struct {
 	throw.Throwable // 继承
 }
 
-func NewBusinessException(code int, msg string, data ...interface{}) {
-	new(BusinessException).Exception(msg, code, utils.Ifindex(data, 0))
+func BusinessException(p ...*parameter.Parameter) {
+	new(Business).Exception(p...)
 }

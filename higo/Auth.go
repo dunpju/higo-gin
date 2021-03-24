@@ -6,9 +6,9 @@ import (
 )
 
 // 是否空标记
-func IsEmptyFlag(route *router.Route)  {
-	if route.Flag() == "" && !route.IsStatic(){
-		throw.Throw(route.RelativePath() + "未设置标记",0)
+func IsEmptyFlag(route *router.Route) {
+	if route.Flag() == "" && !route.IsStatic() {
+		throw.Throw(throw.Message(route.RelativePath()+"未设置标记"), throw.Code(0))
 	}
 }
 

@@ -109,13 +109,13 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 				yamlFile, _ := ioutil.ReadFile(p)
 				yamlFileErr := yaml.Unmarshal(yamlFile, NewConfigure())
 				if yamlFileErr != nil {
-					throw.Throw(yamlFileErr, 0)
+					throw.Throw(throw.Message(yamlFileErr), throw.Code(0))
 				}
 			}
 			return nil
 		})
 	if filepathErr != nil {
-		throw.Throw(filepathErr, 0)
+		throw.Throw(throw.Message(filepathErr), throw.Code(0))
 	}
 	mapSslConf := Config("SSL")
 	SslOut = root + mapSslConf.Str("OUT") + fmt.Sprintf("%s", PathSeparator)
@@ -314,7 +314,7 @@ func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
 func (this *Higo) Cron(expr string, fn func()) *Higo {
 	_, err := CronTask().AddFunc(expr, fn)
 	if err != nil {
-		throw.Throw(err, 0)
+		throw.Throw(throw.Message(err), throw.Code(0))
 	}
 	return this
 }

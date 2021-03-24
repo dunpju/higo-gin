@@ -51,7 +51,7 @@ func (this Configure) All() Configure {
 func (this Configure) Get(key string) interface{} {
 	v, ok := this[key]
 	if !ok {
-		throw.Throw("获取"+key+"配置失败", 0)
+		throw.Throw(throw.Message("获取"+key+"配置失败"), throw.Code(0))
 	}
 	return v
 }

@@ -22,12 +22,12 @@ func (this Auth) Loader(hg *higo.Higo) gin.HandlerFunc {
 			// TODO::非静态页面需要鉴权
 			if !higo.IsNotAuth(route.Flag()) && !route.IsStatic() {
 				if "" == c.GetHeader("X-Token") {
-					throw.Throw(code.Message(Consts.INVALID_TOKEN).Message, code.Message(Consts.INVALID_TOKEN).Code)
+					throw.Throw(throw.Message(code.Message(Consts.INVALID_TOKEN).Message), throw.Code(code.Message(Consts.INVALID_TOKEN).Code))
 				}
 			}
 			c.Next()
 		} else {
-			throw.Throw(code.Message(Consts.INVALID_API).Message, code.Message(Consts.INVALID_API).Code)
+			throw.Throw(throw.Message(code.Message(Consts.INVALID_API).Message), throw.Code(code.Message(Consts.INVALID_API).Code))
 		}
 	}
 }

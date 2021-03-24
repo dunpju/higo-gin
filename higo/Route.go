@@ -24,7 +24,7 @@ func (this RouterCollect) All() RouterCollect {
 func (this RouterCollect) Get(relativePath string) *router.Route {
 	route, ok := this[relativePath]
 	if !ok {
-		throw.Throw(relativePath+"未定义路由", 0)
+		throw.Throw(throw.Message(relativePath+"未定义路由"), throw.Code(0))
 	}
 	return route
 }

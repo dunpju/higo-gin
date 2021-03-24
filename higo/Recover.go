@@ -5,6 +5,7 @@ import (
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -37,6 +38,8 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 							"msg":  msg.Message,
 							"data": nil,
 						})
+					} else if MapString, ok := r.(utils.MapString); ok {
+						c.JSON(http.StatusOK, MapString)
 					} else {
 						c.JSON(http.StatusOK, gin.H{
 							"code": 0,

@@ -7,7 +7,7 @@ import (
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
-	throw.Throw("https 测试异常", 0)
+	throw.Throw(throw.Message("https 测试异常"), throw.Code(0))
 	return "https_test_throw"
 }
 
@@ -23,7 +23,7 @@ func HttpsTestPost(ctx *gin.Context) string {
 
 // 测试异常
 func HttpTestThrow(ctx *gin.Context) string  {
-	throw.Throw("http 测试异常", 0)
+	throw.Throw(throw.Message("http 测试异常"), throw.Code(0))
 	return "http_test_throw"
 }
 
