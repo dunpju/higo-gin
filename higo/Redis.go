@@ -2,6 +2,7 @@ package higo
 
 import (
 	"fmt"
+	"gitee.com/dengpju/higo-configure/configure"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/gomodule/redigo/redis"
 	"sync"
@@ -14,7 +15,7 @@ var redisOnce sync.Once
 
 func InitRedisPool() *redis.Pool {
 	redisOnce.Do(func() {
-		_redis := Config("REDIS")
+		_redis := configure.Config("REDIS")
 		confDefault := _redis.Configure("DEFAULT")
 		pool := confDefault.Configure("POOL")
 		RedisPool = &redis.Pool {
@@ -23,9 +24,9 @@ func InitRedisPool() *redis.Pool {
 			IdleTimeout: time.Duration(pool.Int("MAX_IDLE_TIME")) * time.Second,
 			Dial: func() (conn redis.Conn, e error) {
 				return redis.Dial("tcp",
-					fmt.Sprintf("%s:%s", confDefault.Str("HOST"), confDefault.Str("PORT")),
+					fmt.Sprintf("%s:%s", confDefault.String("HOST"), confDefault.String("PORT")),
 					redis.DialDatabase(confDefault.Int("DB")),
-					redis.DialPassword(confDefault.Str("AUTH")),
+					redis.DialPassword(confDefault.String("AUTH")),
 				)
 			},
 		}

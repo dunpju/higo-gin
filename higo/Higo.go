@@ -2,6 +2,7 @@ package higo
 
 import (
 	"fmt"
+	"gitee.com/dengpju/higo-configure/configure"
 	"github.com/dengpju/higo-gin/higo/consts"
 	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
@@ -43,7 +44,7 @@ type Higo struct {
 	group       *gin.RouterGroup
 	errgroup    errgroup.Group
 	root        string
-	isAutoSsl   bool
+	isAutoTLS   bool
 	isRedisPool bool
 	middle      []IMiddleware
 	serve       []Hse
@@ -62,7 +63,7 @@ func Init() *Higo {
 	// 初始分隔符
 	PathSeparator = string(os.PathSeparator)
 	// 是否使用自带ssl测试https
-	hg.isAutoSsl = false
+	hg.isAutoTLS = false
 
 	return hg
 }
@@ -93,7 +94,8 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	// 装载env配置
 	confDir := root + "env"
 	if _, err := os.Stat(confDir); os.IsNotExist(err) {
-		if os.Mkdir(confDir, os.ModePerm) != nil {
+		if err = os.Mkdir(confDir, os.ModePerm); err != nil {
+			throw.Throw(throw.Message(err), throw.Code(0))
 		}
 	}
 	filepathErr := filepath.Walk(confDir,
@@ -105,9 +107,9 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				fmt.Println("Loader configure file:", filepath.Base(p))
+				logger.Logrus.Infoln("Loader Configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
-				yamlFileErr := yaml.Unmarshal(yamlFile, NewConfigure())
+				yamlFileErr := yaml.Unmarshal(yamlFile, configure.New())
 				if yamlFileErr != nil {
 					throw.Throw(throw.Message(yamlFileErr), throw.Code(0))
 				}
@@ -117,10 +119,10 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	if filepathErr != nil {
 		throw.Throw(throw.Message(filepathErr), throw.Code(0))
 	}
-	mapSslConf := Config("SSL")
-	SslOut = root + mapSslConf.Str("OUT") + fmt.Sprintf("%s", PathSeparator)
-	SslCrt = mapSslConf.Str("CRT")
-	SslKey = mapSslConf.Str("KEY")
+	mapSslConf := configure.Config("SSL")
+	SslOut = root + mapSslConf.String("OUT") + fmt.Sprintf("%s", PathSeparator)
+	SslCrt = mapSslConf.String("CRT")
+	SslKey = mapSslConf.String("KEY")
 	return this
 }
 
@@ -151,8 +153,8 @@ func (this *Higo) WebsocketServe(conf string, router IRouterLoader) *Higo {
 }
 
 // 是否自动生成ssl证书
-func (this *Higo) IsAutoGenerateSsl(isAuto bool) *Higo {
-	this.isAutoSsl = isAuto
+func (this *Higo) IsAutoTLS(isAuto bool) *Higo {
+	this.isAutoTLS = isAuto
 	return this
 }
 
@@ -173,21 +175,21 @@ func (this *Higo) Boot() {
 			hg.Engine.Use(m.Loader(hg))
 		}
 		// 是否使用自带ssl测试https
-		if this.isAutoSsl {
+		if this.isAutoTLS {
 			// 生成ssl证书
-			utils.NewSsl(SslOut, SslCrt, SslKey).Generate()
+			utils.NewTLS(SslOut, SslCrt, SslKey).Generate()
 		}
 		// 是否使用redis pool
 		if this.isRedisPool {
 			InitRedisPool()
 		}
 		// 运行模式debug/release
-		if gin.ReleaseMode == ValueToStr("MODE") {
+		if gin.ReleaseMode == configure.ValueToString("MODE") {
 			gin.SetMode(gin.ReleaseMode)
 		}
 
-		configs := Config(s.Config)
-		addr := configs.Str("Addr")
+		configs := configure.Config(s.Config)
+		addr := configs.String("Addr")
 		readTimeout := configs.Int("ReadTimeout")
 		writeTimeout := configs.Int("WriteTimeout")
 
@@ -195,7 +197,7 @@ func (this *Higo) Boot() {
 		hg.loadRoute()
 
 		serve := &http.Server{
-			Addr:         configs.Str("Addr"),
+			Addr:         configs.String("Addr"),
 			Handler:      handler,
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
@@ -205,19 +207,19 @@ func (this *Higo) Boot() {
 
 		if s.Serve == "http" {
 			this.errgroup.Go(func() error {
-				fmt.Println("HTTP Server listening at " + addr + " 启动成功\n")
+				logger.Logrus.Infoln("HTTP Server listening at " + addr + " Starting Success!")
 				return serve.ListenAndServe()
 			})
 		}
 		if s.Serve == "https" {
 			this.errgroup.Go(func() error {
-				fmt.Println("HTTPS Server listening at " + addr + " 启动成功\n")
+				logger.Logrus.Infoln("HTTPS Server listening at " + addr + " Starting Success!")
 				return serve.ListenAndServeTLS(SslOut+SslCrt, SslOut+SslKey)
 			})
 		}
 		if s.Serve == "websocket" {
 			this.errgroup.Go(func() error {
-				fmt.Println("WEBSOCKET Server listening at " + addr + " 启动成功\n")
+				logger.Logrus.Infoln("WEBSOCKET Server listening at " + addr + " Starting Success!")
 				return serve.ListenAndServe()
 			})
 		}

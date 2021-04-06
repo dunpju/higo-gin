@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"gitee.com/dengpju/higo-configure/configure"
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/throw"
 )
@@ -18,12 +19,12 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 空配置
-	if nil == ConfigAll() {
+	if nil == configure.All() {
 		return false
 	}
 	// 判断是否不需要鉴权
-	if nil != Config("NotAuth") {
-		_, ok := Config("NotAuth")[flag]
+	if nil != configure.Config("NotAuth") {
+		_, ok := configure.Config("NotAuth")[flag]
 		return ok
 	}
 	return false

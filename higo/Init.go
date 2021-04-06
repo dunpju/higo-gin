@@ -6,7 +6,6 @@ import (
 
 func init() {
 	Once.Do(func() {
-		config = make(Configure)
 		container = make(Dependency)
 		RouterContainer = make(RouterCollect)
 		taskList = make(chan *TaskExecutor)

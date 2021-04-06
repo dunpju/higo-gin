@@ -29,7 +29,7 @@ func main()  {
 		LoadConfigur(".\\test\\").
 		HttpServe("HTTP_HOST", router.NewHttp()).
 		HttpsServe("HTTPS_HOST", router.NewHttps()).
-		IsAutoGenerateSsl(true).
+		IsAutoTLS(true).
 		IsRedisPool().
 		Beans(beanConfig).
 		//Cron("0/3 * * * * *", func() {
