@@ -45,6 +45,7 @@ type Higo struct {
 	errgroup    errgroup.Group
 	root        string
 	isAutoTLS   bool
+	bits        int
 	isRedisPool bool
 	middle      []IMiddleware
 	serve       []Hse
@@ -56,6 +57,7 @@ func Init() *Higo {
 		Engine: gin.New(),
 		middle: make([]IMiddleware, 0),
 		serve:  make([]Hse, 0),
+		bits:   1024,
 	}
 
 	// 全局异常
@@ -66,6 +68,10 @@ func Init() *Higo {
 	hg.isAutoTLS = false
 
 	return hg
+}
+
+func (this *Higo) SetBits(bits int) {
+	this.bits = bits
 }
 
 // 设置主目录
@@ -177,7 +183,7 @@ func (this *Higo) Boot() {
 		// 是否使用自带ssl测试https
 		if this.isAutoTLS {
 			// 生成ssl证书
-			utils.NewTLS(SslOut, SslCrt, SslKey).Generate()
+			utils.NewTLS(SslOut, SslCrt, SslKey).SetBits(this.bits).Build()
 		}
 		// 是否使用redis pool
 		if this.isRedisPool {
