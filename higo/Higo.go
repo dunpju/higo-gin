@@ -70,8 +70,9 @@ func Init() *Higo {
 	return hg
 }
 
-func (this *Higo) SetBits(bits int) {
+func (this *Higo) SetBits(bits int) *Higo {
 	this.bits = bits
+	return this
 }
 
 // 设置主目录
