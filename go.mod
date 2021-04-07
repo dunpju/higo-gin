@@ -11,7 +11,7 @@ require (
 	github.com/dengpju/higo-logger v1.0.3
 	github.com/dengpju/higo-router v1.0.6
 	github.com/dengpju/higo-throw v1.0.5
-	github.com/dengpju/higo-utils v1.0.9
+	github.com/dengpju/higo-utils v1.0.10
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gomodule/redigo v1.8.3
 	github.com/jinzhu/gorm v1.9.16
