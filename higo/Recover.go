@@ -29,17 +29,17 @@ func init() {
 				c.JSON(http.StatusOK, h)
 			} else if msg, ok := r.(*code.Code); ok {
 				c.JSON(http.StatusOK, gin.H{
-					"code": msg.Code,
-					"msg":  msg.Message,
-					"data": nil,
+					"code":    msg.Code,
+					"message": msg.Message,
+					"data":    nil,
 				})
 			} else if MapString, ok := r.(utils.MapString); ok {
 				c.JSON(http.StatusOK, MapString)
 			} else {
 				c.JSON(http.StatusOK, gin.H{
-					"code": 0,
-					"msg":  throw.ErrorToString(r),
-					"data": nil,
+					"code":    0,
+					"message": throw.ErrorToString(r),
+					"data":    nil,
 				})
 			}
 		}
