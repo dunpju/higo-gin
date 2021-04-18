@@ -32,13 +32,6 @@ var (
 	Once                   sync.Once
 )
 
-// http 服务结构体
-type Hse struct {
-	Config string
-	Router IRouterLoader
-	Serve  string
-}
-
 type Higo struct {
 	*gin.Engine
 	group       *gin.RouterGroup
@@ -48,7 +41,8 @@ type Higo struct {
 	bits        int
 	isRedisPool bool
 	middle      []IMiddleware
-	serve       []Hse
+	serveType   string // serve type
+	serve       string // serve name
 }
 
 // 初始化
@@ -56,7 +50,7 @@ func Init() *Higo {
 	hg = &Higo{
 		Engine: gin.New(),
 		middle: make([]IMiddleware, 0),
-		serve:  make([]Hse, 0),
+		serve:  router.DefaultServe,
 		bits:   1024,
 	}
 
@@ -141,21 +135,30 @@ func (this *Higo) Middleware(imiddleware ...IMiddleware) *Higo {
 	return this
 }
 
-// http服务
-func (this *Higo) HttpServe(conf string, router IRouterLoader) *Higo {
-	this.serve = append(this.serve, Hse{Config: conf, Router: router, Serve: "http"})
+func (this *Higo) SetServe(serve string) *Higo {
+	this.serve = serve
 	return this
 }
 
-// https服务
-func (this *Higo) HttpsServe(conf string, router IRouterLoader) *Higo {
-	this.serve = append(this.serve, Hse{Config: conf, Router: router, Serve: "https"})
+// 获取serve name
+func (this *Higo) Serve() string {
+	return this.serve
+}
+
+func (this *Higo) Type() string {
+	return this.serveType
+}
+
+func (this *Higo) SetType(serveType string) *Higo {
+	this.serveType = serveType
 	return this
 }
 
-// websocket服务
-func (this *Higo) WebsocketServe(conf string, router IRouterLoader) *Higo {
-	this.serve = append(this.serve, Hse{Config: conf, Router: router, Serve: "websocket"})
+func (this *Higo) AddServe(router IRouterLoader) *Higo {
+	if ! onlySupportServe.Exist(router.Serve().Type) {
+		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + router.Serve().Type)
+	}
+	serves = append(serves, router.Serve())
 	return this
 }
 
@@ -174,9 +177,15 @@ func (this *Higo) IsRedisPool() *Higo {
 // 启动
 func (this *Higo) Boot() {
 	// 服务
-	for _, s := range this.serve {
-		// 初始化、加载配置、路由
-		hg := Init().LoadConfigur(this.GetRoot())
+	for _, ser := range serves {
+		// 初始化
+		hg := Init().
+			//设置服务类型
+			SetType(ser.Type).
+			//设置服务名称
+			SetServe(ser.Name).
+			//加载配置
+			LoadConfigur(this.GetRoot())
 		// 中间件
 		for _, m := range this.middle {
 			hg.Engine.Use(m.Loader(hg))
@@ -195,12 +204,15 @@ func (this *Higo) Boot() {
 			gin.SetMode(gin.ReleaseMode)
 		}
 
-		configs := configure.Config(s.Config)
+		configs := configure.Config(ser.Config)
 		addr := configs.String("Addr")
 		readTimeout := configs.Int("ReadTimeout")
 		writeTimeout := configs.Int("WriteTimeout")
 
-		handler := s.Router.Loader(hg)
+		// 添加服务
+		router.AddServe(hg.serve)
+		handler := ser.Router.Loader(hg)
+		// 加载路由
 		hg.loadRoute()
 
 		serve := &http.Server{
@@ -210,21 +222,19 @@ func (this *Higo) Boot() {
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
 
-		router.Clear() //初始化路由容器
-
-		if s.Serve == "http" {
+		if ser.Type == HttpServe {
 			this.errgroup.Go(func() error {
 				logger.Logrus.Infoln("HTTP Server listening at " + addr + " Starting Success!")
 				return serve.ListenAndServe()
 			})
 		}
-		if s.Serve == "https" {
+		if ser.Type == HttpsServe {
 			this.errgroup.Go(func() error {
 				logger.Logrus.Infoln("HTTPS Server listening at " + addr + " Starting Success!")
 				return serve.ListenAndServeTLS(SslOut+SslCrt, SslOut+SslKey)
 			})
 		}
-		if s.Serve == "websocket" {
+		if ser.Type == WebsocketServe {
 			this.errgroup.Go(func() error {
 				logger.Logrus.Infoln("WEBSOCKET Server listening at " + addr + " Starting Success!")
 				return serve.ListenAndServe()
@@ -248,14 +258,14 @@ func (this *Higo) GetRoute(relativePath string) (*router.Route, bool) {
 // 静态文件
 func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	// 添加路由容器
-	router.AddRoute("", relativePath, "", router.IsStatic(true))
+	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
 	hg.Engine.StaticFile(relativePath, filepath)
 	return this
 }
 
 // 装载路由
 func (this *Higo) loadRoute() *Higo {
-	for _, route := range router.GetRoutes() {
+	router.GetRoutes(this.serve).ForEach(func(index int, route *router.Route) {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
@@ -266,7 +276,7 @@ func (this *Higo) loadRoute() *Higo {
 		} else {
 			this.Handle(route)
 		}
-	}
+	})
 	return this
 }
 

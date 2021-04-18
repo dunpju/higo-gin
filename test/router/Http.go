@@ -10,10 +10,15 @@ import (
 )
 
 // https api 接口
-type Http struct {}
+type Http struct {
+}
 
-func NewHttp() *Http  {
+func NewHttp() *Http {
 	return &Http{}
+}
+
+func (this *Http) Serve() *higo.Serve {
+	return higo.NewServe("HTTP_HOST", this)
 }
 
 func (this *Http) Loader(hg *higo.Higo) *higo.Higo {

@@ -9,12 +9,11 @@ import (
 	"os/exec"
 )
 
-func main()  {
+func main() {
 
 	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
-	fmt.Printf("%s",output)
-
+	fmt.Printf("%s", output)
 
 	beanConfig := Config.NewBean()
 
@@ -23,12 +22,11 @@ func main()  {
 	//injector.BeanFactory.Apply(demoController)
 	//fmt.Println(demoController.DB)
 
-
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		LoadConfigur(".\\test\\").
-		HttpServe("HTTP_HOST", router.NewHttp()).
-		HttpsServe("HTTPS_HOST", router.NewHttps()).
+		AddServe(router.NewHttp()).
+		AddServe(router.NewHttps()).
 		IsAutoTLS(true).
 		IsRedisPool().
 		Beans(beanConfig).
