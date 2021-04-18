@@ -2,7 +2,6 @@ package V3
 
 import (
 	"fmt"
-	"gitee.com/dengpju/higo-parameter/parameter"
 	"github.com/dengpju/higo-annotation/annotation"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Exception"
@@ -62,14 +61,14 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	s = append(s, m1)
 	s = append(s, m2)
 	//测试自定义异常处理函数
-	throw.Handle = func(p *parameter.Parameter) {
-		if p.Name == throw.MESSAGE {
-			throw.LogPayload.Msg = throw.ErrorToString(p.Value)
-			throw.MapString.Put(p.Name, p.Value)
-		}
-	}
-	Exception.BusinessException(throw.Code(2), throw.Message("v3 https 测试异常"))
-	throw.Throw(throw.Message("v3 https 测试异常"), throw.Code(2), throw.Data(struct {
+	//throw.Handle = func(p *parameter.Parameter) {
+	//	if p.Name == throw.MESSAGE {
+	//		throw.LogPayload.Msg = throw.ErrorToString(p.Value)
+	//		throw.MapString.Put(p.Name, p.Value)
+	//	}
+	//}
+	Exception.BusinessException(throw.Code(2), throw.Message("v3 https 测试异常2"))
+	throw.Throw(throw.Message("v3 https 测试异常11"), throw.Code(2), throw.Data(struct {
 		Id   int
 		Name string
 	}{Id: 1, Name: "哦哦"}))
