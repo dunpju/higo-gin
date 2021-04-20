@@ -14,6 +14,7 @@ require (
 	github.com/dengpju/higo-utils v1.0.28
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gomodule/redigo v1.8.3
+	github.com/gorilla/websocket v1.4.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 	github.com/robfig/cron/v3 v3.0.0

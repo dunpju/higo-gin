@@ -3,7 +3,9 @@ package higo
 import (
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/gorilla/websocket"
 	"github.com/robfig/cron/v3"
+	"net/http"
 	"sync"
 )
 
@@ -19,6 +21,7 @@ var (
 	onlySupportServe *router.UniqueString
 	pathSeparator    string
 	root             *utils.SliceString
+	upgrader         websocket.Upgrader
 )
 
 func init() {
@@ -34,6 +37,11 @@ func init() {
 			Append(HttpsServe).
 			Append(WebsocketServe)
 		root = utils.NewSliceString(".", "..", "")
+		upgrader = websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		}
 	})
 
 	chlist := getTaskList()

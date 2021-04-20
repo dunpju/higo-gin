@@ -7,6 +7,7 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Controllers/V2"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 	"github.com/dengpju/higo-router/router"
+	"github.com/dengpju/higo-utils/utils"
 )
 
 // https api 接口
@@ -25,7 +26,7 @@ func (this *Https) Serve() *higo.Serve {
 func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 
 	// 静态文件
-	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot()))
+	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot().Separator(utils.PathSeparator())))
 	this.Api(hg)
 
 	return hg

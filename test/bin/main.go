@@ -28,6 +28,7 @@ func main() {
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		AddServe(router.NewHttp()).
 		AddServe(router.NewHttps()).
+		AddServe(router.NewWebsocket()).
 		IsAutoTLS(true).
 		IsRedisPool().
 		Beans(beanConfig).
