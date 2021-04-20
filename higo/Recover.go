@@ -13,11 +13,11 @@ import (
 var (
 	//Recover处理函数(可自定义)
 	RecoverHandlerFunc RecoverFunc
-	once               sync.Once
+	recoverOnce        sync.Once
 )
 
 func init() {
-	once.Do(func() {
+	recoverOnce.Do(func() {
 		//初始化Recover处理函数
 		RecoverHandlerFunc = func(c *gin.Context, r interface{}) {
 			//打印错误堆栈信息

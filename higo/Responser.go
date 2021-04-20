@@ -6,8 +6,11 @@ import (
 	"sync"
 )
 
-var responderList []Responder
-var onceRespList sync.Once
+var (
+	responderList      []Responder
+	onceRespList       sync.Once
+	getSyncHandlerOnce sync.Once
+)
 
 type Responder interface {
 	RespondTo() gin.HandlerFunc
@@ -57,7 +60,7 @@ func Convert(handler interface{}) gin.HandlerFunc {
 var syncHandler *SyncHandler
 
 func getSyncHandler() *SyncHandler {
-	Once.Do(func() {
+	getSyncHandlerOnce.Do(func() {
 		syncHandler = &SyncHandler{}
 	})
 	return syncHandler
@@ -80,7 +83,7 @@ func (this *SyncHandler) handler(responder Responder, ctx *gin.Context) interfac
 
 type ModelResponder func(*gin.Context) Model
 
-func (this ModelResponder) RespondTo() gin.HandlerFunc  {
+func (this ModelResponder) RespondTo() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		context.JSON(200, this(context))
 	}
@@ -88,9 +91,9 @@ func (this ModelResponder) RespondTo() gin.HandlerFunc  {
 
 type ModelsResponder func(*gin.Context) Models
 
-func (this ModelsResponder) RespondTo() gin.HandlerFunc  {
+func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		context.Writer.Header().Set("Content-typ","application/json")
+		context.Writer.Header().Set("Content-typ", "application/json")
 		_, _ = context.Writer.WriteString(string(this(context)))
 	}
 }

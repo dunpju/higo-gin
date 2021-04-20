@@ -2,7 +2,7 @@ package higo
 
 import (
 	"fmt"
-	"gitee.com/dengpju/higo-configure/configure"
+	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-throw/throw"
 	"github.com/gomodule/redigo/redis"
 	"sync"
@@ -15,18 +15,17 @@ var redisOnce sync.Once
 
 func InitRedisPool() *redis.Pool {
 	redisOnce.Do(func() {
-		_redis := configure.Config("REDIS")
-		confDefault := _redis.Configure("DEFAULT")
-		pool := confDefault.Configure("POOL")
+		confDefault := config.Get("app.REDIS.DEFAULT").(config.Configure)
+		pool := confDefault.Get("POOL").(config.Configure)
 		RedisPool = &redis.Pool {
-			MaxActive:   pool.Int("MAX_CONNECTIONS"),
-			MaxIdle:     pool.Int("MAX_IDLE"),
-			IdleTimeout: time.Duration(pool.Int("MAX_IDLE_TIME")) * time.Second,
+			MaxActive:   pool.Get("MAX_CONNECTIONS").(int),
+			MaxIdle:     pool.Get("MAX_IDLE").(int),
+			IdleTimeout: time.Duration(pool.Get("MAX_IDLE_TIME").(int)) * time.Second,
 			Dial: func() (conn redis.Conn, e error) {
 				return redis.Dial("tcp",
-					fmt.Sprintf("%s:%s", confDefault.String("HOST"), confDefault.String("PORT")),
-					redis.DialDatabase(confDefault.Int("DB")),
-					redis.DialPassword(confDefault.String("AUTH")),
+					fmt.Sprintf("%s:%s", confDefault.Get("HOST").(string), confDefault.Get("PORT").(string)),
+					redis.DialDatabase(confDefault.Get("DB").(int)),
+					redis.DialPassword(confDefault.Get("AUTH").(string)),
 				)
 			},
 		}

@@ -1,9 +1,7 @@
 package higo
 
 import (
-	"fmt"
-	"gitee.com/dengpju/higo-configure/configure"
-	"github.com/dengpju/higo-gin/higo/consts"
+	"github.com/dengpju/higo-config/config"
 	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-logger/logger"
@@ -19,24 +17,19 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 )
 
 var (
 	hg *Higo
-	// 路径分隔符
-	PathSeparator string
 	// ssl 证书
 	SslOut, SslCrt, SslKey string
-	Once                   sync.Once
 )
 
 type Higo struct {
 	*gin.Engine
 	group       *gin.RouterGroup
 	errgroup    errgroup.Group
-	root        string
 	isAutoTLS   bool
 	bits        int
 	isRedisPool bool
@@ -57,11 +50,20 @@ func Init() *Higo {
 	// 全局异常
 	hg.Engine.Use(NewRecover().Exception(hg))
 	// 初始分隔符
-	PathSeparator = string(os.PathSeparator)
+	pathSeparator = utils.PathSeparator()
 	// 是否使用自带ssl测试https
 	hg.isAutoTLS = false
 
 	return hg
+}
+
+func (this *Higo) SetPathSeparator(sep string) *Higo {
+	pathSeparator = sep
+	return this
+}
+
+func (this *Higo) PathSeparator() string {
+	return pathSeparator
 }
 
 func (this *Higo) SetBits(bits int) *Higo {
@@ -70,34 +72,29 @@ func (this *Higo) SetBits(bits int) *Higo {
 }
 
 // 设置主目录
-func (this *Higo) setRoot(root string) *Higo {
-	this.root = root
+func (this *Higo) setRoot(r *utils.SliceString) *Higo {
+	root = r
 	return this
 }
 
 // 获取主目录
-func (this *Higo) GetRoot() string {
-	return utils.If(this.root == "", consts.ROOT, this.root).(string)
+func (this *Higo) GetRoot() *utils.SliceString {
+	return Root()
 }
 
 // 加载配置
-func (this *Higo) LoadConfigur(root string) *Higo {
+func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
+	utils.SetPathSeparator(pathSeparator)
 	// 设置主目录
 	this.setRoot(root)
-	// runtime目录
-	runtimeDir := root + "runtime"
-	if _, err := os.Stat(runtimeDir); os.IsNotExist(err) {
-		if os.Mkdir(runtimeDir, os.ModePerm) != nil {
-		}
-	}
+	// 创建runtime
+	utils.Mkdir(this.GetRoot().Separator(pathSeparator) + "runtime")
 	// 日志
-	logger.Logrus.Root(root).File("higo").Init()
+	logger.Logrus.Root(this.GetRoot().Separator(pathSeparator)).File("higo").Init()
 	// 装载env配置
-	confDir := root + "env"
-	if _, err := os.Stat(confDir); os.IsNotExist(err) {
-		if err = os.Mkdir(confDir, os.ModePerm); err != nil {
-			throw.Throw(throw.Message(err), throw.Code(0))
-		}
+	confDir := this.GetRoot().Separator(pathSeparator) + "env"
+	if ! utils.DirExist(confDir) {
+		utils.Mkdir(confDir)
 	}
 	filepathErr := filepath.Walk(confDir,
 		func(p string, f os.FileInfo, err error) error {
@@ -110,7 +107,9 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 			if path.Ext(p) == ".yaml" {
 				logger.Logrus.Infoln("Loader Configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
-				yamlFileErr := yaml.Unmarshal(yamlFile, configure.New())
+				conf := config.New()
+				yamlFileErr := yaml.Unmarshal(yamlFile, conf)
+				config.Set(utils.Basename(p, "yaml"), conf)
 				if yamlFileErr != nil {
 					throw.Throw(throw.Message(yamlFileErr), throw.Code(0))
 				}
@@ -120,10 +119,9 @@ func (this *Higo) LoadConfigur(root string) *Higo {
 	if filepathErr != nil {
 		throw.Throw(throw.Message(filepathErr), throw.Code(0))
 	}
-	mapSslConf := configure.Config("SSL")
-	SslOut = root + mapSslConf.String("OUT") + fmt.Sprintf("%s", PathSeparator)
-	SslCrt = mapSslConf.String("CRT")
-	SslKey = mapSslConf.String("KEY")
+	SslOut = this.GetRoot().Separator(pathSeparator) + config.String("app.SSL.OUT") + pathSeparator
+	SslCrt = config.String("app.SSL.CRT")
+	SslKey = config.String("app.SSL.KEY")
 	return this
 }
 
@@ -200,14 +198,14 @@ func (this *Higo) Boot() {
 			InitRedisPool()
 		}
 		// 运行模式debug/release
-		if gin.ReleaseMode == configure.ValueToString("MODE") {
+		if gin.ReleaseMode == config.String("app.MODE") {
 			gin.SetMode(gin.ReleaseMode)
 		}
 
-		configs := configure.Config(ser.Config)
-		addr := configs.String("Addr")
-		readTimeout := configs.Int("ReadTimeout")
-		writeTimeout := configs.Int("WriteTimeout")
+		configs := config.Get(ser.Config).(config.Configure)
+		addr := configs.Get("Addr").(string)
+		readTimeout := configs.Get("ReadTimeout").(int)
+		writeTimeout := configs.Get("WriteTimeout").(int)
 
 		// 添加服务
 		router.AddServe(hg.serve)
@@ -216,7 +214,7 @@ func (this *Higo) Boot() {
 		hg.loadRoute()
 
 		serve := &http.Server{
-			Addr:         configs.String("Addr"),
+			Addr:         addr,
 			Handler:      handler,
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,

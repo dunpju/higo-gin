@@ -1,6 +1,8 @@
 package higo
 
-import "gitee.com/dengpju/higo-configure/configure"
+import (
+	"github.com/dengpju/higo-config/config"
+)
 
 type Serve struct {
 	Name   string
@@ -9,9 +11,9 @@ type Serve struct {
 	Router IRouterLoader
 }
 
-func NewServe(config string, router IRouterLoader) *Serve {
-	configs := configure.Config(config)
-	name := configs.String("Name")
-	t := configs.String("Type")
-	return &Serve{Name: name, Type: t, Config: config, Router: router}
+func NewServe(conf string, router IRouterLoader) *Serve {
+	configs := config.Get(conf).(config.Configure)
+	name := configs.Get("Name").(string)
+	t := configs.Get("Type").(string)
+	return &Serve{Name: name, Type: t, Config: conf, Router: router}
 }

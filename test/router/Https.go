@@ -18,7 +18,7 @@ func NewHttps() *Https {
 }
 
 func (this *Https) Serve() *higo.Serve {
-	return higo.NewServe("HTTPS_HOST", this)
+	return higo.NewServe("app.HTTPS_HOST", this)
 }
 
 // 路由装载器

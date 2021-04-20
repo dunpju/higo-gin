@@ -2,7 +2,7 @@ package higo
 
 import (
 	"fmt"
-	"gitee.com/dengpju/higo-configure/configure"
+	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -21,22 +21,21 @@ type Gorm struct {
 
 func NewGorm() *Gorm {
 	onceGorm.Do(func() {
-		_db := configure.Config("DB")
-		confDefault := _db.Configure("DEFAULT")
+		confDefault := config.Get("app.DB.DEFAULT").(config.Configure)
 		args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-			confDefault.String("USERNAME"),
-			confDefault.String("PASSWORD"),
-			confDefault.String("HOST"),
-			confDefault.String("PORT"),
-			confDefault.String("DATABASE"),
-			confDefault.String("CHARSET"),
+			confDefault.Get("USERNAME").(string),
+			confDefault.Get("PASSWORD").(string),
+			confDefault.Get("HOST").(string),
+			confDefault.Get("PORT").(string),
+			confDefault.Get("DATABASE").(string),
+			confDefault.Get("CHARSET").(string),
 		)
-		db, err := gorm.Open(confDefault.String("DRIVER"), args)
+		db, err := gorm.Open(confDefault.Get("DRIVER").(string), args)
 		if err != nil {
 			log.Fatal(err)
 		}
-		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", confDefault.String("HOST"),
-			confDefault.String("PORT")))
+		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", confDefault.Get("HOST").(string),
+			confDefault.Get("PORT").(string)))
 		db.SingularTable(true)
 		db.DB().SetMaxIdleConns(5)
 		db.DB().SetMaxOpenConns(10)

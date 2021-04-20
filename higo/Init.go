@@ -2,7 +2,9 @@ package higo
 
 import (
 	"github.com/dengpju/higo-router/router"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/robfig/cron/v3"
+	"sync"
 )
 
 const (
@@ -12,21 +14,26 @@ const (
 )
 
 var (
+	initOnce         sync.Once
 	serves           []*Serve
 	onlySupportServe *router.UniqueString
+	pathSeparator    string
+	root             *utils.SliceString
 )
 
 func init() {
-	Once.Do(func() {
+	initOnce.Do(func() {
 		serves = make([]*Serve, 0)
 		container = make(Dependency)
 		RouterContainer = make(RouterCollect)
 		taskList = make(chan *TaskExecutor)
 		taskCron = cron.New(cron.WithSeconds())
 		onlySupportServe = router.NewUniqueString()
-		onlySupportServe.Append(HttpServe).
+		onlySupportServe.
+			Append(HttpServe).
 			Append(HttpsServe).
 			Append(WebsocketServe)
+		root = utils.NewSliceString(".", "..", "")
 	})
 
 	chlist := getTaskList()
@@ -35,4 +42,8 @@ func init() {
 			doTask(t)
 		}
 	}()
+}
+
+func Root() *utils.SliceString {
+	return root
 }

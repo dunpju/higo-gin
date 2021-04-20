@@ -6,6 +6,7 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Config"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
+	"github.com/dengpju/higo-utils/utils"
 	"os/exec"
 )
 
@@ -24,7 +25,7 @@ func main() {
 
 	higo.Init().
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
-		LoadConfigur(".\\test\\").
+		LoadConfigur(utils.NewSliceString(".", "test", "")).
 		AddServe(router.NewHttp()).
 		AddServe(router.NewHttps()).
 		IsAutoTLS(true).
