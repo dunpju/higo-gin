@@ -21,7 +21,7 @@ type Gorm struct {
 
 func NewGorm() *Gorm {
 	onceGorm.Do(func() {
-		confDefault := config.Get("app.DB.DEFAULT").(config.Configure)
+		confDefault := config.Get("env.app.DB.DEFAULT").(config.Configure)
 		args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 			confDefault.Get("USERNAME").(string),
 			confDefault.Get("PASSWORD").(string),

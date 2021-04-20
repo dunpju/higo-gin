@@ -24,8 +24,8 @@ func main() {
 	//fmt.Println(demoController.DB)
 
 	higo.Init().
+		LoadEnv(utils.NewSliceString(".", "test", "")).
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
-		LoadConfigur(utils.NewSliceString(".", "test", "")).
 		AddServe(router.NewHttp()).
 		AddServe(router.NewHttps()).
 		IsAutoTLS(true).

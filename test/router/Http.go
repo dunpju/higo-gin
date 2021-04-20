@@ -18,7 +18,7 @@ func NewHttp() *Http {
 }
 
 func (this *Http) Serve() *higo.Serve {
-	return higo.NewServe("app.HTTP_HOST", this)
+	return higo.NewServe("env.app.HTTP_HOST", this)
 }
 
 func (this *Http) Loader(hg *higo.Higo) *higo.Higo {

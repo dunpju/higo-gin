@@ -82,8 +82,8 @@ func (this *Higo) GetRoot() *utils.SliceString {
 	return Root()
 }
 
-// 加载配置
-func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
+// 加载env
+func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	utils.SetPathSeparator(pathSeparator)
 	// 设置主目录
 	this.setRoot(root)
@@ -92,11 +92,12 @@ func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
 	// 日志
 	logger.Logrus.Root(this.GetRoot().Separator(pathSeparator)).File("higo").Init()
 	// 装载env配置
-	confDir := this.GetRoot().Separator(pathSeparator) + "env"
-	if ! utils.DirExist(confDir) {
-		utils.Mkdir(confDir)
+	env := this.GetRoot().Separator(pathSeparator) + "env"
+	if ! utils.DirExist(env) {
+		utils.Mkdir(env)
 	}
-	filepathErr := filepath.Walk(confDir,
+	envConf := config.New()
+	filepathErr := filepath.Walk(env,
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
 				return err
@@ -105,23 +106,29 @@ func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				logger.Logrus.Infoln("Loader Configure file:", filepath.Base(p))
 				yamlFile, _ := ioutil.ReadFile(p)
 				conf := config.New()
 				yamlFileErr := yaml.Unmarshal(yamlFile, conf)
-				config.Set(utils.Basename(p, "yaml"), conf)
+				envConf.Set(utils.Basename(p, "yaml"), conf)
 				if yamlFileErr != nil {
 					throw.Throw(throw.Message(yamlFileErr), throw.Code(0))
 				}
+				logger.Logrus.Infoln("Loader env file:", filepath.Base(p))
 			}
 			return nil
 		})
 	if filepathErr != nil {
 		throw.Throw(throw.Message(filepathErr), throw.Code(0))
 	}
-	SslOut = this.GetRoot().Separator(pathSeparator) + config.String("app.SSL.OUT") + pathSeparator
-	SslCrt = config.String("app.SSL.CRT")
-	SslKey = config.String("app.SSL.KEY")
+	config.Set("env", envConf)
+	SslOut = this.GetRoot().Separator(pathSeparator) + config.String("env.app.SSL.OUT") + pathSeparator
+	SslCrt = config.String("env.app.SSL.CRT")
+	SslKey = config.String("env.app.SSL.KEY")
+	return this
+}
+
+// 加载配置
+func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
 	return this
 }
 
@@ -174,8 +181,9 @@ func (this *Higo) IsRedisPool() *Higo {
 
 // 启动
 func (this *Higo) Boot() {
-	// 服务
+	// 启动服务
 	for _, ser := range serves {
+		logger.Logrus.Infoln("Server starting......")
 		// 初始化
 		hg := Init().
 			//设置服务类型
@@ -198,7 +206,7 @@ func (this *Higo) Boot() {
 			InitRedisPool()
 		}
 		// 运行模式debug/release
-		if gin.ReleaseMode == config.String("app.MODE") {
+		if gin.ReleaseMode == config.String("env.app.MODE") {
 			gin.SetMode(gin.ReleaseMode)
 		}
 
