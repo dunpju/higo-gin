@@ -41,34 +41,11 @@ func (this *WebsocketController) Self() higo.IClass {
 }
 
 func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
-	router.Get("/ping", this.Ping, router.Flag("WebsocketController.Ping"), router.Desc("ping"))
+	router.Get("/websocket/ping", this.Ping, router.Flag("WebsocketController.Ping"), router.Desc("ping"))
 	return hg
 }
 
 //webSocket请求ping 返回pong
-func (this *WebsocketController) Ping() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		//升级get请求为webSocket协议
-		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			return
-		}
-		defer ws.Close()
-		for {
-			//读取ws中的数据
-			mt, message, err := ws.ReadMessage()
-			if err != nil {
-				break
-			}
-			if string(message) == "ping" {
-				message = []byte("pong")
-			}
-			//写入ws数据
-			err = ws.WriteMessage(mt, message)
-			if err != nil {
-				break
-			}
-		}
-	}
+func (this *WebsocketController) Ping(ctx *gin.Context) higo.WebsocketPong {
+	return higo.WebsocketPongFunc(ctx)
 }
-

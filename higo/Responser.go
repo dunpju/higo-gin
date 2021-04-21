@@ -23,6 +23,7 @@ func getResponderList() []Responder {
 			(JsonResponder)(nil),
 			(ModelResponder)(nil),
 			(ModelsResponder)(nil),
+			(WebsocketResponder)(nil),
 		}
 	})
 	return responderList
@@ -94,6 +95,17 @@ type ModelsResponder func(*gin.Context) Models
 func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		context.Writer.Header().Set("Content-typ", "application/json")
-		_, _ = context.Writer.WriteString(string(this(context)))
+		_, err := context.Writer.WriteString(string(this(context)))
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+type WebsocketResponder func(*gin.Context) WebsocketPong
+
+func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		this(context)
 	}
 }

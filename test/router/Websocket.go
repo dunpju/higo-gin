@@ -20,6 +20,7 @@ func (this *Websocket) Serve() *higo.Serve {
 func (this *Websocket) Loader(hg *higo.Higo) *higo.Higo {
 
 	this.api(hg)
+
 	Controllers.NewWebsocketController().Route(hg)
 
 	return hg

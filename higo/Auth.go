@@ -23,8 +23,8 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 判断是否不需要鉴权
-	if nil != config.Get("env.app.NotAuth") {
-		_, ok := config.Get("env.app.NotAuth").(config.Configure)[flag]
+	if nil != config.Get("env.auth.NotAuth") {
+		_, ok := config.Get("env.auth.NotAuth").(config.Configure)[flag]
 		return ok
 	}
 	return false

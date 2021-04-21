@@ -1,13 +1,19 @@
 package higo
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type WebsocketPong string
+
+var WebsocketPongFunc = websocketPongFunc
 
 //webSocket请求ping 返回pong
-func ping(c *gin.Context) {
+func websocketPongFunc(ctx *gin.Context) WebsocketPong {
 	//升级get请求为webSocket协议
-	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		return
+		return ""
 	}
 	defer ws.Close()
 	for {
@@ -25,4 +31,5 @@ func ping(c *gin.Context) {
 			break
 		}
 	}
+	return ""
 }

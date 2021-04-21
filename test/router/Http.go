@@ -33,16 +33,16 @@ func (this *Http) Loader(hg *higo.Higo) *higo.Higo {
 
 // api 路由
 func (this *Http) http(hg *higo.Higo) {
-	router.Get("/test_throw", Controllers.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("测试异常"))
-	router.Get("/test_get", Controllers.HttpsTestGet, router.Flag("TestGet"), router.Desc("测试GET"))
-	router.Post("/test_post", Controllers.HttpsTestPost, router.Flag("TestPost"), router.Desc("测试POST"))
+	router.Get("/http/test_throw", Controllers.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("测试异常"))
+	router.Get("/http/test_get", Controllers.HttpsTestGet, router.Flag("TestGet"), router.Desc("测试GET"))
+	router.Post("/http/test_post", Controllers.HttpsTestPost, router.Flag("TestPost"), router.Desc("测试POST"))
 	// 路由组
-	router.AddGroup("/v2", func() {
+	router.AddGroup("/http/v2", func() {
 		router.Get("/test_throw", V2.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("v2 测试异常"))
 		router.Get("/test_get", V2.HttpsTestGet, router.Flag("TestGet"), router.Desc("v2 测试GET"))
 		router.Post("/test_post", V2.HttpsTestPost, router.Flag("TestPost"), router.Desc("v2 测试POST"))
 	})
-	router.AddGroup("/v3", func() {
+	router.AddGroup("/http/v3", func() {
 		router.AddGroup("/user", func() {
 			router.Post("/login", V3.NewDemoController().Login, router.Flag("Login"), router.Desc("V3 登录"))
 		})

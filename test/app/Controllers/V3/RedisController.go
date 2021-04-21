@@ -42,7 +42,7 @@ func (this *RedisController) Test(ctx *gin.Context) string {
 
 func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
 	// 路由组
-	router.AddGroup("/v4", func() {
+	router.AddGroup("/https/v4", func() {
 		router.Get("/test_redis", this.Test, router.Flag("TestThrow"), router.Desc("V4 测试redis"))
 		router.AddGroup("/v5", func() {
 			router.Get("/get_test_redis", this.Test, router.Flag("get_test_redis"), router.Middleware(this.MiddleWare()))
