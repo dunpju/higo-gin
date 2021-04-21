@@ -18,7 +18,6 @@ type WebsocketController struct {
 var (
 	redisControllerOnce        sync.Once
 	WebsocketControllerPointer *WebsocketController
-	upgrader                   websocket.Upgrader
 )
 
 func NewWebsocketController() *WebsocketController {
@@ -27,7 +26,7 @@ func NewWebsocketController() *WebsocketController {
 		injector.BeanFactory.Apply(WebsocketControllerPointer)
 		injector.BeanFactory.Set(WebsocketControllerPointer)
 		higo.AddContainer(WebsocketControllerPointer)
-		upgrader = websocket.Upgrader{
+		higo.Upgrader = websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
@@ -41,11 +40,17 @@ func (this *WebsocketController) Self() higo.IClass {
 }
 
 func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
-	router.Get("/websocket/ping", this.Ping, router.Flag("WebsocketController.Ping"), router.Desc("ping"))
+	router.Get("/ping", this.Ping, router.Flag("WebsocketController.Ping"), router.Desc("ping"))
+	router.Get("/send_all", this.SendAll, router.Flag("WebsocketController.SendAll"), router.Desc("ping"))
 	return hg
 }
 
 //webSocket请求ping 返回pong
 func (this *WebsocketController) Ping(ctx *gin.Context) higo.WebsocketPong {
-	return higo.WebsocketPongFunc(ctx)
+	return higo.WebsocketPongHandler(ctx)
+}
+
+func (this *WebsocketController) SendAll(ctx *gin.Context) higo.WebsocketPong {
+	higo.WebsocketClientContainer.SendAll("hello")
+	return "ok"
 }

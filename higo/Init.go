@@ -16,12 +16,14 @@ const (
 )
 
 var (
-	initOnce         sync.Once
-	serves           []*Serve
-	onlySupportServe *router.UniqueString
-	pathSeparator    string
-	root             *utils.SliceString
-	upgrader         websocket.Upgrader
+	initOnce                 sync.Once
+	serves                   []*Serve
+	onlySupportServe         *router.UniqueString
+	pathSeparator            string
+	root                     *utils.SliceString
+	Upgrader                 websocket.Upgrader
+	WebsocketPongHandler     WebsocketPongFunc
+	WebsocketClientContainer *WebsocketClient
 )
 
 func init() {
@@ -37,11 +39,13 @@ func init() {
 			Append(HttpsServe).
 			Append(WebsocketServe)
 		root = utils.NewSliceString(".", "..", "")
-		upgrader = websocket.Upgrader{
+		Upgrader = websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
 		}
+		WebsocketPongHandler = websocketPongFunc
+		WebsocketClientContainer = NewWebsocketClient()
 	})
 
 	chlist := getTaskList()

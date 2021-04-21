@@ -7,6 +7,7 @@ import (
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"runtime/debug"
 	"sync"
 )
 
@@ -21,7 +22,7 @@ func init() {
 		//初始化Recover处理函数
 		RecoverHandlerFunc = func(c *gin.Context, r interface{}) {
 			//打印错误堆栈信息
-			//debug.PrintStack()
+			debug.PrintStack()
 			// 输出换行debug调用栈
 			go logger.PrintlnStack()
 			//封装通用json返回
