@@ -16,14 +16,14 @@ const (
 )
 
 var (
-	initOnce                 sync.Once
-	serves                   []*Serve
-	onlySupportServe         *router.UniqueString
-	pathSeparator            string
-	root                     *utils.SliceString
-	Upgrader                 websocket.Upgrader
-	WebsocketPongHandler     WebsocketPongFunc
-	WebsocketClientContainer *WebsocketClient
+	initOnce             sync.Once
+	serves               []*Serve
+	onlySupportServe     *router.UniqueString
+	pathSeparator        string
+	root                 *utils.SliceString
+	Upgrader             websocket.Upgrader
+	WebsocketPongHandler WebsocketPongFunc
+	WebsocketContainer   *WebsocketClient
 )
 
 func init() {
@@ -45,7 +45,7 @@ func init() {
 			},
 		}
 		WebsocketPongHandler = websocketPongFunc
-		WebsocketClientContainer = NewWebsocketClient()
+		WebsocketContainer = NewWebsocketClient()
 	})
 
 	chlist := getTaskList()

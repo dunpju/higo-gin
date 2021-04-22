@@ -1,9 +1,11 @@
 package higo
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"sync"
+	"time"
 )
 
 type WebsocketPong string
@@ -19,19 +21,27 @@ func NewWebsocketClient() *WebsocketClient {
 	return &WebsocketClient{}
 }
 
-func (this *WebsocketClient) Store(key string, conn *websocket.Conn) {
-	this.clients.Store(key, conn)
+func (this *WebsocketClient) Store(conn *websocket.Conn) {
+	wsConn := NewWebsocketConn(conn)
+	this.clients.Store(conn.RemoteAddr().String(), wsConn)
+	go wsConn.Ping(time.Second * 2)
 }
 
 func (this *WebsocketClient) SendAll(msg string) {
 	this.clients.Range(func(key, client interface{}) bool {
-		err := client.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(msg))
+		conn := client.(*WebsocketConn).conn
+		err := conn.WriteMessage(websocket.TextMessage, []byte(msg))
 		if err != nil {
 			//TODO::应该记录日志
+			this.Remove(conn)
 			panic(err)
 		}
 		return true
 	})
+}
+
+func (this *WebsocketClient) Remove(conn *websocket.Conn) {
+	this.clients.Delete(conn.RemoteAddr().String())
 }
 
 //webSocket请求连接
@@ -41,7 +51,7 @@ func websocketConnFunc(ctx *gin.Context) WebsocketPong {
 	if err != nil {
 		panic(err)
 	}
-	WebsocketClientContainer.Store(client.RemoteAddr().String(), client)
+	WebsocketContainer.Store(client)
 	return "ok"
 }
 
@@ -52,7 +62,7 @@ func websocketPongFunc(ctx *gin.Context) WebsocketPong {
 	if err != nil {
 		panic(err)
 	}
-	WebsocketClientContainer.Store(client.RemoteAddr().String(), client)
+	WebsocketContainer.Store(client)
 	defer client.Close()
 	for {
 		//读取ws中的数据
@@ -70,4 +80,25 @@ func websocketPongFunc(ctx *gin.Context) WebsocketPong {
 		}
 	}
 	return "ok"
+}
+
+type WebsocketConn struct {
+	conn *websocket.Conn
+}
+
+func NewWebsocketConn(conn *websocket.Conn) *WebsocketConn {
+	return &WebsocketConn{conn: conn}
+}
+
+func (this *WebsocketConn) Ping(waittime time.Duration) {
+	for {
+		time.Sleep(waittime)
+		err := this.conn.WriteMessage(websocket.TextMessage, []byte("ping"))
+		if err != nil {
+			fmt.Println(WebsocketContainer)
+			fmt.Println(err)
+			WebsocketContainer.Remove(this.conn)
+			return
+		}
+	}
 }

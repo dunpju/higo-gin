@@ -41,7 +41,7 @@ func (this *WebsocketController) Self() higo.IClass {
 
 func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
 	router.Get("/ping", this.Ping, router.Flag("WebsocketController.Ping"), router.Desc("ping"))
-	router.Get("/send_all", this.SendAll, router.Flag("WebsocketController.SendAll"), router.Desc("ping"))
+	router.Get("/send_all", this.SendAll, router.Flag("WebsocketController.SendAll"), router.Desc("SendAll"))
 	return hg
 }
 
@@ -51,6 +51,6 @@ func (this *WebsocketController) Ping(ctx *gin.Context) higo.WebsocketPong {
 }
 
 func (this *WebsocketController) SendAll(ctx *gin.Context) higo.WebsocketPong {
-	higo.WebsocketClientContainer.SendAll("hello")
+	higo.WebsocketContainer.SendAll("hello")
 	return "ok"
 }
