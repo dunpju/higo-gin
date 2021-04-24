@@ -6,13 +6,16 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/robfig/cron/v3"
 	"net/http"
+	"reflect"
 	"sync"
+	"time"
 )
 
 const (
 	HttpServe      = "http"
 	HttpsServe     = "https"
 	WebsocketServe = "websocket"
+	WsConnIp       = "ws_conn_ip"
 )
 
 var (
@@ -22,8 +25,9 @@ var (
 	pathSeparator        string
 	root                 *utils.SliceString
 	Upgrader             websocket.Upgrader
-	WebsocketPongHandler WebsocketPongFunc
+	WebsocketPingHandler WebsocketPingFunc
 	WebsocketContainer   *WebsocketClient
+	reflectWsResponder   reflect.Type
 )
 
 func init() {
@@ -44,8 +48,9 @@ func init() {
 				return true
 			},
 		}
-		WebsocketPongHandler = websocketPongFunc
+		WebsocketPingHandler = websocketPingFunc
 		WebsocketContainer = NewWebsocketClient()
+		reflectWsResponder = reflect.TypeOf((WebsocketResponder)(nil))
 	})
 
 	chlist := getTaskList()
@@ -58,4 +63,13 @@ func init() {
 
 func Root() *utils.SliceString {
 	return root
+}
+
+func websocketPingFunc(websocketConn *WebsocketConn, waittime time.Duration) {
+	time.Sleep(waittime)
+	err := websocketConn.conn.WriteMessage(websocket.TextMessage, []byte("ping"))
+	if err != nil {
+		WebsocketContainer.Remove(websocketConn.conn)
+		return
+	}
 }

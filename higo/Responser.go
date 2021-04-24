@@ -102,7 +102,7 @@ func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	}
 }
 
-type WebsocketResponder func(*gin.Context) WebsocketPong
+type WebsocketResponder func(*gin.Context) Websocket
 
 func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
 	return func(context *gin.Context) {

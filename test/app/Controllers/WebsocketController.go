@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-router/router"
@@ -40,17 +41,49 @@ func (this *WebsocketController) Self() higo.IClass {
 }
 
 func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
-	router.Get("/ping", this.Ping, router.Flag("WebsocketController.Ping"), router.Desc("ping"))
+	router.Get("/conn", this.Conn, router.Flag("WebsocketController.Conn"), router.Desc("conn"))
 	router.Get("/send_all", this.SendAll, router.Flag("WebsocketController.SendAll"), router.Desc("SendAll"))
 	return hg
 }
 
-//webSocket请求ping 返回pong
-func (this *WebsocketController) Ping(ctx *gin.Context) higo.WebsocketPong {
-	return higo.WebsocketPongHandler(ctx)
+//webSocket请求
+func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
+
+	ws := higo.GetWebsocketConn(ctx).Conn()
+	/**
+	for {
+		//读取ws中的数据
+		mt, message, err := ws.ReadMessage()
+		if err != nil {
+			break
+		}
+		if string(message) == "ping" {
+			message = []byte("pong")
+		}
+		//写入ws数据
+		err = ws.WriteMessage(mt, message)
+		if err != nil {
+			break
+		}
+	}
+	 */
+
+	//读取ws中的数据
+	mt, message, err := ws.ReadMessage()
+	fmt.Println(string(message))
+	if err != nil {
+		panic(err)
+	}
+	//写入ws数据
+	err = ws.WriteMessage(mt, []byte("conn ok"))
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
 }
 
-func (this *WebsocketController) SendAll(ctx *gin.Context) higo.WebsocketPong {
-	higo.WebsocketContainer.SendAll("hello")
+func (this *WebsocketController) SendAll(ctx *gin.Context) string {
+	higo.WebsocketContainer.SendAll(ctx.Query("msg"))
 	return "ok"
 }

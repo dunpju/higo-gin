@@ -20,5 +20,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/syyongx/php2go v0.9.4 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/tools v0.0.0-20201030010431-2feb2bb1ff51
 	gopkg.in/yaml.v2 v2.2.8
 )

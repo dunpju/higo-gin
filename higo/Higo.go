@@ -16,6 +16,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -308,6 +309,12 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 
 func handleSlice(route *router.Route) []gin.HandlerFunc {
 	handles := make([]gin.HandlerFunc, 0)
+	if WebsocketServe == route.Serve() {
+		hRef := reflect.ValueOf(route.Handle())
+		if hRef.Type().ConvertibleTo(reflectWsResponder) {
+			handles = append(handles, websocketConnMiddleWare())
+		}
+	}
 	if groupMiddles, ok := route.GroupMiddle().([]interface{}); ok {
 		for _, groupMiddle := range groupMiddles {
 			if middle, ok := groupMiddle.(gin.HandlerFunc); ok {

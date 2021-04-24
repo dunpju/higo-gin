@@ -1,20 +1,18 @@
 package higo
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"sync"
 	"time"
 )
 
-type WebsocketPong string
+type Websocket interface{}
 
-type WebsocketPongFunc func(ctx *gin.Context) WebsocketPong
+type WebsocketPingFunc func(websocketConn *WebsocketConn, waittime time.Duration)
 
 type WebsocketClient struct {
-	heartbeat sync.Map
-	clients   sync.Map
+	clients sync.Map
 }
 
 func NewWebsocketClient() *WebsocketClient {
@@ -44,61 +42,15 @@ func (this *WebsocketClient) Remove(conn *websocket.Conn) {
 	this.clients.Delete(conn.RemoteAddr().String())
 }
 
-//webSocket请求连接
-func websocketConnFunc(ctx *gin.Context) WebsocketPong {
-	//升级get请求为webSocket协议
-	client, err := Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	if err != nil {
-		panic(err)
-	}
-	WebsocketContainer.Store(client)
-	return "ok"
-}
-
-//webSocket请求ping 返回pong
-func websocketPongFunc(ctx *gin.Context) WebsocketPong {
-	//升级get请求为webSocket协议
-	client, err := Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	if err != nil {
-		panic(err)
-	}
-	WebsocketContainer.Store(client)
-	defer client.Close()
-	for {
-		//读取ws中的数据
-		mt, message, err := client.ReadMessage()
-		if err != nil {
-			break
-		}
-		if string(message) == "ping" {
-			message = []byte("pong")
-		}
-		//写入ws数据
-		err = client.WriteMessage(mt, message)
-		if err != nil {
-			break
-		}
-	}
-	return "ok"
-}
-
-type WebsocketConn struct {
-	conn *websocket.Conn
-}
-
-func NewWebsocketConn(conn *websocket.Conn) *WebsocketConn {
-	return &WebsocketConn{conn: conn}
-}
-
-func (this *WebsocketConn) Ping(waittime time.Duration) {
-	for {
-		time.Sleep(waittime)
-		err := this.conn.WriteMessage(websocket.TextMessage, []byte("ping"))
-		if err != nil {
-			fmt.Println(WebsocketContainer)
-			fmt.Println(err)
-			WebsocketContainer.Remove(this.conn)
-			return
-		}
+//webSocket请求连接中间件
+func websocketConnMiddleWare() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		conn := websocketConnFunc(ctx)
+		// 设置变量到Context的key中，可以通过Get()取
+		ctx.Set(WsConnIp, conn)
+		// 执行函数
+		ctx.Next()
+		// 中间件执行完后续的一些事情
+		//status := ctx.Writer.Status()
 	}
 }
