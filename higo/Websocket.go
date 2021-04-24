@@ -22,7 +22,10 @@ func NewWebsocketClient() *WebsocketClient {
 func (this *WebsocketClient) Store(conn *websocket.Conn) {
 	wsConn := NewWebsocketConn(conn)
 	this.clients.Store(conn.RemoteAddr().String(), wsConn)
-	go wsConn.Ping(time.Second * 2)
+	go wsConn.Ping(time.Second * 1) //心跳
+	go wsConn.WriteLoop()//写循环
+	go wsConn.ReadLoop()//读循环
+	go wsConn.HandlerLoop()//处理控制循环
 }
 
 func (this *WebsocketClient) SendAll(msg string) {

@@ -1,7 +1,6 @@
 package Controllers
 
 import (
-	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-router/router"
@@ -49,7 +48,7 @@ func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
 //webSocket请求
 func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
 
-	ws := higo.GetWebsocketConn(ctx).Conn()
+	//ws := higo.GetWebsocketConn(ctx).Conn()
 	/**
 	for {
 		//读取ws中的数据
@@ -68,6 +67,7 @@ func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
 	}
 	 */
 
+	/**
 	//读取ws中的数据
 	mt, message, err := ws.ReadMessage()
 	fmt.Println(string(message))
@@ -79,6 +79,8 @@ func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
 	if err != nil {
 		panic(err)
 	}
+
+	 */
 
 	return nil
 }
