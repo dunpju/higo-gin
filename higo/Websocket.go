@@ -43,7 +43,7 @@ func (this *WebsocketClient) Remove(conn *websocket.Conn) {
 }
 
 //webSocket请求连接中间件
-func websocketConnMiddleWare() gin.HandlerFunc {
+func wsConnMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		conn := websocketConnFunc(ctx)
 		// 设置变量到Context的key中，可以通过Get()取

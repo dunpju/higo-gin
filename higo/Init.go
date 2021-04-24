@@ -28,6 +28,9 @@ var (
 	WebsocketPingHandler WebsocketPingFunc
 	WebsocketContainer   *WebsocketClient
 	reflectWsResponder   reflect.Type
+	WsCheckOrigin        = func(r *http.Request) bool {
+		return true
+	}
 )
 
 func init() {
@@ -44,9 +47,7 @@ func init() {
 			Append(WebsocketServe)
 		root = utils.NewSliceString(".", "..", "")
 		Upgrader = websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
+			CheckOrigin: WsCheckOrigin,
 		}
 		WebsocketPingHandler = websocketPingFunc
 		WebsocketContainer = NewWebsocketClient()

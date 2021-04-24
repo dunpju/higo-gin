@@ -310,9 +310,8 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 func handleSlice(route *router.Route) []gin.HandlerFunc {
 	handles := make([]gin.HandlerFunc, 0)
 	if WebsocketServe == route.Serve() {
-		hRef := reflect.ValueOf(route.Handle())
-		if hRef.Type().ConvertibleTo(reflectWsResponder) {
-			handles = append(handles, websocketConnMiddleWare())
+		if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(reflectWsResponder) {
+			handles = append(handles, wsConnMiddleWare())
 		}
 	}
 	if groupMiddles, ok := route.GroupMiddle().([]interface{}); ok {
@@ -322,7 +321,6 @@ func handleSlice(route *router.Route) []gin.HandlerFunc {
 			}
 		}
 	}
-
 	if middlewares, ok := route.Middleware().([]interface{}); ok {
 		for _, middleware := range middlewares {
 			if middle, ok := middleware.(gin.HandlerFunc); ok {
@@ -330,7 +328,6 @@ func handleSlice(route *router.Route) []gin.HandlerFunc {
 			}
 		}
 	}
-
 	return handles
 }
 
