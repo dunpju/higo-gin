@@ -1,6 +1,8 @@
 package higo
 
 import (
+	"fmt"
+	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"sync"
@@ -19,13 +21,13 @@ func NewWebsocketClient() *WebsocketClient {
 	return &WebsocketClient{}
 }
 
-func (this *WebsocketClient) Store(conn *websocket.Conn) {
-	wsConn := NewWebsocketConn(conn)
+func (this *WebsocketClient) Store(url string,conn *websocket.Conn) {
+	wsConn := NewWebsocketConn(url, conn)
 	this.clients.Store(conn.RemoteAddr().String(), wsConn)
 	go wsConn.Ping(time.Second * 1) //心跳
-	go wsConn.WriteLoop()//写循环
-	go wsConn.ReadLoop()//读循环
-	go wsConn.HandlerLoop()//处理控制循环
+	go wsConn.WriteLoop()           //写循环
+	go wsConn.ReadLoop()            //读循环
+	go wsConn.HandlerLoop()         //处理控制循环
 }
 
 func (this *WebsocketClient) SendAll(msg string) {
@@ -55,5 +57,16 @@ func wsConnMiddleWare() gin.HandlerFunc {
 		ctx.Next()
 		// 中间件执行完后续的一些事情
 		//status := ctx.Writer.Status()
+	}
+}
+
+// 连接升级协议handler不用做任何业务
+func wsUpgraderHandler(route *router.Route) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ip, ok := ctx.Get(WsConnIp)
+		if !ok {
+			panic("websocket conn ip non-existent")
+		}
+		fmt.Println("wsUpgraderHandler", ip)
 	}
 }

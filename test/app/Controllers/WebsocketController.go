@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-router/router"
@@ -47,8 +48,8 @@ func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
 
 //webSocket请求
 func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
-
-	//ws := higo.GetWebsocketConn(ctx).Conn()
+fmt.Println("控制器")
+	//ws := higo.GetWebsocketConn(ctx)
 	/**
 	for {
 		//读取ws中的数据

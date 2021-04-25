@@ -8,14 +8,20 @@ import (
 )
 
 type WebsocketConn struct {
+	url       string
 	conn      *websocket.Conn
 	readChan  chan *WebsocketMessage
 	writeChan chan []byte
 	closeChan chan byte
 }
 
-func NewWebsocketConn(conn *websocket.Conn) *WebsocketConn {
-	return &WebsocketConn{conn: conn, readChan: make(chan *WebsocketMessage), writeChan: make(chan []byte), closeChan: make(chan byte)}
+func NewWebsocketConn(url string, conn *websocket.Conn) *WebsocketConn {
+	return &WebsocketConn{url: url, conn: conn, readChan: make(chan *WebsocketMessage),
+		writeChan: make(chan []byte), closeChan: make(chan byte)}
+}
+
+func (this *WebsocketConn) Url() string {
+	return this.url
 }
 
 func (this *WebsocketConn) Conn() *websocket.Conn {
@@ -61,7 +67,11 @@ loop:
 	for {
 		select {
 		case msg := <-this.readChan:
+			//TODO::做路由转发
+			fmt.Println("HandlerLoop", this.url)
 			fmt.Println(string(msg.MessageData))
+			fmt.Println(this.conn.RemoteAddr().String())
+			fmt.Println(this.conn.RemoteAddr().Network())
 			// 写数据
 			this.writeChan <- []byte("receiv: " + string(msg.MessageData))
 		case <-this.closeChan:
@@ -90,6 +100,7 @@ func websocketConnFunc(ctx *gin.Context) string {
 	if err != nil {
 		panic(err)
 	}
-	WebsocketContainer.Store(client)
+	fmt.Println("websocketConnFunc", ctx.Request.URL)
+	WebsocketContainer.Store(ctx.Request.URL.Path, client)
 	return client.RemoteAddr().String()
 }

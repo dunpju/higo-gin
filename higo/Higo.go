@@ -291,7 +291,11 @@ func (this *Higo) loadRoute() *Higo {
 func (this *Higo) GroupHandle(route *router.Route) *Higo {
 	if handle := Convert(route.Handle()); handle != nil {
 		handles := handleSlice(route)
-		handles = append(handles, handle)
+		if WebsocketServe == route.Serve() {
+			handles = append(handles, wsUpgraderHandler(route))
+		} else {
+			handles = append(handles, handle)
+		}
 		this.group.Handle(strings.ToUpper(route.Method()), route.RelativePath(), handles...)
 	}
 	return this
@@ -301,7 +305,11 @@ func (this *Higo) GroupHandle(route *router.Route) *Higo {
 func (this *Higo) Handle(route *router.Route) *Higo {
 	if handle := Convert(route.Handle()); handle != nil {
 		handles := handleSlice(route)
-		handles = append(handles, handle)
+		if WebsocketServe == route.Serve() {
+			handles = append(handles, wsUpgraderHandler(route))
+		} else {
+			handles = append(handles, handle)
+		}
 		this.Engine.Handle(strings.ToUpper(route.Method()), route.RelativePath(), handles...)
 	}
 	return this
