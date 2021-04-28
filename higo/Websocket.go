@@ -21,8 +21,8 @@ func NewWebsocketClient() *WebsocketClient {
 	return &WebsocketClient{}
 }
 
-func (this *WebsocketClient) Store(url string,conn *websocket.Conn) {
-	wsConn := NewWebsocketConn(url, conn)
+func (this *WebsocketClient) Store(route *router.Route, conn *websocket.Conn) {
+	wsConn := NewWebsocketConn(route, conn)
 	this.clients.Store(conn.RemoteAddr().String(), wsConn)
 	go wsConn.Ping(time.Second * 1) //心跳
 	go wsConn.WriteLoop()           //写循环

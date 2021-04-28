@@ -1,27 +1,27 @@
 package higo
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"net/http"
+	"net/url"
 	"time"
 )
 
 type WebsocketConn struct {
-	url       string
+	route     *router.Route
 	conn      *websocket.Conn
 	readChan  chan *WebsocketMessage
 	writeChan chan []byte
 	closeChan chan byte
 }
 
-func NewWebsocketConn(url string, conn *websocket.Conn) *WebsocketConn {
-	return &WebsocketConn{url: url, conn: conn, readChan: make(chan *WebsocketMessage),
+func NewWebsocketConn(route *router.Route, conn *websocket.Conn) *WebsocketConn {
+	return &WebsocketConn{route: route, conn: conn, readChan: make(chan *WebsocketMessage),
 		writeChan: make(chan []byte), closeChan: make(chan byte)}
-}
-
-func (this *WebsocketConn) Url() string {
-	return this.url
 }
 
 func (this *WebsocketConn) Conn() *websocket.Conn {
@@ -68,12 +68,21 @@ loop:
 		select {
 		case msg := <-this.readChan:
 			//TODO::做路由转发
-			fmt.Println("HandlerLoop", this.url)
-			fmt.Println(string(msg.MessageData))
-			fmt.Println(this.conn.RemoteAddr().String())
-			fmt.Println(this.conn.RemoteAddr().Network())
+			fmt.Println("HandlerLoop", this.route)
+			fmt.Println("HandlerLoop", string(msg.MessageData))
+			fmt.Println("HandlerLoop", this.conn.RemoteAddr().String())
+
+			handle := this.route.Handle()
+			ctx := &gin.Context{Request: &http.Request{PostForm: make(url.Values)}}
+			reader := bytes.NewReader(msg.MessageData)
+			request,_ := http.NewRequest(router.POST, this.route.FullPath(), reader)
+			request.Header.Set("Content-Type", "application/json")
+			ctx.Request = request
+
+			//调度
+			responser := handle.(func(*gin.Context) Websocket)(ctx)
 			// 写数据
-			this.writeChan <- []byte("receiv: " + string(msg.MessageData))
+			this.writeChan <- []byte("receiv: " + responser.(string))
 		case <-this.closeChan:
 			fmt.Println("已经关闭")
 			break loop
@@ -100,7 +109,10 @@ func websocketConnFunc(ctx *gin.Context) string {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("websocketConnFunc", ctx.Request.URL)
-	WebsocketContainer.Store(ctx.Request.URL.Path, client)
+	fmt.Println("websocketConnFunc Method", ctx.Request.Method)
+	fmt.Println("websocketConnFunc URL", ctx.Request.URL)
+	route := router.GetRoutes(WebsocketServe).Route(ctx.Request.Method, ctx.Request.URL.Path).SetHeader(ctx.Request.Header)
+	fmt.Println("websocketConnFunc route", route)
+	WebsocketContainer.Store(route, client)
 	return client.RemoteAddr().String()
 }
