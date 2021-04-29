@@ -7,6 +7,7 @@ import (
 
 // 测试异常
 func HttpsTestThrow(ctx *gin.Context) string  {
+	//panic("https 测试异常")
 	throw.Throw(throw.Message("https 测试异常"), throw.Code(0))
 	return "https_test_throw"
 }

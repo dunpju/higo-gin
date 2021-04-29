@@ -52,6 +52,7 @@ func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
 //webSocket请求
 func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
 	fmt.Println("控制器 Conn")
+	fmt.Println("控制器 Conn", ctx.Request.URL.Path)
 	loginEntity := Entity.NewLoginEntity()
 	err := ctx.ShouldBind(loginEntity)
 	if err != nil {

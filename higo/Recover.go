@@ -23,7 +23,7 @@ func init() {
 			//打印错误堆栈信息
 			//debug.PrintStack()
 			// 输出换行debug调用栈
-			logger.PrintlnStack()
+			logger.LoggerStack(r, utils.GoroutineID())
 			//封装通用json返回
 			if h, ok := r.(gin.H); ok {
 				c.JSON(http.StatusOK, h)
