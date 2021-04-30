@@ -118,7 +118,7 @@ loop:
 			// 写数据
 			this.writeChan <- this.dispatch(msg)
 		case <-this.closeChan:
-			logger.Logrus.Info("ws conn " + this.Conn().RemoteAddr().String() + " have already closed")
+			logger.Logrus.Info("websocket conn " + this.Conn().RemoteAddr().String() + " have already closed")
 			break loop
 		}
 	}
@@ -136,11 +136,11 @@ func (this *WebsocketConn) dispatch(msg *WsReadMessage) WsWriteMessage {
 }
 
 func WsConn(ctx *gin.Context) *WebsocketConn {
-	ip, ok := ctx.Get(WsConnIp)
+	client, ok := ctx.Get(WsConnIp)
 	if !ok {
-		panic("websocket conn ip non-existent")
+		panic("websocket conn client non-existent")
 	}
-	if conn, ok := WsContainer.clients.Load(ip); ok {
+	if conn, ok := WsContainer.clients.Load(client); ok {
 		return conn.(*WebsocketConn)
 	} else {
 		panic("websocket conn non-existent")
