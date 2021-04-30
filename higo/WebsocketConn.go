@@ -2,26 +2,46 @@ package higo
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-router/router"
+	"github.com/dengpju/higo-throw/exception"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 )
+
+var (
+	//Recover处理函数(可自定义替换)
+	WsRecoverHandle WsRecoverFunc
+	wsRecoverOnce   sync.Once
+)
+
+func init() {
+	wsRecoverOnce.Do(func() {
+		WsRecoverHandle = func(wsconn *WebsocketConn, r interface{}) {
+			logger.LoggerStack(r, utils.GoroutineID())
+			wsconn.writeChan <- WsRespError(exception.ErrorToString(r))
+		}
+	})
+}
+
+type WsRecoverFunc func(wsconn *WebsocketConn, r interface{})
 
 type WebsocketConn struct {
 	route     *router.Route
 	conn      *websocket.Conn
-	readChan  chan *WebsocketMessage
-	writeChan chan []byte
+	readChan  chan *WsReadMessage
+	writeChan chan WsWriteMessage
 	closeChan chan byte
 }
 
 func NewWebsocketConn(route *router.Route, conn *websocket.Conn) *WebsocketConn {
-	return &WebsocketConn{route: route, conn: conn, readChan: make(chan *WebsocketMessage),
-		writeChan: make(chan []byte), closeChan: make(chan byte)}
+	return &WebsocketConn{route: route, conn: conn, readChan: make(chan *WsReadMessage),
+		writeChan: make(chan WsWriteMessage), closeChan: make(chan byte)}
 }
 
 func (this *WebsocketConn) Conn() *websocket.Conn {
@@ -30,7 +50,7 @@ func (this *WebsocketConn) Conn() *websocket.Conn {
 
 func (this *WebsocketConn) Ping(waittime time.Duration) {
 	for {
-		WebsocketPingHandler(this, waittime)
+		WsPingHandle(this, waittime)
 	}
 }
 
@@ -38,13 +58,17 @@ func (this *WebsocketConn) ReadLoop() {
 	for {
 		t, message, err := this.conn.ReadMessage()
 		if err != nil {
-			this.conn.Close()
-			WebsocketContainer.Remove(this.conn)
-			this.closeChan <- 1
+			this.Close()
 			break
 		}
-		this.readChan <- NewWebsocketMessage(t, message)
+		this.readChan <- NewReadMessage(t, message)
 	}
+}
+
+func (this *WebsocketConn) Close() {
+	this.conn.Close()
+	WsContainer.Remove(this.conn)
+	this.closeChan <- 1
 }
 
 func (this *WebsocketConn) WriteLoop() {
@@ -52,10 +76,13 @@ loop:
 	for {
 		select {
 		case msg := <-this.writeChan:
-			if err := this.conn.WriteMessage(websocket.TextMessage, msg); err != nil {
-				this.conn.Close()
-				WebsocketContainer.Remove(this.conn)
-				this.closeChan <- 1
+			if WsResperror == msg.MessageType {
+				_ = this.conn.WriteMessage(websocket.TextMessage, msg.MessageData)
+				this.Close()
+				break loop
+			}
+			if err := this.conn.WriteMessage(websocket.TextMessage, msg.MessageData); err != nil {
+				this.Close()
 				break loop
 			}
 		}
@@ -63,31 +90,33 @@ loop:
 }
 
 func (this *WebsocketConn) HandlerLoop() {
+	defer func() {
+		if r := recover(); r != nil {
+			WsRecoverHandle(this, r)
+		}
+	}()
 loop:
 	for {
 		select {
 		case msg := <-this.readChan:
-			//TODO::做路由转发
-			fmt.Println("HandlerLoop", this.route)
-			fmt.Println("HandlerLoop", string(msg.MessageData))
-			fmt.Println("HandlerLoop", this.conn.RemoteAddr().String())
-
-			handle := this.route.Handle()
-			ctx := &gin.Context{Request: &http.Request{PostForm: make(url.Values)}}
-			reader := bytes.NewReader(msg.MessageData)
-			request,_ := http.NewRequest(router.POST, this.route.FullPath(), reader)
-			request.Header.Set("Content-Type", "application/json")
-			ctx.Request = request
-
-			//调度
-			responser := handle.(func(*gin.Context) Websocket)(ctx)
 			// 写数据
-			this.writeChan <- []byte("receiv: " + responser.(string))
+			this.writeChan <- this.dispatch(msg)
 		case <-this.closeChan:
-			fmt.Println("已经关闭")
+			logger.Logrus.Info("ws conn " + this.Conn().RemoteAddr().String() + " have already closed")
 			break loop
 		}
 	}
+}
+
+func (this *WebsocketConn) dispatch(msg *WsReadMessage) WsWriteMessage {
+	handle := this.route.Handle()
+	ctx := &gin.Context{Request: &http.Request{PostForm: make(url.Values)}}
+	reader := bytes.NewReader(msg.MessageData)
+	request, _ := http.NewRequest(router.POST, this.route.FullPath(), reader)
+	request.Header.Set("Content-Type", "application/json")
+	ctx.Request = request
+
+	return handle.(func(*gin.Context) WsWriteMessage)(ctx)
 }
 
 func GetWebsocketConn(ctx *gin.Context) *WebsocketConn {
@@ -95,7 +124,7 @@ func GetWebsocketConn(ctx *gin.Context) *WebsocketConn {
 	if !ok {
 		panic("websocket conn ip non-existent")
 	}
-	if conn, ok := WebsocketContainer.clients.Load(ip); ok {
+	if conn, ok := WsContainer.clients.Load(ip); ok {
 		return conn.(*WebsocketConn)
 	} else {
 		panic("websocket conn non-existent")
@@ -109,10 +138,9 @@ func websocketConnFunc(ctx *gin.Context) string {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("websocketConnFunc Method", ctx.Request.Method)
-	fmt.Println("websocketConnFunc URL", ctx.Request.URL)
+
 	route := router.GetRoutes(WebsocketServe).Route(ctx.Request.Method, ctx.Request.URL.Path).SetHeader(ctx.Request.Header)
-	fmt.Println("websocketConnFunc route", route)
-	WebsocketContainer.Store(route, client)
+
+	WsContainer.Store(route, client)
 	return client.RemoteAddr().String()
 }

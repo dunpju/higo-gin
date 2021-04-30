@@ -4,7 +4,7 @@ import (
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Consts"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +22,12 @@ func (this Auth) Loader(hg *higo.Higo) gin.HandlerFunc {
 			// TODO::非静态页面需要鉴权
 			if !higo.IsNotAuth(route.Flag()) && !route.IsStatic() {
 				if "" == c.GetHeader("X-Token") {
-					throw.Throw(throw.Message(code.Message(Consts.INVALID_TOKEN).Message), throw.Code(code.Message(Consts.INVALID_TOKEN).Code))
+					exception.Throw(exception.Message(code.Message(Consts.INVALID_TOKEN).Message), exception.Code(code.Message(Consts.INVALID_TOKEN).Code))
 				}
 			}
 			c.Next()
 		} else {
-			throw.Throw(throw.Message(code.Message(Consts.INVALID_API).Message), throw.Code(code.Message(Consts.INVALID_API).Code))
+			exception.Throw(exception.Message(code.Message(Consts.INVALID_API).Message), exception.Code(code.Message(Consts.INVALID_API).Code))
 		}
 	}
 }

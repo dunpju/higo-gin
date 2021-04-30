@@ -2,11 +2,11 @@ package Exception
 
 import (
 	"gitee.com/dengpju/higo-parameter/parameter"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 )
 
 type Business struct {
-	throw.Throwable // 继承
+	exception.Throwable // 继承
 }
 
 func BusinessException(p ...*parameter.Parameter) {

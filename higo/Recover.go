@@ -3,7 +3,7 @@ package higo
 import (
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-logger/logger"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,15 +11,15 @@ import (
 )
 
 var (
-	//Recover处理函数(可自定义)
-	RecoverHandlerFunc RecoverFunc
-	recoverOnce        sync.Once
+	//Recover处理函数(可自定义替换)
+	RecoverHandle RecoverFunc
+	recoverOnce   sync.Once
 )
 
 func init() {
 	recoverOnce.Do(func() {
 		//初始化Recover处理函数
-		RecoverHandlerFunc = func(c *gin.Context, r interface{}) {
+		RecoverHandle = func(c *gin.Context, r interface{}) {
 			//打印错误堆栈信息
 			//debug.PrintStack()
 			// 输出换行debug调用栈
@@ -38,7 +38,7 @@ func init() {
 			} else {
 				c.JSON(http.StatusOK, gin.H{
 					"code":    0,
-					"message": throw.ErrorToString(r),
+					"message": exception.ErrorToString(r),
 					"data":    nil,
 				})
 			}
@@ -60,8 +60,8 @@ func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				RecoverHandlerFunc(c, r) //执行Recover处理函数
-				c.Abort()                //终止
+				RecoverHandle(c, r) //执行Recover处理函数
+				c.Abort()           //终止
 			}
 		}()
 		c.Next() //继续

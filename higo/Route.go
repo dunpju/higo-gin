@@ -2,7 +2,7 @@ package higo
 
 import (
 	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 )
 
 var RouterContainer RouterCollect
@@ -24,7 +24,7 @@ func (this RouterCollect) All() RouterCollect {
 func (this RouterCollect) Get(relativePath string) *router.Route {
 	route, ok := this[relativePath]
 	if !ok {
-		throw.Throw(throw.Message(relativePath+"未定义路由"), throw.Code(0))
+		exception.Throw(exception.Message(relativePath+"未定义路由"), exception.Code(0))
 	}
 	return route
 }

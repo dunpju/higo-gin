@@ -3,7 +3,7 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-config/config"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/gomodule/redigo/redis"
 	"sync"
 	"time"
@@ -55,7 +55,7 @@ func (this *RedisAdapter) Set(key string, v interface{}) bool {
 	_, err := this.conn.Do("set", key, v)
 	if err != nil {
 		this.conn.Close()
-		throw.Throw(throw.Message(err), throw.Code(0))
+		exception.Throw(exception.Message(err), exception.Code(0))
 	}
 	return true
 }
@@ -80,7 +80,7 @@ func (this *RedisAdapter) Setex(key string, expire int, data []byte) bool {
 	_, err := this.conn.Do("setex", key, expire, data)
 	if err != nil {
 		this.conn.Close()
-		throw.Throw(throw.Message(err), throw.Code(0))
+		exception.Throw(exception.Message(err), exception.Code(0))
 	}
 	return true
 }

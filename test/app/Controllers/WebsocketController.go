@@ -1,7 +1,6 @@
 package Controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Entity"
@@ -50,7 +49,7 @@ func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
 }
 
 //webSocket请求
-func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
+func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
 	fmt.Println("控制器 Conn")
 	fmt.Println("控制器 Conn", ctx.Request.URL.Path)
 	loginEntity := Entity.NewLoginEntity()
@@ -60,16 +59,15 @@ func (this *WebsocketController) Conn(ctx *gin.Context) higo.Websocket {
 	}
 	fmt.Println("Conn", loginEntity)
 
-	result,err := json.Marshal(loginEntity)
-	return string(result)
+	return higo.WsRespStruct(loginEntity)
 }
 
-func (this *WebsocketController) Echo(ctx *gin.Context) higo.Websocket {
+func (this *WebsocketController) Echo(ctx *gin.Context) higo.WsWriteMessage {
 
-	return "echo"
+	return higo.WsRespString("echo")
 }
 
 func (this *WebsocketController) SendAll(ctx *gin.Context) string {
-	higo.WebsocketContainer.SendAll(ctx.Query("msg"))
+	higo.WsContainer.SendAll(ctx.Query("msg"))
 	return "ok"
 }

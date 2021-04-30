@@ -3,13 +3,13 @@ package higo
 import (
 	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 )
 
 // 是否空标记
 func IsEmptyFlag(route *router.Route) {
 	if route.Flag() == "" && !route.IsStatic() {
-		throw.Throw(throw.Message(route.RelativePath()+"未设置标记"), throw.Code(0))
+		exception.Throw(exception.Message(route.RelativePath()+"未设置标记"), exception.Code(0))
 	}
 }
 

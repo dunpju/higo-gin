@@ -1,15 +1,15 @@
 package higo
 
 import (
-	"fmt"
 	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"net/http"
 	"sync"
 	"time"
 )
 
-type Websocket interface{}
+type WebsocketCheckFunc func(r *http.Request) bool
 
 type WebsocketPingFunc func(websocketConn *WebsocketConn, waittime time.Duration)
 
@@ -61,12 +61,11 @@ func wsConnMiddleWare() gin.HandlerFunc {
 }
 
 // 连接升级协议handler不用做任何业务
-func wsUpgraderHandler(route *router.Route) gin.HandlerFunc {
+func wsUpgraderHandle(route *router.Route) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ip, ok := ctx.Get(WsConnIp)
+		_, ok := ctx.Get(WsConnIp)
 		if !ok {
 			panic("websocket conn ip non-existent")
 		}
-		fmt.Println("wsUpgraderHandler", ip)
 	}
 }

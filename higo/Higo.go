@@ -6,7 +6,7 @@ import (
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -112,14 +112,14 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 				yamlFileErr := yaml.Unmarshal(yamlFile, conf)
 				envConf.Set(utils.Basename(p, "yaml"), conf)
 				if yamlFileErr != nil {
-					throw.Throw(throw.Message(yamlFileErr), throw.Code(0))
+					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
 				}
 				logger.Logrus.Infoln("Loader env file:", filepath.Base(p))
 			}
 			return nil
 		})
 	if filepathErr != nil {
-		throw.Throw(throw.Message(filepathErr), throw.Code(0))
+		exception.Throw(exception.Message(filepathErr), exception.Code(0))
 	}
 	config.Set("env", envConf)
 	SslOut = this.GetRoot().Separator(pathSeparator) + config.String("env.app.SSL.OUT") + pathSeparator
@@ -290,12 +290,7 @@ func (this *Higo) loadRoute() *Higo {
 // 路由组Handle
 func (this *Higo) GroupHandle(route *router.Route) *Higo {
 	if handle := Convert(route.Handle()); handle != nil {
-		handles := handleSlice(route)
-		if WebsocketServe == route.Serve() {
-			handles = append(handles, wsUpgraderHandler(route))
-		} else {
-			handles = append(handles, handle)
-		}
+		handles := appendHandle(handle, route)
 		this.group.Handle(strings.ToUpper(route.Method()), route.RelativePath(), handles...)
 	}
 	return this
@@ -304,23 +299,26 @@ func (this *Higo) GroupHandle(route *router.Route) *Higo {
 // 路由Handle
 func (this *Higo) Handle(route *router.Route) *Higo {
 	if handle := Convert(route.Handle()); handle != nil {
-		handles := handleSlice(route)
-		if WebsocketServe == route.Serve() {
-			handles = append(handles, wsUpgraderHandler(route))
-		} else {
-			handles = append(handles, handle)
-		}
+		handles := appendHandle(handle, route)
 		this.Engine.Handle(strings.ToUpper(route.Method()), route.RelativePath(), handles...)
 	}
 	return this
 }
 
+func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc {
+	handles := handleSlice(route)
+	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
+		handles = append(handles, wsUpgraderHandle(route))
+	} else {
+		handles = append(handles, handle)
+	}
+	return handles
+}
+
 func handleSlice(route *router.Route) []gin.HandlerFunc {
 	handles := make([]gin.HandlerFunc, 0)
-	if WebsocketServe == route.Serve() {
-		if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(reflectWsResponder) {
-			handles = append(handles, wsConnMiddleWare())
-		}
+	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
+		handles = append(handles, wsConnMiddleWare())
 	}
 	if groupMiddles, ok := route.GroupMiddle().([]interface{}); ok {
 		for _, groupMiddle := range groupMiddles {
@@ -351,7 +349,7 @@ func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
 func (this *Higo) Cron(expr string, fn func()) *Higo {
 	_, err := CronTask().AddFunc(expr, fn)
 	if err != nil {
-		throw.Throw(throw.Message(err), throw.Code(0))
+		exception.Throw(exception.Message(err), exception.Code(0))
 	}
 	return this
 }

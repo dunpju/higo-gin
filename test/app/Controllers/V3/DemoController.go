@@ -8,7 +8,7 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Models"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/dengpju/higo-ioc/injector"
-	"github.com/dengpju/higo-throw/throw"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"log"
@@ -67,8 +67,8 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	//		throw.MapString.Put(p.Name, p.Value)
 	//	}
 	//}
-	Exception.BusinessException(throw.Code(2), throw.Message("v3 https 测试异常2"))
-	throw.Throw(throw.Message("v3 https 测试异常11"), throw.Code(2), throw.Data(struct {
+	Exception.BusinessException(exception.Code(2), exception.Message("v3 https 测试异常2"))
+	exception.Throw(exception.Message("v3 https 测试异常11"), exception.Code(2), exception.Data(struct {
 		Id   int
 		Name string
 	}{Id: 1, Name: "哦哦"}))
@@ -102,7 +102,7 @@ func (this *DemoController) HttpsTestPost(ctx *gin.Context) string {
 
 // 测试异常
 func (this *DemoController) HttpTestThrow(ctx *gin.Context) string {
-	throw.Throw(throw.Message("v3 http 测试异常"), throw.Code(0))
+	exception.Throw(exception.Message("v3 http 测试异常"), exception.Code(0))
 	return "v3 http_test_throw"
 }
 
