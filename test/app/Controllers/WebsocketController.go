@@ -7,8 +7,6 @@ import (
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	"net/http"
 	"sync"
 )
 
@@ -28,11 +26,6 @@ func NewWebsocketController() *WebsocketController {
 		injector.BeanFactory.Apply(WebsocketControllerPointer)
 		injector.BeanFactory.Set(WebsocketControllerPointer)
 		higo.AddContainer(WebsocketControllerPointer)
-		higo.Upgrader = websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		}
 	})
 	return WebsocketControllerPointer
 }

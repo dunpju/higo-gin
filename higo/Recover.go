@@ -18,25 +18,24 @@ var (
 
 func init() {
 	recoverOnce.Do(func() {
-		//初始化Recover处理函数
-		RecoverHandle = func(c *gin.Context, r interface{}) {
-			//打印错误堆栈信息
-			//debug.PrintStack()
-			// 输出换行debug调用栈
+		RecoverHandle = func(cxt *gin.Context, r interface{}) {
+
+			//记录debug调用栈
 			logger.LoggerStack(r, utils.GoroutineID())
+
 			//封装通用json返回
 			if h, ok := r.(gin.H); ok {
-				c.JSON(http.StatusOK, h)
+				cxt.JSON(http.StatusOK, h)
 			} else if msg, ok := r.(*code.Code); ok {
-				c.JSON(http.StatusOK, gin.H{
+				cxt.JSON(http.StatusOK, gin.H{
 					"code":    msg.Code,
 					"message": msg.Message,
 					"data":    nil,
 				})
 			} else if MapString, ok := r.(utils.MapString); ok {
-				c.JSON(http.StatusOK, MapString)
+				cxt.JSON(http.StatusOK, MapString)
 			} else {
-				c.JSON(http.StatusOK, gin.H{
+				cxt.JSON(http.StatusOK, gin.H{
 					"code":    0,
 					"message": exception.ErrorToString(r),
 					"data":    nil,
@@ -46,24 +45,22 @@ func init() {
 	})
 }
 
-type RecoverFunc func(c *gin.Context, r interface{})
+type RecoverFunc func(cxt *gin.Context, r interface{})
 
-// 全局异常
 type Recover struct{}
 
-// 构造函数
 func NewRecover() *Recover {
 	return &Recover{}
 }
 
 func (this *Recover) Exception(hg *Higo) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(cxt *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				RecoverHandle(c, r) //执行Recover处理函数
-				c.Abort()           //终止
+				RecoverHandle(cxt, r)
+				cxt.Abort()
 			}
 		}()
-		c.Next() //继续
+		cxt.Next()
 	}
 }

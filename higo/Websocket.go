@@ -24,10 +24,10 @@ func NewWebsocketClient() *WebsocketClient {
 func (this *WebsocketClient) Store(route *router.Route, conn *websocket.Conn) {
 	wsConn := NewWebsocketConn(route, conn)
 	this.clients.Store(conn.RemoteAddr().String(), wsConn)
-	go wsConn.Ping(time.Second * 1) //心跳
-	go wsConn.WriteLoop()           //写循环
-	go wsConn.ReadLoop()            //读循环
-	go wsConn.HandlerLoop()         //处理控制循环
+	go wsConn.Ping(WsPitpatSleep) //心跳
+	go wsConn.WriteLoop()         //写循环
+	go wsConn.ReadLoop()          //读循环
+	go wsConn.HandlerLoop()       //处理控制循环
 }
 
 func (this *WebsocketClient) SendAll(msg string) {
@@ -45,7 +45,7 @@ func (this *WebsocketClient) Remove(conn *websocket.Conn) {
 	this.clients.Delete(conn.RemoteAddr().String())
 }
 
-//webSocket请求连接中间件
+//ws连接中间件
 func wsConnMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		conn := websocketConnFunc(ctx)
@@ -58,7 +58,7 @@ func wsConnMiddleWare() gin.HandlerFunc {
 	}
 }
 
-// 连接升级协议handler不用做任何业务
+// 连接升级协议handle
 func wsUpgraderHandle(route *router.Route) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		_, ok := ctx.Get(WsConnIp)

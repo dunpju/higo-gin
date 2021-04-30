@@ -2,6 +2,7 @@ package higo
 
 import (
 	"bytes"
+	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
@@ -22,14 +23,28 @@ var (
 
 func init() {
 	wsRecoverOnce.Do(func() {
-		WsRecoverHandle = func(wsconn *WebsocketConn, r interface{}) {
-			logger.LoggerStack(r, utils.GoroutineID())
-			wsconn.writeChan <- WsRespError(exception.ErrorToString(r))
+		WsRecoverHandle = func(r interface{}) (respMsg string) {
+			if msg, ok := r.(*code.Code); ok {
+				respMsg = make(utils.MapString).
+					Put("code", msg.Code).
+					Put("message", msg.Message).
+					Put("data", nil).
+					String()
+			} else if MapString, ok := r.(utils.MapString); ok {
+				respMsg = MapString.String()
+			} else {
+				respMsg = make(utils.MapString).
+					Put("code", 0).
+					Put("message", exception.ErrorToString(r)).
+					Put("data", nil).
+					String()
+			}
+			return
 		}
 	})
 }
 
-type WsRecoverFunc func(wsconn *WebsocketConn, r interface{})
+type WsRecoverFunc func(r interface{}) string
 
 type WebsocketConn struct {
 	route     *router.Route
@@ -92,7 +107,8 @@ loop:
 func (this *WebsocketConn) HandlerLoop() {
 	defer func() {
 		if r := recover(); r != nil {
-			WsRecoverHandle(this, r)
+			logger.LoggerStack(r, utils.GoroutineID())
+			this.writeChan <- WsRespError(WsRecoverHandle(r))
 		}
 	}()
 loop:

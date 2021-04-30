@@ -34,6 +34,7 @@ var (
 	WsContainer      *WebsocketClient
 	refWsResponder   reflect.Type
 	WsCheckOrigin    WebsocketCheckFunc
+	WsPitpatSleep    time.Duration
 )
 
 func init() {
@@ -58,6 +59,7 @@ func init() {
 		WsPingHandle = wsPingFunc
 		WsContainer = NewWebsocketClient()
 		refWsResponder = reflect.TypeOf((WebsocketResponder)(nil))
+		WsPitpatSleep = time.Second * 1
 	})
 
 	chlist := getTaskList()

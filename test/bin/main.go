@@ -23,6 +23,8 @@ func main() {
 	//injector.BeanFactory.Apply(demoController)
 	//fmt.Println(demoController.DB)
 
+	//higo.WsPitpatSleep = time.Second * 5
+
 	higo.Init().
 		LoadEnv(utils.NewSliceString(".", "test", "")).
 		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
