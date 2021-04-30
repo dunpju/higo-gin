@@ -35,9 +35,7 @@ func (this *WebsocketClient) SendAll(msg string) {
 		conn := client.(*WebsocketConn).conn
 		err := conn.WriteMessage(websocket.TextMessage, []byte(msg))
 		if err != nil {
-			//TODO::应该记录日志
 			this.Remove(conn)
-			panic(err)
 		}
 		return true
 	})
