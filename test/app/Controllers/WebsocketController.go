@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Entity"
-	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +21,9 @@ func (this *WebsocketController) Self(hg *higo.Higo) higo.IClass {
 }
 
 func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
-	router.Ws("/conn", this.Conn, router.Flag("WebsocketController.Conn"), router.Desc("conn"))
-	router.Ws("/echo", this.Echo, router.Flag("WebsocketController.Echo"), router.Desc("Echo"))
-	router.Ws("/send_all", this.SendAll, router.Flag("WebsocketController.SendAll"), router.Desc("SendAll"))
+	hg.Ws("/conn", this.Conn, hg.Flag("WebsocketController.Conn"), hg.Desc("conn"))
+	hg.Ws("/echo", this.Echo, hg.Flag("WebsocketController.Echo"), hg.Desc("Echo"))
+	hg.Ws("/send_all", this.SendAll, hg.Flag("WebsocketController.SendAll"), hg.Desc("SendAll"))
 	return hg
 }
 

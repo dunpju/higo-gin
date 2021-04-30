@@ -3,7 +3,6 @@ package V3
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"time"
@@ -24,12 +23,12 @@ func (this *RedisController) Self(hg *higo.Higo) higo.IClass {
 
 func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
 	// 路由组
-	router.AddGroup("/https/v4", func() {
-		router.Get("/test_redis", this.Test, router.Flag("TestThrow"), router.Desc("V4 测试redis"))
-		router.AddGroup("/v5", func() {
-			router.Get("/get_test_redis", this.Test, router.Flag("get_test_redis"), router.Middleware(this.MiddleWare()))
-		}, router.GroupMiddle(this.V5GroupMiddleWare()))
-	}, router.GroupMiddle(this.V4GroupMiddleWare()))
+	hg.AddGroup("/https/v4", func() {
+		hg.Get("/test_redis", this.Test, hg.Flag("TestThrow"), hg.Desc("V4 测试redis"))
+		hg.AddGroup("/v5", func() {
+			hg.Get("/get_test_redis", this.Test, hg.Flag("get_test_redis"), hg.Middle(this.MiddleWare()))
+		}, hg.GroupMiddle(this.V5GroupMiddleWare()))
+	}, hg.GroupMiddle(this.V4GroupMiddleWare()))
 	return hg
 }
 

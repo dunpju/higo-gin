@@ -133,15 +133,15 @@ func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
 	return this
 }
 
-// 中间件装载器
-func (this *Higo) Middleware(imiddleware ...IMiddleware) *Higo {
+//注入中间件
+func (this *Higo) InjectMiddle(imiddleware ...IMiddleware) *Higo {
 	for _, middleware := range imiddleware {
 		this.middle = append(this.middle, middleware)
 	}
 	return this
 }
 
-func (this *Higo) SetServe(serve string) *Higo {
+func (this *Higo) SetName(serve string) *Higo {
 	this.serve = serve
 	return this
 }
@@ -189,7 +189,7 @@ func (this *Higo) Boot() {
 			//设置服务类型
 			SetType(ser.Type).
 			//设置服务名称
-			SetServe(ser.Name).
+			SetName(ser.Name).
 			//加载配置
 			LoadConfigur(this.GetRoot())
 		// 中间件

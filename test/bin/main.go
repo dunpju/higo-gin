@@ -27,7 +27,7 @@ func main() {
 
 	higo.Init().
 		LoadEnv(utils.NewSliceString(".", "test", "")).
-		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
+		InjectMiddle(Middlewares.NewAuth(), Middlewares.NewRunLog()).
 		AddServe(router.NewHttp()).
 		AddServe(router.NewHttps()).
 		AddServe(router.NewWebsocket()).

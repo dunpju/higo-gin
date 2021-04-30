@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -24,24 +23,16 @@ type DemoController struct {
 	*redis.Pool `inject:"Bean.NewRedisPool()"`
 }
 
+func NewDemoController() *DemoController {
+	return &DemoController{}
+}
+
 type DemoController2 struct {
 	Ttt string
 }
 
 func (this *DemoController) Self(hg *higo.Higo) higo.IClass {
 	return this
-}
-
-var demoControllerOnce sync.Once
-var demoControllerPointer *DemoController
-
-func NewDemoController() *DemoController {
-	demoControllerOnce.Do(func() {
-		demoControllerPointer = &DemoController{}
-		injector.BeanFactory.Apply(demoControllerPointer)
-		injector.BeanFactory.Set(demoControllerPointer)
-	})
-	return demoControllerPointer
 }
 
 // 测试异常

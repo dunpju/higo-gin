@@ -6,7 +6,6 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V2"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
-	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-utils/utils"
 )
 
@@ -34,23 +33,23 @@ func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 
 // api 路由
 func (this *Https) Api(hg *higo.Higo) {
-	router.Get("/https/test_throw", Controllers.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("测试异常"))
-	router.Get("/https/test_get", Controllers.HttpsTestGet, router.Flag("TestGet"), router.Desc("测试GET"))
-	router.Post("/https/test_post", Controllers.HttpsTestPost, router.Flag("TestPost"), router.Desc("测试POST"))
+	hg.Get("/https/test_throw", Controllers.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("测试异常"))
+	hg.Get("/https/test_get", Controllers.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("测试GET"))
+	hg.Post("/https/test_post", Controllers.HttpsTestPost, hg.Flag("TestPost"), hg.Desc("测试POST"))
 	// 路由组
-	router.AddGroup("/https/v2", func() {
-		router.Get("/test_throw", V2.HttpsTestThrow, router.Flag("TestThrow"), router.Desc("v2 测试异常"))
-		router.Get("/test_get", V2.HttpsTestGet, router.Flag("TestGet"), router.Desc("v2 测试GET"))
-		router.Post("/test_post", V2.HttpsTestPost, router.Flag("TestPost"), router.Desc("v2 测试POST"))
+	hg.AddGroup("/https/v2", func() {
+		hg.Get("/test_throw", V2.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("v2 测试异常"))
+		hg.Get("/test_get", V2.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("v2 测试GET"))
+		hg.Post("/test_post", V2.HttpsTestPost, hg.Flag("TestPost"), hg.Desc("v2 测试POST"))
 	})
-	router.AddGroup("/https/v3", func() {
-		router.AddGroup("/user", func() {
-			router.Post("/login", V3.NewDemoController().Login, router.Flag("Login"), router.Desc("V3 登录"))
+	hg.AddGroup("/https/v3", func() {
+		hg.AddGroup("/user", func() {
+			hg.Post("/login", V3.NewDemoController().Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		})
-		router.Get("/test_throw", V3.NewDemoController().HttpsTestThrow, router.Flag("TestThrow"), router.Desc("V3 测试异常"))
-		router.Get("/test_get", V3.NewDemoController().HttpsTestGet, router.Flag("TestGet"), router.Desc("V3 测试GET"))
-		router.Post("/test_post", V3.NewDemoController().HttpsTestPost, router.Flag("TestPost"), router.Desc("V3 测试POST"))
-		router.Get("/test_get_redis", V3.NewRedisController().Test, router.Flag("test_get_redis"), router.Desc("V3 测试redis"))
+		hg.Get("/test_throw", V3.NewDemoController().HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常"))
+		hg.Get("/test_get", V3.NewDemoController().HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
+		hg.Post("/test_post", V3.NewDemoController().HttpsTestPost, hg.Flag("TestPost"), hg.Desc("V3 测试POST"))
+		hg.Get("/test_get_redis", V3.NewRedisController().Test, hg.Flag("test_get_redis"), hg.Desc("V3 测试redis"))
 
 	})
 
