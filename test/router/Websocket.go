@@ -18,10 +18,9 @@ func (this *Websocket) Serve() *higo.Serve {
 }
 
 func (this *Websocket) Loader(hg *higo.Higo) *higo.Higo {
+	hg.Route(Controllers.NewWebsocketController())
 
 	this.api(hg)
-
-	Controllers.NewWebsocketController().Route(hg)
 
 	return hg
 }

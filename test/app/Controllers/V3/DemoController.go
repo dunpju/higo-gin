@@ -28,7 +28,7 @@ type DemoController2 struct {
 	Ttt string
 }
 
-func (this *DemoController) Self() higo.IClass {
+func (this *DemoController) Self(hg *higo.Higo) higo.IClass {
 	return this
 }
 

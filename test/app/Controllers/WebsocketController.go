@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Entity"
-	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
-	"sync"
 )
 
 type WebsocketController struct {
@@ -15,22 +13,11 @@ type WebsocketController struct {
 	Redis      *higo.RedisAdapter `inject:"Bean.NewRedisAdapter()"`
 }
 
-var (
-	redisControllerOnce        sync.Once
-	WebsocketControllerPointer *WebsocketController
-)
-
 func NewWebsocketController() *WebsocketController {
-	redisControllerOnce.Do(func() {
-		WebsocketControllerPointer = &WebsocketController{}
-		injector.BeanFactory.Apply(WebsocketControllerPointer)
-		injector.BeanFactory.Set(WebsocketControllerPointer)
-		higo.AddContainer(WebsocketControllerPointer)
-	})
-	return WebsocketControllerPointer
+	return &WebsocketController{}
 }
 
-func (this *WebsocketController) Self() higo.IClass {
+func (this *WebsocketController) Self(hg *higo.Higo) higo.IClass {
 	return this
 }
 
@@ -44,7 +31,10 @@ func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
 //webSocket请求
 func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
 	fmt.Println("控制器 Conn")
+	fmt.Println("控制器 Conn", this)
 	fmt.Println("控制器 Conn", ctx.Request.URL.Path)
+	//测试异常抛出
+	//exception.Throw(exception.Message("111"), exception.Code(1), exception.Data("hhh"))
 	loginEntity := Entity.NewLoginEntity()
 	err := ctx.ShouldBind(loginEntity)
 	if err != nil {

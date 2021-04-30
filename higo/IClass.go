@@ -1,5 +1,5 @@
 package higo
 
 type IClass interface {
-	Self() IClass
+	Self(hg *Higo) IClass
 }

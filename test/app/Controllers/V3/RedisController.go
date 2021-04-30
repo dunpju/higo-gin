@@ -3,11 +3,9 @@ package V3
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-router/router"
 	"github.com/gin-gonic/gin"
 	"math/rand"
-	"sync"
 	"time"
 )
 
@@ -16,28 +14,12 @@ type RedisController struct {
 	Redis      *higo.RedisAdapter `inject:"Bean.NewRedisAdapter()"`
 }
 
-var redisControllerOnce sync.Once
-var RedisControllerPointer *RedisController
-
 func NewRedisController() *RedisController {
-	redisControllerOnce.Do(func() {
-		RedisControllerPointer = &RedisController{}
-		injector.BeanFactory.Apply(RedisControllerPointer)
-		injector.BeanFactory.Set(RedisControllerPointer)
-		higo.AddContainer(RedisControllerPointer)
-	})
-	return RedisControllerPointer
+	return &RedisController{}
 }
 
-func (this *RedisController) Self() higo.IClass {
+func (this *RedisController) Self(hg *higo.Higo) higo.IClass {
 	return this
-}
-
-func (this *RedisController) Test(ctx *gin.Context) string {
-	ctx.Set("db_result", rand.Intn(1000))
-	this.Redis.Set("name", rand.Intn(1000))
-	v, _ := this.Redis.Get("name")
-	return v
 }
 
 func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
@@ -49,6 +31,13 @@ func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
 		}, router.GroupMiddle(this.V5GroupMiddleWare()))
 	}, router.GroupMiddle(this.V4GroupMiddleWare()))
 	return hg
+}
+
+func (this *RedisController) Test(ctx *gin.Context) string {
+	ctx.Set("db_result", rand.Intn(1000))
+	this.Redis.Set("name", rand.Intn(1000))
+	v, _ := this.Redis.Get("name")
+	return v
 }
 
 func (this *RedisController) V4GroupMiddleWare() gin.HandlerFunc {

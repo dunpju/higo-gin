@@ -53,5 +53,6 @@ func (this *Https) Api(hg *higo.Higo) {
 		router.Get("/test_get_redis", V3.NewRedisController().Test, router.Flag("test_get_redis"), router.Desc("V3 测试redis"))
 
 	})
-	V3.NewRedisController().Route(hg)
+
+	hg.Route(V3.NewRedisController())
 }

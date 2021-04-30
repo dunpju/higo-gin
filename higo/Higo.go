@@ -184,7 +184,6 @@ func (this *Higo) IsRedisPool() *Higo {
 func (this *Higo) Boot() {
 	// 启动服务
 	for _, ser := range serves {
-		logger.Logrus.Infoln("Server starting......")
 		// 初始化
 		hg := Init().
 			//设置服务类型
@@ -284,6 +283,26 @@ func (this *Higo) loadRoute() *Higo {
 			this.Handle(route)
 		}
 	})
+	return this
+}
+
+//注入
+func (this *Higo) Inject(classs ...IClass) *Higo {
+	for _, class := range classs {
+		injector.BeanFactory.Apply(class)
+		injector.BeanFactory.Set(class)
+		AddContainer(class)
+	}
+	return this
+}
+
+func (this *Higo) Route(controllers ...IController) *Higo {
+	for _, controller := range controllers {
+		injector.BeanFactory.Apply(controller)
+		injector.BeanFactory.Set(controller)
+		AddContainer(controller)
+		controller.Route(hg)
+	}
 	return this
 }
 
