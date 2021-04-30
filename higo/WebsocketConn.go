@@ -135,7 +135,7 @@ func (this *WebsocketConn) dispatch(msg *WsReadMessage) WsWriteMessage {
 	return handle.(func(*gin.Context) WsWriteMessage)(ctx)
 }
 
-func GetWebsocketConn(ctx *gin.Context) *WebsocketConn {
+func WsConn(ctx *gin.Context) *WebsocketConn {
 	ip, ok := ctx.Get(WsConnIp)
 	if !ok {
 		panic("websocket conn ip non-existent")
