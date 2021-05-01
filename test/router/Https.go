@@ -17,8 +17,8 @@ func NewHttps() *Https {
 	return &Https{}
 }
 
-func (this *Https) Serve() *higo.Serve {
-	return higo.NewServe("env.app.HTTPS_HOST", this)
+func (this *Https) Serve(middles ...higo.IMiddleware) *higo.Serve {
+	return higo.NewServe("env.serve.HTTPS_HOST", this, middles...)
 }
 
 // 路由装载器

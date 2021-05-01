@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gorilla/websocket"
@@ -60,6 +61,10 @@ func init() {
 		WsContainer = NewWebsocketClient()
 		refWsResponder = reflect.TypeOf((WebsocketResponder)(nil))
 		WsPitpatSleep = time.Second * 1
+		config.AppPrefix = config.EnvConf
+		config.ServePrefix = config.EnvConf
+		config.AuthPrefix = config.EnvConf
+		config.DbPrefix = config.EnvConf
 	})
 
 	chlist := getTaskList()

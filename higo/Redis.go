@@ -15,8 +15,8 @@ var redisOnce sync.Once
 
 func InitRedisPool() *redis.Pool {
 	redisOnce.Do(func() {
-		confDefault := config.Get("env.app.REDIS.DEFAULT").(config.Configure)
-		pool := confDefault.Get("POOL").(config.Configure)
+		confDefault := config.Db("REDIS.DEFAULT").(*config.Configure)
+		pool := confDefault.Get("POOL").(*config.Configure)
 		RedisPool = &redis.Pool {
 			MaxActive:   pool.Get("MAX_CONNECTIONS").(int),
 			MaxIdle:     pool.Get("MAX_IDLE").(int),

@@ -13,8 +13,8 @@ func NewWebsocket() *Websocket {
 	return &Websocket{}
 }
 
-func (this *Websocket) Serve() *higo.Serve {
-	return higo.NewServe("env.app.WEBSOCKET_HOST", this)
+func (this *Websocket) Serve(middles ...higo.IMiddleware) *higo.Serve {
+	return higo.NewServe("env.serve.WEBSOCKET_HOST", this, middles...)
 }
 
 func (this *Websocket) Loader(hg *higo.Higo) *higo.Higo {

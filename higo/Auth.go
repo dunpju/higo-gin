@@ -18,14 +18,6 @@ func IsNotAuth(flag string) bool {
 	if "" == flag {
 		return false
 	}
-	// 空配置
-	if nil == config.All() {
-		return false
-	}
 	// 判断是否不需要鉴权
-	if nil != config.Get("env.auth.NotAuth") {
-		_, ok := config.Get("env.auth.NotAuth").(config.Configure)[flag]
-		return ok
-	}
-	return false
+	return config.Env("auth.NotAuth").(*config.Configure).Exist(flag)
 }

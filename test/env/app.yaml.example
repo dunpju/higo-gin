@@ -7,39 +7,6 @@ VERSION: 0.0.1
 # 运行模式debug/release
 MODE: debug
 
-# Http服务器
-HTTP_HOST:
-  Type: http
-  Name: http
-  # IP或者域名，如:192.168.42.131:6122或:6122
-  Addr: :6122
-  # 请求超时时间(秒)
-  ReadTimeout: 5
-  # 响应超时时间(秒)
-  WriteTimeout: 10
-
-# Https服务器
-HTTPS_HOST:
-  Type: https
-  Name: https
-  # IP或者域名，如:192.168.42.131:6123或:6123
-  Addr: :6123
-  # 请求超时时间(秒)
-  ReadTimeout: 5
-  # 响应超时时间(秒)
-  WriteTimeout: 10
-
-# Websocket服务器
-WEBSOCKET_HOST:
-  Type: websocket
-  Name: websocket
-  # IP或者域名，如:192.168.42.131:6125或:6125
-  Addr: :6125
-  # 请求超时时间(秒)
-  ReadTimeout: 5
-  # 响应超时时间(秒)
-  WriteTimeout: 10
-
 # 项目根目录
 ROOT: .
 
@@ -60,31 +27,3 @@ CONFIG:
   user:
     score: 100
     age: 19
-
-# 数据库
-DB:
-  DEFAULT:
-    DRIVER: "mysql"
-    HOST: "192.168.42.131"
-    PORT: "3306"
-    DATABASE: "education_live_active"
-    USERNAME: "root"
-    PASSWORD: "1qaz2wsx"
-    CHARSET: "utf8mb4"
-    COLLATION: "utf8mb4_unicode_ci"
-    PREFIX:
-
-REDIS:
-  DEFAULT:
-    HOST: "192.168.8.99"
-    AUTH: "1qaz2wsx"
-    PORT: "6379"
-    DB: 0
-    POOL:
-      MIN_CONNECTIONS: 1
-      MAX_CONNECTIONS: 10
-      CONNECT_TIMEOUT: 10.0
-      WAIT_TIMEOUT: 3.0
-      HEARTBEAT: -1
-      MAX_IDLE: 3
-      MAX_IDLE_TIME: 60

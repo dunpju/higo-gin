@@ -16,7 +16,7 @@ func NewAuth() *Auth {
 	return &Auth{}
 }
 
-func (this Auth) Loader(hg *higo.Higo) gin.HandlerFunc {
+func (this Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if route, ok := hg.GetRoute(c.Request.URL.Path); ok {
 			// TODO::非静态页面需要鉴权

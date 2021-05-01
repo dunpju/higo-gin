@@ -107,10 +107,13 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				yamlFile, _ := ioutil.ReadFile(p)
-				conf := config.New()
-				yamlFileErr := yaml.Unmarshal(yamlFile, conf)
-				envConf.Set(utils.Basename(p, "yaml"), conf)
+				yamlFile, err := ioutil.ReadFile(p)
+				if err != nil {
+					logger.LoggerStack(err, utils.GoroutineID())
+				}
+				yamlMap := make(map[interface{}]interface{})
+				yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
+				envConf.Set(utils.Basename(p, "yaml"), yamlMap)
 				if yamlFileErr != nil {
 					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
 				}
@@ -121,10 +124,12 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	if filepathErr != nil {
 		exception.Throw(exception.Message(filepathErr), exception.Code(0))
 	}
-	config.Set("env", envConf)
-	SslOut = this.GetRoot().Separator(pathSeparator) + config.String("env.app.SSL.OUT") + pathSeparator
-	SslCrt = config.String("env.app.SSL.CRT")
-	SslKey = config.String("env.app.SSL.KEY")
+
+	config.Set(config.EnvConf, envConf)
+	SslOut = this.GetRoot().Separator(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
+	SslCrt = config.App("SSL.CRT").(string)
+	SslKey = config.App("SSL.KEY").(string)
+
 	return this
 }
 
@@ -133,9 +138,9 @@ func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
 	return this
 }
 
-//注入中间件
-func (this *Higo) InjectMiddle(imiddleware ...IMiddleware) *Higo {
-	for _, middleware := range imiddleware {
+//全局中间件
+func (this *Higo) GlobalMiddle(middlewares ...IMiddleware) *Higo {
+	for _, middleware := range middlewares {
 		this.middle = append(this.middle, middleware)
 	}
 	return this
@@ -160,11 +165,11 @@ func (this *Higo) SetType(serveType string) *Higo {
 	return this
 }
 
-func (this *Higo) AddServe(router IRouterLoader) *Higo {
-	if ! onlySupportServe.Exist(router.Serve().Type) {
-		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + router.Serve().Type)
+func (this *Higo) AddServe(route IRouterLoader, middles ...IMiddleware) *Higo {
+	if ! onlySupportServe.Exist(route.Serve().Type) {
+		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + route.Serve().Type)
 	}
-	serves = append(serves, router.Serve())
+	serves = append(serves, route.Serve(middles...))
 	return this
 }
 
@@ -194,7 +199,7 @@ func (this *Higo) Boot() {
 			LoadConfigur(this.GetRoot())
 		// 中间件
 		for _, m := range this.middle {
-			hg.Engine.Use(m.Loader(hg))
+			hg.Engine.Use(m.Middle(hg))
 		}
 		// 是否使用自带ssl测试https
 		if this.isAutoTLS {
@@ -210,7 +215,7 @@ func (this *Higo) Boot() {
 			gin.SetMode(gin.ReleaseMode)
 		}
 
-		configs := config.Get(ser.Config).(config.Configure)
+		configs := config.Get(ser.Config).(*config.Configure)
 		addr := configs.Get("Addr").(string)
 		readTimeout := configs.Get("ReadTimeout").(int)
 		writeTimeout := configs.Get("WriteTimeout").(int)

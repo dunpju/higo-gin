@@ -1,0 +1,34 @@
+
+# Http服务器
+HTTP_HOST:
+  Type: http
+  Name: http
+  # IP或者域名，如:192.168.42.131:6122或:6122
+  Addr: :6122
+  # 请求超时时间(秒)
+  ReadTimeout: 5
+  # 响应超时时间(秒)
+  WriteTimeout: 10
+
+# Https服务器
+HTTPS_HOST:
+  Type: https
+  Name: https
+  # IP或者域名，如:192.168.42.131:6123或:6123
+  Addr: :6123
+  # 请求超时时间(秒)
+  ReadTimeout: 5
+  # 响应超时时间(秒)
+  WriteTimeout: 10
+
+# Websocket服务器
+WEBSOCKET_HOST:
+  Type: websocket
+  Name: websocket
+  # IP或者域名，如:192.168.42.131:6125或:6125
+  Addr: :6125
+  # 请求超时时间(秒)
+  ReadTimeout: 5
+  # 响应超时时间(秒)
+  WriteTimeout: 10
+
