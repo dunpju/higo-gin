@@ -139,10 +139,8 @@ func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
 }
 
 //全局中间件
-func (this *Higo) GlobalMiddle(middlewares ...IMiddleware) *Higo {
-	for _, middleware := range middlewares {
-		this.middle = append(this.middle, middleware)
-	}
+func (this *Higo) Middleware(middlewares ...IMiddleware) *Higo {
+	this.middle = append(this.middle, middlewares...)
 	return this
 }
 
@@ -166,10 +164,11 @@ func (this *Higo) SetType(serveType string) *Higo {
 }
 
 func (this *Higo) AddServe(route IRouterLoader, middles ...IMiddleware) *Higo {
-	if ! onlySupportServe.Exist(route.Serve().Type) {
-		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + route.Serve().Type)
+	if ! onlySupportServe.Exist(route.GetServe().Type) {
+		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + route.GetServe().Type)
 	}
-	serves = append(serves, route.Serve(middles...))
+	route.GetServe().SetMiddle(middles...)
+	serves = append(serves, route.GetServe())
 	return this
 }
 
@@ -219,6 +218,11 @@ func (this *Higo) Boot() {
 		addr := configs.Get("Addr").(string)
 		readTimeout := configs.Get("ReadTimeout").(int)
 		writeTimeout := configs.Get("WriteTimeout").(int)
+
+		// 服务中间件
+		for _, m := range ser.Middle {
+			hg.Engine.Use(m.Middle(hg))
+		}
 
 		// 添加服务
 		router.AddServe(hg.serve)

@@ -27,8 +27,8 @@ func main() {
 
 	higo.Init().
 		LoadEnv(utils.NewSliceString(".", "test", "")).
-		GlobalMiddle(Middlewares.NewAuth(), Middlewares.NewRunLog()).
-		AddServe(router.NewHttp()).
+		Middleware(Middlewares.NewAuth(), Middlewares.NewRunLog()).
+		AddServe(router.NewHttp(), Middlewares.NewHttp()).
 		AddServe(router.NewHttps()).
 		AddServe(router.NewWebsocket()).
 		IsAutoTLS(true).
