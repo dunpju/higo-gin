@@ -50,6 +50,8 @@ func Init() *Higo {
 
 	// 全局异常
 	hg.Engine.Use(NewRecover().Exception(hg))
+	//设置跨域、鉴权
+	hg.Middleware(NewCors(), NewAuth())
 	// 初始分隔符
 	pathSeparator = utils.PathSeparator()
 	// 是否使用自带ssl测试https
@@ -135,6 +137,7 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 
 // 加载配置
 func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
+	//TODO::待完善
 	return this
 }
 
@@ -184,36 +187,35 @@ func (this *Higo) IsRedisPool() *Higo {
 	return this
 }
 
-// 启动
+//启动
 func (this *Higo) Boot() {
-	// 启动服务
+	//启动服务
 	for _, ser := range serves {
-		// 初始化
+		//初始化
 		hg := Init().
 			//设置服务类型
 			SetType(ser.Type).
 			//设置服务名称
-			SetName(ser.Name).
-			//加载配置
-			LoadConfigur(this.GetRoot())
-		// 全局中间件
+			SetName(ser.Name)
+
+		//全局中间件
 		for _, m := range this.middle {
 			hg.Engine.Use(m.Middle(hg))
 		}
-		// 服务中间件
+		//服务中间件
 		for _, m := range ser.Middle {
 			hg.Engine.Use(m.Middle(hg))
 		}
-		// 是否使用自带ssl测试https
+		//是否使用自带ssl测试https
 		if this.isAutoTLS {
-			// 生成ssl证书
+			//生成ssl证书
 			utils.NewTLS(SslOut, SslCrt, SslKey).SetBits(this.bits).Build()
 		}
-		// 是否使用redis pool
+		//是否使用redis pool
 		if this.isRedisPool {
 			InitRedisPool()
 		}
-		// 运行模式debug/release
+		//运行模式debug/release
 		if gin.ReleaseMode == config.String("env.app.MODE") {
 			gin.SetMode(gin.ReleaseMode)
 		}
@@ -223,10 +225,10 @@ func (this *Higo) Boot() {
 		readTimeout := configs.Get("ReadTimeout").(int)
 		writeTimeout := configs.Get("WriteTimeout").(int)
 
-		// 添加服务
+		//添加服务
 		router.AddServe(hg.serve)
 		handler := ser.Router.Loader(hg)
-		// 加载路由
+		//加载路由
 		hg.loadRoute()
 
 		serve := &http.Server{
@@ -256,7 +258,7 @@ func (this *Higo) Boot() {
 		}
 	}
 
-	// 启动定时任务
+	//启动定时任务
 	CronTask().Start()
 
 	if err := this.errgroup.Wait(); err != nil {
