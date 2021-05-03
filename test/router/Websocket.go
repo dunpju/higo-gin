@@ -7,21 +7,13 @@ import (
 
 // https api 接口
 type Websocket struct {
-	*higo.Serve
+	*higo.HiServe
 }
 
 func NewWebsocket() *Websocket {
-	this := &Websocket{}
+	this := &Websocket{higo.NewHiServe()}
 	higo.NewServe("env.serve.WEBSOCKET_HOST", this)
 	return this
-}
-
-func (this *Websocket) SetServe(serve *higo.Serve) {
-	this.Serve = serve
-}
-
-func (this *Websocket) GetServe() *higo.Serve {
-	return this.Serve
 }
 
 func (this *Websocket) Loader(hg *higo.Higo) *higo.Higo {

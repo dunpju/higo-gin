@@ -12,6 +12,10 @@ type Serve struct {
 	Middle []IMiddleware
 }
 
+func newServe() *Serve {
+	return &Serve{Middle: make([]IMiddleware, 0)}
+}
+
 func NewServe(conf string, router IRouterLoader) {
 	configs := config.Get(conf).(*config.Configure)
 	name := configs.Get("Name").(string)

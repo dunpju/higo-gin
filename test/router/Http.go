@@ -11,21 +11,13 @@ import (
 
 // https api 接口
 type Http struct {
-	*higo.Serve
+	*higo.HiServe
 }
 
 func NewHttp() *Http {
-	this := &Http{}
+	this := &Http{higo.NewHiServe()}
 	higo.NewServe("env.serve.HTTP_HOST", this)
 	return this
-}
-
-func (this *Http) SetServe(serve *higo.Serve) {
-	this.Serve = serve
-}
-
-func (this *Http) GetServe() *higo.Serve {
-	return this.Serve
 }
 
 func (this *Http) Loader(hg *higo.Higo) *higo.Higo {
