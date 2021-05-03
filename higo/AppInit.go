@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	ROOT           = "./../"
 	HttpServe      = "http"
 	HttpsServe     = "https"
 	WebsocketServe = "websocket"

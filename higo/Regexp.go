@@ -1,4 +1,4 @@
-package consts
+package higo
 
 // 正则常量
 const (
