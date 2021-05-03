@@ -15,8 +15,8 @@ func NewHttp() *Http {
 }
 
 func (this *Http) Middle(hg *higo.Higo) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(cxt *gin.Context) {
 		fmt.Println("http 中间件")
-		c.Next()
+		cxt.Next()
 	}
 }

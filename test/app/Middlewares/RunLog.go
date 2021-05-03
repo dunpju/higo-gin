@@ -15,8 +15,8 @@ func NewRunLog() *RunLog {
 }
 
 func (this *RunLog) Middle(hg *higo.Higo) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		fmt.Printf("RunLog:%s\n",higo.RouterContainer.Get(c.Request.URL.Path).Desc())
-		c.Next()
+	return func(cxt *gin.Context) {
+		fmt.Printf("RunLog:%s\n",higo.RouterContainer.Get(cxt.Request.URL.Path).Desc())
+		cxt.Next()
 	}
 }

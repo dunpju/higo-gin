@@ -196,8 +196,12 @@ func (this *Higo) Boot() {
 			SetName(ser.Name).
 			//加载配置
 			LoadConfigur(this.GetRoot())
-		// 中间件
+		// 全局中间件
 		for _, m := range this.middle {
+			hg.Engine.Use(m.Middle(hg))
+		}
+		// 服务中间件
+		for _, m := range ser.Middle {
 			hg.Engine.Use(m.Middle(hg))
 		}
 		// 是否使用自带ssl测试https
@@ -218,11 +222,6 @@ func (this *Higo) Boot() {
 		addr := configs.Get("Addr").(string)
 		readTimeout := configs.Get("ReadTimeout").(int)
 		writeTimeout := configs.Get("WriteTimeout").(int)
-
-		// 服务中间件
-		for _, m := range ser.Middle {
-			hg.Engine.Use(m.Middle(hg))
-		}
 
 		// 添加服务
 		router.AddServe(hg.serve)

@@ -17,15 +17,15 @@ func NewAuth() *Auth {
 }
 
 func (this Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if route, ok := hg.GetRoute(c.Request.URL.Path); ok {
+	return func(cxt *gin.Context) {
+		if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
 			// TODO::非静态页面需要鉴权
 			if !higo.IsNotAuth(route.Flag()) && !route.IsStatic() {
-				if "" == c.GetHeader("X-Token") {
+				if "" == cxt.GetHeader("X-Token") {
 					exception.Throw(exception.Message(code.Message(Consts.INVALID_TOKEN).Message), exception.Code(code.Message(Consts.INVALID_TOKEN).Code))
 				}
 			}
-			c.Next()
+			cxt.Next()
 		} else {
 			exception.Throw(exception.Message(code.Message(Consts.INVALID_API).Message), exception.Code(code.Message(Consts.INVALID_API).Code))
 		}
