@@ -16,14 +16,34 @@ func newServe() *Serve {
 	return &Serve{Middle: make([]IMiddleware, 0)}
 }
 
-func NewServe(conf string, router IRouterLoader) {
-	configs := config.Get(conf).(*config.Configure)
-	name := configs.Get("Name").(string)
-	t := configs.Get("Type").(string)
-	serve := &Serve{Name: name, Type: t, Config: conf, Router: router, Middle: make([]IMiddleware, 0)}
-	router.SetServe(serve)
+func NewServe(conf string) *Serve {
+	serve := newServe()
+	if "" != conf {
+		configs := config.Get(conf).(*config.Configure)
+		name := configs.Get("Name").(string)
+		t := configs.Get("Type").(string)
+		serve.Name = name
+		serve.Type = t
+		serve.Config = conf
+	}
+	return serve
 }
 
-func (this *Serve) SetMiddle(middles ...IMiddleware) {
+func (this *Serve) SetRouter(router IRouterLoader) *Serve {
+	this.Router = router
+	return this
+}
+
+func (this *Serve) SetMiddle(middles ...IMiddleware) *Serve {
 	this.Middle = append(this.Middle, middles...)
+	return this
+}
+
+func (this *Serve) GetServe() *Serve {
+	return this
+}
+
+func (this *Serve) Loader(hg *Higo) *Higo {
+
+	return hg
 }

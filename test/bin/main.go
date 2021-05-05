@@ -16,7 +16,7 @@ func main() {
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
 	fmt.Printf("%s", output)
 
-	beanConfig := Config.NewBean()
+	beanConfig := Config.NewMyBean()
 
 	//injector.BeanFactory.Config(beanConfig)
 	//demoController := V3.NewDemoController()
@@ -25,8 +25,7 @@ func main() {
 
 	//higo.WsPitpatSleep = time.Second * 5
 
-	higo.Init().
-		LoadEnv(utils.NewSliceString(".", "test", "")).
+	higo.Init(utils.NewSliceString(".", "test", "")).
 		Middleware(Middlewares.NewRunLog()).
 		AddServe(router.NewHttp(), Middlewares.NewHttp()).
 		AddServe(router.NewHttps()).

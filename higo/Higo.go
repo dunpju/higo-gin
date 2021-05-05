@@ -25,6 +25,7 @@ var (
 	hg *Higo
 	// ssl 证书
 	SslOut, SslCrt, SslKey string
+	isLoadEnv              bool
 )
 
 type Higo struct {
@@ -40,7 +41,7 @@ type Higo struct {
 }
 
 // 初始化
-func Init() *Higo {
+func Init(root *utils.SliceString) *Higo {
 	hg = &Higo{
 		Engine: gin.New(),
 		middle: make([]IMiddleware, 0),
@@ -56,6 +57,10 @@ func Init() *Higo {
 	pathSeparator = utils.PathSeparator()
 	// 是否使用自带ssl测试https
 	hg.isAutoTLS = false
+	// 未加载env
+	if false == isLoadEnv {
+		hg.LoadEnv(root)
+	}
 
 	return hg
 }
@@ -87,6 +92,7 @@ func (this *Higo) GetRoot() *utils.SliceString {
 
 // 加载env
 func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
+
 	utils.SetPathSeparator(pathSeparator)
 	// 设置主目录
 	this.setRoot(root)
@@ -132,6 +138,11 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	SslCrt = config.App("SSL.CRT").(string)
 	SslKey = config.App("SSL.KEY").(string)
 
+	// bean
+	this.Beans(NewBean())
+
+	isLoadEnv = true
+
 	return this
 }
 
@@ -167,10 +178,12 @@ func (this *Higo) SetType(serveType string) *Higo {
 }
 
 func (this *Higo) AddServe(route IRouterLoader, middles ...IMiddleware) *Higo {
+	injector.BeanFactory.Apply(route)
+	injector.BeanFactory.Set(route)
 	if ! onlySupportServe.Exist(route.GetServe().Type) {
 		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + route.GetServe().Type)
 	}
-	route.GetServe().SetMiddle(middles...)
+	route.GetServe().SetRouter(route).SetMiddle(middles...)
 	serves = append(serves, route.GetServe())
 	return this
 }
@@ -192,7 +205,7 @@ func (this *Higo) Boot() {
 	//启动服务
 	for _, ser := range serves {
 		//初始化
-		hg := Init().
+		hg := Init(this.GetRoot()).
 			//设置服务类型
 			SetType(ser.Type).
 			//设置服务名称

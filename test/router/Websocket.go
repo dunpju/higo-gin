@@ -7,13 +7,11 @@ import (
 
 // https api 接口
 type Websocket struct {
-	*higo.HiServe
+	*higo.Serve `inject:"Bean.NewServe('env.serve.WEBSOCKET_HOST')"`
 }
 
 func NewWebsocket() *Websocket {
-	this := &Websocket{higo.NewHiServe()}
-	higo.NewServe("env.serve.WEBSOCKET_HOST", this)
-	return this
+	return &Websocket{}
 }
 
 func (this *Websocket) Loader(hg *higo.Higo) *higo.Higo {

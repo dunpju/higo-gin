@@ -6,29 +6,26 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-type Bean struct {
+type MyBean struct {
+	higo.Bean
 }
 
-func NewBean() *Bean {
-	return &Bean{}
+func NewMyBean() *MyBean {
+	return &MyBean{}
 }
 
-func (this *Bean) Provider() {
-
-}
-
-func (this *Bean) DemoService() *Services.DemoService {
+func (this *MyBean) DemoService() *Services.DemoService {
 	return Services.NewDemoService()
 }
 
-func (this *Bean) NewGorm() *higo.Gorm {
+func (this *MyBean) NewGorm() *higo.Gorm {
 	return higo.NewGorm()
 }
 
-func (this *Bean) NewRedisPool() *redis.Pool {
+func (this *MyBean) NewRedisPool() *redis.Pool {
 	return higo.RedisPool
 }
 
-func (this *Bean) NewRedisAdapter() *higo.RedisAdapter {
+func (this *MyBean) NewRedisAdapter() *higo.RedisAdapter {
 	return higo.NewRedisAdapter()
 }

@@ -11,13 +11,11 @@ import (
 
 // https api 接口
 type Https struct {
-	*higo.HiServe
+	*higo.Serve `inject:"Bean.NewServe('env.serve.HTTPS_HOST')"`
 }
 
 func NewHttps() *Https {
-	this := &Https{higo.NewHiServe()}
-	higo.NewServe("env.serve.HTTPS_HOST", this)
-	return this
+	return &Https{}
 }
 
 // 路由装载器

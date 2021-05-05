@@ -11,13 +11,11 @@ import (
 
 // https api 接口
 type Http struct {
-	*higo.HiServe
+	*higo.Serve `inject:"Bean.NewServe('env.serve.HTTP_HOST')"`
 }
 
 func NewHttp() *Http {
-	this := &Http{higo.NewHiServe()}
-	higo.NewServe("env.serve.HTTP_HOST", this)
-	return this
+	return &Http{}
 }
 
 func (this *Http) Loader(hg *higo.Higo) *higo.Higo {
