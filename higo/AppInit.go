@@ -74,7 +74,7 @@ func init() {
 		WsPitpatSleep = time.Second * 1
 		config.AppPrefix = "config"
 		config.AuthPrefix = config.AppPrefix
-		config.DbPrefix = config.AppPrefix
+		config.DbPrefix = config.EnvConf
 		config.ServePrefix = config.EnvConf
 	})
 
