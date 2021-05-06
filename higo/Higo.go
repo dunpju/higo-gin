@@ -1,7 +1,6 @@
 package higo
 
 import (
-	"fmt"
 	"github.com/dengpju/higo-config/config"
 	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
@@ -109,7 +108,6 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	logger.Logrus.Root(this.GetRoot().Separator(pathSeparator)).File("higo").Init()
 	// 装载env配置
 	env := this.GetRoot().Separator(pathSeparator) + "env"
-	fmt.Println(env)
 	if ! utils.DirExist(env) {
 		utils.Mkdir(env)
 	}
