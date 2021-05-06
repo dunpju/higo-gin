@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-config/config"
 	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
@@ -55,6 +56,12 @@ func Init(root *utils.SliceString) *Higo {
 	hg.Middleware(NewCors(), NewAuth())
 	// 初始分隔符
 	pathSeparator = utils.PathSeparator()
+	AppConfigDir.Clone(root)
+	root.ForEach(func(index int, value interface{}) {
+		AppConfigDir.Append(value)
+	})
+	AppConfigDir.Append("app")
+	AppConfigDir.Append("Config")
 	// 是否使用自带ssl测试https
 	hg.isAutoTLS = false
 	// 未加载env
@@ -102,6 +109,7 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	logger.Logrus.Root(this.GetRoot().Separator(pathSeparator)).File("higo").Init()
 	// 装载env配置
 	env := this.GetRoot().Separator(pathSeparator) + "env"
+	fmt.Println(env)
 	if ! utils.DirExist(env) {
 		utils.Mkdir(env)
 	}
@@ -134,6 +142,7 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	}
 
 	config.Set(config.EnvConf, envConf)
+	this.loadConfigur()
 	SslOut = this.GetRoot().Separator(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
 	SslCrt = config.App("SSL.CRT").(string)
 	SslKey = config.App("SSL.KEY").(string)
@@ -147,8 +156,38 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 }
 
 // 加载配置
-func (this *Higo) LoadConfigur(root *utils.SliceString) *Higo {
-	//TODO::待完善
+func (this *Higo) loadConfigur() *Higo {
+	if ! utils.DirExist(AppConfigDir.Separator(utils.PathSeparator())) {
+		utils.Mkdir(AppConfigDir.Separator(utils.PathSeparator()))
+	}
+	conf := config.New()
+	filepathErr := filepath.Walk(AppConfigDir.Separator(utils.PathSeparator()),
+		func(p string, f os.FileInfo, err error) error {
+			if f == nil {
+				return err
+			}
+			if f.IsDir() {
+				return nil
+			}
+			if path.Ext(p) == ".yaml" {
+				yamlFile, err := ioutil.ReadFile(p)
+				if err != nil {
+					logger.LoggerStack(err, utils.GoroutineID())
+				}
+				yamlMap := make(map[interface{}]interface{})
+				yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
+				conf.Set(utils.Basename(p, "yaml"), yamlMap)
+				if yamlFileErr != nil {
+					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
+				}
+				logger.Logrus.Infoln("Loader config file:", filepath.Base(p))
+			}
+			return nil
+		})
+	if filepathErr != nil {
+		exception.Throw(exception.Message(filepathErr), exception.Code(0))
+	}
+	config.Set("config", conf)
 	return this
 }
 
@@ -229,7 +268,7 @@ func (this *Higo) Boot() {
 			InitRedisPool()
 		}
 		//运行模式debug/release
-		if gin.ReleaseMode == config.String("env.app.MODE") {
+		if gin.ReleaseMode == config.App("MODE") {
 			gin.SetMode(gin.ReleaseMode)
 		}
 

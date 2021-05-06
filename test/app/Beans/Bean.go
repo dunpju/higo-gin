@@ -1,4 +1,4 @@
-package Config
+package Beans
 
 import (
 	"github.com/dengpju/higo-gin/higo"

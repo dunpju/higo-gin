@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Config"
+	"github.com/dengpju/higo-gin/test/app/Beans"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
 	"github.com/dengpju/higo-utils/utils"
@@ -16,7 +16,7 @@ func main() {
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
 	fmt.Printf("%s", output)
 
-	beanConfig := Config.NewMyBean()
+	beanConfig := Beans.NewMyBean()
 
 	//injector.BeanFactory.Config(beanConfig)
 	//demoController := V3.NewDemoController()

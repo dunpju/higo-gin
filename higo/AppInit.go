@@ -34,6 +34,7 @@ var (
 	serves           []*Serve
 	onlySupportServe *router.UniqueString
 	pathSeparator    string
+	AppConfigDir     *utils.SliceString
 	root             *utils.SliceString
 	MiddleCorsFunc   func(cxt *gin.Context)
 	MiddleAuthFunc   func(cxt *gin.Context)
@@ -58,6 +59,7 @@ func init() {
 			Append(HttpsServe).
 			Append(WebsocketServe)
 		root = utils.NewSliceString(".", "..", "")
+		AppConfigDir = utils.NewSliceString()
 		MiddleCorsFunc = middleCorsFunc
 		MiddleAuthFunc = middleAuthFunc
 		WsCheckOrigin = func(r *http.Request) bool {
@@ -70,10 +72,10 @@ func init() {
 		WsContainer = NewWebsocketClient()
 		refWsResponder = reflect.TypeOf((WebsocketResponder)(nil))
 		WsPitpatSleep = time.Second * 1
-		config.AppPrefix = config.EnvConf
+		config.AppPrefix = "config"
+		config.AuthPrefix = config.AppPrefix
+		config.DbPrefix = config.AppPrefix
 		config.ServePrefix = config.EnvConf
-		config.AuthPrefix = config.EnvConf
-		config.DbPrefix = config.EnvConf
 	})
 
 	chlist := getTaskList()
