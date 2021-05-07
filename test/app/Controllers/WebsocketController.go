@@ -21,7 +21,7 @@ func (this *WebsocketController) Self(hg *higo.Higo) higo.IClass {
 }
 
 func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
-	hg.Ws("/conn", this.Conn, hg.Flag("WebsocketController.Conn"), hg.Desc("conn"))
+	hg.Ws("/conn", this.Conn, hg.Desc("conn"))
 	hg.Ws("/echo", this.Echo, hg.Flag("WebsocketController.Echo"), hg.Desc("Echo"))
 	hg.Ws("/send_all", this.SendAll, hg.Flag("WebsocketController.SendAll"), hg.Desc("SendAll"))
 	return hg

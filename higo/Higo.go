@@ -361,7 +361,7 @@ func (this *Higo) Route(controllers ...IController) *Higo {
 		injector.BeanFactory.Apply(controller)
 		injector.BeanFactory.Set(controller)
 		AddContainer(controller)
-		controller.Route(hg)
+		controller.Route(this)
 	}
 	return this
 }
