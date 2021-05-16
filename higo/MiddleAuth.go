@@ -20,7 +20,7 @@ func IsNotAuth(flag string) bool {
 		return false
 	}
 	// 判断是否不需要鉴权
-	return config.Env("auth.NotAuth").(*config.Configure).Exist(flag)
+	return config.Auth("NotAuth").(*config.Configure).Exist(flag)
 }
 
 // 鉴权

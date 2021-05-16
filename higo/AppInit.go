@@ -74,6 +74,7 @@ func init() {
 		WsPitpatSleep = time.Second * 1
 		config.AppPrefix = "config"
 		config.AuthPrefix = config.AppPrefix
+		config.AnnoPrefix = config.AppPrefix
 		config.DbPrefix = config.EnvConf
 		config.ServePrefix = config.EnvConf
 	})
@@ -118,7 +119,6 @@ func middleCorsFunc(cxt *gin.Context) {
 
 func middleAuthFunc(cxt *gin.Context) {
 	if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
-		// TODO::非静态页面需要鉴权
 		if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
 			if "" == cxt.GetHeader("X-Token") {
 				exception.Throw(exception.Message(code.Message(Consts.INVALID_TOKEN).Message), exception.Code(code.Message(Consts.INVALID_TOKEN).Code))

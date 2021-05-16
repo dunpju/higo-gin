@@ -1,8 +1,8 @@
 package higo
 
 import (
+	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-config/config"
-	iocConfig "github.com/dengpju/higo-ioc/config"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-router/router"
@@ -186,6 +186,7 @@ func (this *Higo) loadConfigur() *Higo {
 		exception.Throw(exception.Message(filepathErr), exception.Code(0))
 	}
 	config.Set("config", conf)
+	anno.Config = config.Anno("value").(*config.Configure)
 	return this
 }
 
@@ -349,18 +350,18 @@ func (this *Higo) loadRoute() *Higo {
 //注入
 func (this *Higo) Inject(classs ...IClass) *Higo {
 	for _, class := range classs {
+		AddContainer(class.New)
 		injector.BeanFactory.Apply(class)
 		injector.BeanFactory.Set(class)
-		AddContainer(class)
 	}
 	return this
 }
 
 func (this *Higo) Route(controllers ...IController) *Higo {
 	for _, controller := range controllers {
+		AddContainer(controller.New)
 		injector.BeanFactory.Apply(controller)
 		injector.BeanFactory.Set(controller)
-		AddContainer(controller)
 		controller.Route(this)
 	}
 	return this
@@ -417,7 +418,7 @@ func handleSlice(route *router.Route) []gin.HandlerFunc {
 }
 
 // 添加到Bean
-func (this *Higo) Beans(configs ...iocConfig.IBean) *Higo {
+func (this *Higo) Beans(configs ...injector.IBean) *Higo {
 	for _, conf := range configs {
 		injector.BeanFactory.Config(conf)
 	}

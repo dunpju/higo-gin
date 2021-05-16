@@ -5,9 +5,9 @@ go 1.14
 require (
 	gitee.com/dengpju/higo-code v1.0.0
 	gitee.com/dengpju/higo-parameter v1.0.3
-	github.com/dengpju/higo-annotation v0.0.0-20201128150601-25a35cd53358
-	github.com/dengpju/higo-config v1.0.6
-	github.com/dengpju/higo-ioc v1.0.0
+	github.com/dengpju/higo-annotation v1.0.4
+	github.com/dengpju/higo-config v1.0.8
+	github.com/dengpju/higo-ioc v1.0.1
 	github.com/dengpju/higo-logger v1.0.7
 	github.com/dengpju/higo-router v1.0.18
 	github.com/dengpju/higo-throw v1.0.9
@@ -20,6 +20,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/syyongx/php2go v0.9.4 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/tools v0.0.0-20201030010431-2feb2bb1ff51
+	golang.org/x/tools v0.0.0-20201030010431-2feb2bb1ff51 // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )

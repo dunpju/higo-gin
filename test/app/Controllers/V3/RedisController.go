@@ -17,11 +17,15 @@ func NewRedisController() *RedisController {
 	return &RedisController{}
 }
 
-func (this *RedisController) Self(hg *higo.Higo) higo.IClass {
-	return this
+func (this *RedisController) New() higo.IClass {
+	return NewRedisController()
 }
 
-func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
+func (this *RedisController) Route(hg *higo.Higo) {
+	hg.AddGroup("/https/v3", func() {
+		hg.Get("/test_get_redis", this.Test, hg.Flag("test_get_redis"), hg.Desc("V3 测试redis"))
+	})
+
 	// 路由组
 	hg.AddGroup("/https/v4", func() {
 		hg.Get("/test_redis", this.Test, hg.Flag("TestThrow"), hg.Desc("V4 测试redis"))
@@ -29,7 +33,6 @@ func (this *RedisController) Route(hg *higo.Higo) *higo.Higo {
 			hg.Get("/get_test_redis", this.Test, hg.Flag("get_test_redis"), hg.Middle(this.MiddleWare()))
 		}, hg.GroupMiddle(this.V5GroupMiddleWare()))
 	}, hg.GroupMiddle(this.V4GroupMiddleWare()))
-	return hg
 }
 
 func (this *RedisController) Test(ctx *gin.Context) string {

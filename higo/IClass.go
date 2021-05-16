@@ -1,5 +1,14 @@
 package higo
 
 type IClass interface {
-	Self(hg *Higo) IClass
+	New() IClass
+}
+
+type Property func(class IClass)
+type Propertys []Property
+
+func (this Propertys) Apply(class IClass) {
+	for _, property := range this {
+		property(class)
+	}
 }

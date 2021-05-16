@@ -1,6 +1,6 @@
 package higo
 
 type IController interface {
-	Self(hg *Higo) IClass
-	Route(hg *Higo) *Higo
+	New() IClass
+	Route(hg *Higo)
 }

@@ -30,6 +30,8 @@ func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
 
 // api 路由
 func (this *Https) Api(hg *higo.Higo) {
+	hg.Route(V3.NewRedisController(), V3.NewDemoController())
+
 	hg.Get("/https/test_throw", Controllers.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("测试异常"))
 	hg.Get("/https/test_get", Controllers.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("测试GET"))
 	hg.Post("/https/test_post", Controllers.HttpsTestPost, hg.Flag("TestPost"), hg.Desc("测试POST"))
@@ -43,12 +45,6 @@ func (this *Https) Api(hg *higo.Higo) {
 		hg.AddGroup("/user", func() {
 			hg.Post("/login", V3.NewDemoController().Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		})
-		hg.Get("/test_throw", V3.NewDemoController().HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常"))
-		hg.Get("/test_get", V3.NewDemoController().HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
 		hg.Post("/test_post", V3.NewDemoController().HttpsTestPost, hg.Flag("TestPost"), hg.Desc("V3 测试POST"))
-		hg.Get("/test_get_redis", V3.NewRedisController().Test, hg.Flag("test_get_redis"), hg.Desc("V3 测试redis"))
-
 	})
-
-	hg.Route(V3.NewRedisController())
 }

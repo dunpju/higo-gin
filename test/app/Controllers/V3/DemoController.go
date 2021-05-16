@@ -2,10 +2,10 @@ package V3
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-annotation/annotation"
+	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Exception"
-	"github.com/dengpju/higo-gin/test/app/Models"
+	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-throw/exception"
@@ -16,23 +16,29 @@ import (
 )
 
 type DemoController struct {
-	Higo        *higo.Higo
-	Age         *annotation.Value     `prefix:"user.age"`
-	DemoService *Services.DemoService `inject:"Bean.DemoService()"`
+	Age         *anno.Value           `prefix:"user.age"`
+	DemoService *Services.DemoService `inject:"MyBean.DemoService()"`
 	*higo.Gorm  `inject:"Bean.NewGorm()"`
 	*redis.Pool `inject:"Bean.NewRedisPool()"`
+	Name        string
 }
 
 func NewDemoController() *DemoController {
 	return &DemoController{}
 }
 
-type DemoController2 struct {
-	Ttt string
+func (this *DemoController) New() higo.IClass {
+	return NewDemoController()
 }
 
-func (this *DemoController) Self(hg *higo.Higo) higo.IClass {
-	return this
+func (this *DemoController) Route(hg *higo.Higo) {
+	hg.AddGroup("/https/v3", func() {
+		//hg.AddGroup("/user", func() {
+		//	hg.Post("/login", this.Login, hg.Flag("Login"), hg.Desc("V3 登录"))
+		//})
+		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常"))
+		hg.Get("/test_get", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
+	})
 }
 
 // 测试异常
@@ -40,8 +46,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
 	fmt.Println(111)
 	fmt.Println(&this)
-	fmt.Println(this.Age.String())
-	fmt.Println(this.Higo)
+	fmt.Println(this.Age)
 	var s []map[string]interface{}
 	m1 := make(map[string]interface{})
 	m1["jj"] = "m1jjj"
@@ -69,8 +74,11 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	fmt.Println(injector.BeanFactory.Get(this))
-	fmt.Println(this.DB)
-	user := Models.NewUserModel()
+	fmt.Println(this)
+	fmt.Printf("%p\n", this)
+	user := UserModel.New(UserModel.WithId(101))
+	user.Uname = this.Age.String()
+	fmt.Println(user)
 	err := ctx.ShouldBindUri(user)
 	if err != nil {
 		log.Fatal("映射错误")
@@ -88,6 +96,10 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 
 // 测试post请求
 func (this *DemoController) HttpsTestPost(ctx *gin.Context) string {
+	fmt.Println(this)
+	this.Name = "1001"
+	fmt.Println(this)
+	fmt.Printf("%p\n", this)
 	return "v3 https_test_post"
 }
 
@@ -108,7 +120,11 @@ func (this *DemoController) HttpTestPost(ctx *gin.Context) string {
 }
 
 func (this *DemoController) Login(ctx *gin.Context) string {
-	return "登录成功"
+	fmt.Println(this)
+	this.Name = "1000"
+	fmt.Println(this)
+	fmt.Printf("%p\n", this)
+	return "登录成功11"
 }
 
 func (this *DemoController) TestTask(params ...interface{}) {

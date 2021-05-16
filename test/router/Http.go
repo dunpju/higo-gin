@@ -29,6 +29,7 @@ func (this *Http) Loader(hg *higo.Higo) *higo.Higo {
 
 // api 路由
 func (this *Http) http(hg *higo.Higo) {
+	hg.Route(V3.NewRedisController(), V3.NewDemoController())
 	hg.Get("/http/test_throw", Controllers.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("测试异常"))
 	hg.Get("/http/test_get", Controllers.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("测试GET"))
 	hg.Post("/http/test_post", Controllers.HttpsTestPost, hg.Flag("TestPost"), hg.Desc("测试POST"))

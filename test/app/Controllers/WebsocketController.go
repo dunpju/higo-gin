@@ -16,15 +16,14 @@ func NewWebsocketController() *WebsocketController {
 	return &WebsocketController{}
 }
 
-func (this *WebsocketController) Self(hg *higo.Higo) higo.IClass {
-	return this
+func (this *WebsocketController) New() higo.IClass {
+	return NewWebsocketController()
 }
 
-func (this *WebsocketController) Route(hg *higo.Higo) *higo.Higo {
+func (this *WebsocketController) Route(hg *higo.Higo) {
 	hg.Ws("/conn", this.Conn, hg.Desc("conn"))
 	hg.Ws("/echo", this.Echo, hg.Flag("WebsocketController.Echo"), hg.Desc("Echo"))
 	hg.Ws("/send_all", this.SendAll, hg.Flag("WebsocketController.SendAll"), hg.Desc("SendAll"))
-	return hg
 }
 
 //webSocket请求

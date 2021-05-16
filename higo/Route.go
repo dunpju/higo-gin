@@ -4,6 +4,10 @@ import (
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
 	"net/http"
+	"reflect"
+	"regexp"
+	"runtime"
+	"strings"
 )
 
 var RouterContainer RouterCollect
@@ -31,7 +35,30 @@ func (this RouterCollect) Get(relativePath string) *router.Route {
 }
 
 func (this *Higo) AddRoute(httpMethod string, relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
-	router.AddRoute(httpMethod, relativePath, handler, attributes...)
+	funcForPC := strings.Split(runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name(), "/")
+	endFuncForPC := funcForPC[len(funcForPC)-1:]
+	typeRegexp := regexp.MustCompile(`.*\.\(\*.*\)`)
+	regResult := typeRegexp.FindStringSubmatch(endFuncForPC[0])
+	if len(regResult) > 0 {
+		regStruct := regResult[0]
+		regStructName := strings.TrimRight(regStruct, ")")
+		regStructName = "*" + strings.Join(strings.Split(regStructName, "(*"), "")
+		typeRegexp = regexp.MustCompile(`\)\..*\-fm`)
+		regMethod := typeRegexp.FindStringSubmatch(endFuncForPC[0])
+		if len(regMethod) > 0 {
+			method := regMethod[0]
+			method = strings.TrimRight(strings.TrimLeft(method, ")."), "-fm")
+			if nil != Di(regStructName) {
+				router.AddRoute(httpMethod, relativePath, NewDispatch(Di(regStructName), method).Call(handler), attributes...)
+			} else {
+				router.AddRoute(httpMethod, relativePath, handler, attributes...)
+			}
+		} else {
+			router.AddRoute(httpMethod, relativePath, handler, attributes...)
+		}
+	} else {
+		router.AddRoute(httpMethod, relativePath, handler, attributes...)
+	}
 	return this
 }
 
