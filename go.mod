@@ -7,9 +7,9 @@ require (
 	gitee.com/dengpju/higo-parameter v1.0.3
 	github.com/dengpju/higo-annotation v1.0.4
 	github.com/dengpju/higo-config v1.0.8
-	github.com/dengpju/higo-ioc v1.0.1
+	github.com/dengpju/higo-ioc v1.0.2
 	github.com/dengpju/higo-logger v1.0.7
-	github.com/dengpju/higo-router v1.0.18
+	github.com/dengpju/higo-router v1.0.19
 	github.com/dengpju/higo-throw v1.0.9
 	github.com/dengpju/higo-utils v1.0.30
 	github.com/gin-gonic/gin v1.6.3

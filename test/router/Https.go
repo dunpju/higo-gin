@@ -19,19 +19,15 @@ func NewHttps() *Https {
 }
 
 // 路由装载器
-func (this *Https) Loader(hg *higo.Higo) *higo.Higo {
+func (this *Https) Loader(hg *higo.Higo) {
 
 	// 静态文件
 	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot().Separator(utils.PathSeparator())))
 	this.Api(hg)
-
-	return hg
 }
 
 // api 路由
 func (this *Https) Api(hg *higo.Higo) {
-	hg.Route(V3.NewRedisController(), V3.NewDemoController())
-
 	hg.Get("/https/test_throw", Controllers.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("测试异常"))
 	hg.Get("/https/test_get", Controllers.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("测试GET"))
 	hg.Post("/https/test_post", Controllers.HttpsTestPost, hg.Flag("TestPost"), hg.Desc("测试POST"))

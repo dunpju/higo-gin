@@ -255,9 +255,11 @@ func (this *Higo) Boot() {
 		for _, m := range this.middle {
 			hg.Engine.Use(m.Middle(hg))
 		}
-		//服务中间件
-		for _, m := range ser.Middle {
-			hg.Engine.Use(m.Middle(hg))
+		//serve Middle
+		for _, mid := range ser.Middle {
+			if m, ok := mid.(IMiddleware); ok {
+				hg.Engine.Use(m.Middle(hg))
+			}
 		}
 		//是否使用自带ssl测试https
 		if this.isAutoTLS {
@@ -280,13 +282,19 @@ func (this *Higo) Boot() {
 
 		//添加服务
 		router.AddServe(hg.serve)
-		handler := ser.Router.Loader(hg)
+		ser.Router.Loader(hg)
+		//serve bean router
+		for _, mid := range ser.Middle {
+			if bean, ok := mid.(injector.IBean); ok {
+				hg.Beans(bean)
+			}
+		}
 		//加载路由
 		hg.loadRoute()
 
 		serve := &http.Server{
 			Addr:         addr,
-			Handler:      handler,
+			Handler:      hg,
 			ReadTimeout:  time.Duration(readTimeout) * time.Second,
 			WriteTimeout: time.Duration(writeTimeout) * time.Second,
 		}
@@ -368,29 +376,37 @@ func (this *Higo) register(conf injector.IBean) *Higo {
 		typeRegexp := regexp.MustCompile(`func\((.*)\)`)
 		regParams := typeRegexp.FindStringSubmatch(fmt.Sprintf("%s", method.Type()))
 		if "" != regParams[1] { // 有参数
-			params := make([]reflect.Value, 0)
+			arguments := make([]reflect.Value, 0)
 			args := strings.Split(regParams[1], ",")
 			for _, a := range args {
 				trimArgType := strings.Trim(a, " ")
 				if "string" == trimArgType {
-					params = append(params, reflect.ValueOf(""))
+					arguments = append(arguments, reflect.ValueOf(""))
 				} else if "int" == trimArgType {
-					params = append(params, reflect.ValueOf(0))
+					arguments = append(arguments, reflect.ValueOf(0))
 				} else if "int64" == trimArgType {
-					params = append(params, reflect.ValueOf(int64(0)))
+					arguments = append(arguments, reflect.ValueOf(int64(0)))
 				}
 			}
-			callRet := method.Call(params)
-			if callRet != nil && len(callRet) == 1 {
-				if ret, ok := callRet[0].Interface().(IClass); ok {
-					this.Register(ret)
+			if len(arguments) > 0 {
+				callRet := method.Call(arguments)
+				if callRet != nil && len(callRet) == 1 {
+					if ret, ok := callRet[0].Interface().(IClass); ok {
+						this.Register(ret)
+					}
+					if controller, ok := callRet[0].Interface().(IController); ok {
+						this.Route(controller)
+					}
 				}
 			}
 		} else { // 无参数
 			callRet := method.Call(nil)
 			if callRet != nil && len(callRet) == 1 {
-				if ret, ok := callRet[0].Interface().(IClass); ok {
-					this.Register(ret)
+				if class, ok := callRet[0].Interface().(IClass); ok {
+					this.Register(class)
+				}
+				if controller, ok := callRet[0].Interface().(IController); ok {
+					this.Route(controller)
 				}
 			}
 		}
@@ -458,7 +474,7 @@ func handleSlice(route *router.Route) []gin.HandlerFunc {
 	return handles
 }
 
-// 添加到Bean
+// 添加Bean
 func (this *Higo) Beans(configs ...injector.IBean) *Higo {
 	for _, conf := range configs {
 		injector.BeanFactory.Config(conf)

@@ -8,3 +8,11 @@ import (
 type IMiddleware interface {
 	Middle(hg *Higo) gin.HandlerFunc
 }
+
+type Middleware struct{}
+
+func (this *Middleware) Middle(hg *Higo) gin.HandlerFunc {
+	return func(cxt *gin.Context) {
+		cxt.Next()
+	}
+}

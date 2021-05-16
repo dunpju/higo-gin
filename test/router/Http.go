@@ -18,13 +18,11 @@ func NewHttp() *Http {
 	return &Http{}
 }
 
-func (this *Http) Loader(hg *higo.Higo) *higo.Higo {
+func (this *Http) Loader(hg *higo.Higo) {
 
 	// 静态文件
 	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot().Separator(utils.PathSeparator())))
 	this.http(hg)
-
-	return hg
 }
 
 // api 路由

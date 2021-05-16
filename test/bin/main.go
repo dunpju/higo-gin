@@ -28,7 +28,7 @@ func main() {
 	higo.Init(utils.NewSliceString(".", "test", "")).
 		Middleware(Middlewares.NewRunLog()).
 		AddServe(router.NewHttp(), Middlewares.NewHttp()).
-		AddServe(router.NewHttps()).
+		AddServe(router.NewHttps(), beanConfig).
 		AddServe(router.NewWebsocket()).
 		IsAutoTLS(true).
 		IsRedisPool().

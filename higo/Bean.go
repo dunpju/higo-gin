@@ -2,7 +2,9 @@ package higo
 
 import "github.com/gomodule/redigo/redis"
 
-type Bean struct{}
+type Bean struct{
+	Middleware
+}
 
 func NewBean() *Bean {
 	return &Bean{}

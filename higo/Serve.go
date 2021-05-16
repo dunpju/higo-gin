@@ -43,7 +43,4 @@ func (this *Serve) GetServe() *Serve {
 	return this
 }
 
-func (this *Serve) Loader(hg *Higo) *Higo {
-
-	return hg
-}
+func (this *Serve) Loader(hg *Higo) {}

@@ -14,12 +14,10 @@ func NewWebsocket() *Websocket {
 	return &Websocket{}
 }
 
-func (this *Websocket) Loader(hg *higo.Higo) *higo.Higo {
+func (this *Websocket) Loader(hg *higo.Higo) {
 	hg.Route(Controllers.NewWebsocketController())
 
 	this.api(hg)
-
-	return hg
 }
 
 // api 路由
