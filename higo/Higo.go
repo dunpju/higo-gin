@@ -282,13 +282,13 @@ func (this *Higo) Boot() {
 
 		//添加服务
 		router.AddServe(hg.serve)
-		ser.Router.Loader(hg)
 		//serve bean router
 		for _, mid := range ser.Middle {
 			if bean, ok := mid.(injector.IBean); ok {
 				hg.Beans(bean)
 			}
 		}
+		ser.Router.Loader(hg)
 		//加载路由
 		hg.loadRoute()
 
