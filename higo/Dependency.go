@@ -11,14 +11,8 @@ import (
 )
 
 var (
-	container       Dependency
-	RefDepBuildType reflect.Type
-	depb            DepBuild
+	container Dependency
 )
-
-func init() {
-	RefDepBuildType = reflect.TypeOf(depb)
-}
 
 type DepBuild func() IClass
 
