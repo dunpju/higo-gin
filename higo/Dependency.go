@@ -10,7 +10,15 @@ import (
 	"reflect"
 )
 
-var container Dependency
+var (
+	container       Dependency
+	RefDepBuildType reflect.Type
+	depb            DepBuild
+)
+
+func init() {
+	RefDepBuildType = reflect.TypeOf(depb)
+}
 
 type DepBuild func() IClass
 
@@ -58,7 +66,9 @@ func AddContainer(builds ...DepBuild) {
 	for _, build := range builds {
 		class := build()
 		v := reflect.ValueOf(class)
-		container[v.Type().String()] = build
+		if _, ok := container[v.Type().String()]; !ok {
+			container[v.Type().String()] = build
+		}
 	}
 }
 

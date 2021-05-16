@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-ioc/injector"
@@ -17,6 +18,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -347,12 +349,51 @@ func (this *Higo) loadRoute() *Higo {
 	return this
 }
 
-//注入
-func (this *Higo) Inject(classs ...IClass) *Higo {
+//register to di container
+func (this *Higo) Register(classs ...IClass) *Higo {
 	for _, class := range classs {
 		AddContainer(class.New)
-		injector.BeanFactory.Apply(class)
-		injector.BeanFactory.Set(class)
+	}
+	return this
+}
+
+func (this *Higo) register(conf injector.IBean) *Higo {
+	t := reflect.TypeOf(conf)
+	if t.Kind() != reflect.Ptr {
+		panic("required ptr object")
+	}
+	v := reflect.ValueOf(conf)
+	for i := 0; i < t.NumMethod(); i++ {
+		method := v.Method(i)
+		typeRegexp := regexp.MustCompile(`func\((.*)\)`)
+		regParams := typeRegexp.FindStringSubmatch(fmt.Sprintf("%s", method.Type()))
+		if "" != regParams[1] { // 有参数
+			params := make([]reflect.Value, 0)
+			args := strings.Split(regParams[1], ",")
+			for _, a := range args {
+				trimArgType := strings.Trim(a, " ")
+				if "string" == trimArgType {
+					params = append(params, reflect.ValueOf(""))
+				} else if "int" == trimArgType {
+					params = append(params, reflect.ValueOf(0))
+				} else if "int64" == trimArgType {
+					params = append(params, reflect.ValueOf(int64(0)))
+				}
+			}
+			callRet := method.Call(params)
+			if callRet != nil && len(callRet) == 1 {
+				if ret, ok := callRet[0].Interface().(IClass); ok {
+					this.Register(ret)
+				}
+			}
+		} else { // 无参数
+			callRet := method.Call(nil)
+			if callRet != nil && len(callRet) == 1 {
+				if ret, ok := callRet[0].Interface().(IClass); ok {
+					this.Register(ret)
+				}
+			}
+		}
 	}
 	return this
 }
@@ -421,6 +462,7 @@ func handleSlice(route *router.Route) []gin.HandlerFunc {
 func (this *Higo) Beans(configs ...injector.IBean) *Higo {
 	for _, conf := range configs {
 		injector.BeanFactory.Config(conf)
+		this.register(conf)
 	}
 	return this
 }
