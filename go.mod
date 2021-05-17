@@ -10,7 +10,7 @@ require (
 	github.com/dengpju/higo-ioc v1.0.2
 	github.com/dengpju/higo-logger v1.0.7
 	github.com/dengpju/higo-router v1.0.19
-	github.com/dengpju/higo-throw v1.0.9
+	github.com/dengpju/higo-throw v1.0.10
 	github.com/dengpju/higo-utils v1.0.30
 	github.com/gin-gonic/gin v1.6.3
 	github.com/gomodule/redigo v1.8.3

@@ -17,3 +17,8 @@ func New(attrs ...higo.Property) *UserModelImpl {
 func (this *UserModelImpl) New() higo.IClass {
 	return New()
 }
+
+func (this *UserModelImpl) Mutate(attrs ...higo.Property) higo.Model {
+	higo.Propertys(attrs).Apply(this)
+	return this
+}

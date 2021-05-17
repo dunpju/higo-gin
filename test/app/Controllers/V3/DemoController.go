@@ -80,6 +80,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	user.Uname = this.Age.String()
 	fmt.Println(user)
 	err := ctx.ShouldBindUri(user)
+	higo.Result(ctx.ShouldBindUri(user)).Unwrap()
 	if err != nil {
 		log.Fatal("映射错误")
 	}
