@@ -19,7 +19,7 @@ func (this *Dispatch) Call(handler interface{}) interface{} {
 	for _, r := range getResponderList() {
 		rRef := reflect.TypeOf(r)
 		if hRef.Type().ConvertibleTo(rRef) {
-			return hRef.Convert(rRef).Interface().(Responder).Handle(this.method)
+			return hRef.Convert(rRef).Interface().(IResponder).Handle(this.method)
 		}
 	}
 	panic("unknown dispatch")

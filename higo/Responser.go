@@ -7,20 +7,20 @@ import (
 )
 
 var (
-	responderList      []Responder
+	responderList      []IResponder
 	onceRespList       sync.Once
 	getSyncHandlerOnce sync.Once
 	syncHandler        *SyncHandler
 )
 
-type Responder interface {
+type IResponder interface {
 	RespondTo() gin.HandlerFunc
 	Handle(method reflect.Value) interface{}
 }
 
-func getResponderList() []Responder {
+func getResponderList() []IResponder {
 	onceRespList.Do(func() {
-		responderList = []Responder{
+		responderList = []IResponder{
 			(StringResponder)(nil),
 			(JsonResponder)(nil),
 			(ModelResponder)(nil),
@@ -37,7 +37,7 @@ func Convert(handler interface{}) gin.HandlerFunc {
 	for _, r := range getResponderList() {
 		rRef := reflect.TypeOf(r)
 		if hRef.Type().ConvertibleTo(rRef) {
-			return hRef.Convert(rRef).Interface().(Responder).RespondTo()
+			return hRef.Convert(rRef).Interface().(IResponder).RespondTo()
 		}
 	}
 	return nil
@@ -64,7 +64,7 @@ type SyncHandler struct {
 	context []IContext
 }
 
-func (this *SyncHandler) handler(responder Responder, ctx *gin.Context) interface{} {
+func (this *SyncHandler) handler(responder IResponder, ctx *gin.Context) interface{} {
 	var ret interface{}
 	if s1, ok := responder.(StringResponder); ok {
 		ret = s1(ctx)
@@ -78,8 +78,8 @@ func (this *SyncHandler) handler(responder Responder, ctx *gin.Context) interfac
 type StringResponder func(*gin.Context) string
 
 func (this StringResponder) RespondTo() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		context.String(200, getSyncHandler().handler(this, context).(string))
+	return func(ctx *gin.Context) {
+		ctx.String(200, getSyncHandler().handler(this, ctx).(string))
 	}
 }
 
@@ -93,8 +93,8 @@ type Json interface{}
 type JsonResponder func(*gin.Context) Json
 
 func (this JsonResponder) RespondTo() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		context.JSON(200, getSyncHandler().handler(this, context))
+	return func(ctx *gin.Context) {
+		ctx.JSON(200, getSyncHandler().handler(this, ctx))
 	}
 }
 
@@ -107,8 +107,8 @@ func (this JsonResponder) Handle(method reflect.Value) interface{} {
 type ModelResponder func(*gin.Context) Model
 
 func (this ModelResponder) RespondTo() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		context.JSON(200, this(context))
+	return func(ctx *gin.Context) {
+		ctx.JSON(200, this(ctx))
 	}
 }
 
@@ -121,9 +121,9 @@ func (this ModelResponder) Handle(method reflect.Value) interface{} {
 type ModelsResponder func(*gin.Context) Models
 
 func (this ModelsResponder) RespondTo() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		context.Writer.Header().Set("Content-typ", "application/json")
-		_, err := context.Writer.WriteString(string(this(context)))
+	return func(ctx *gin.Context) {
+		ctx.Writer.Header().Set("Content-typ", "application/json")
+		_, err := ctx.Writer.WriteString(string(this(ctx)))
 		if err != nil {
 			panic(err)
 		}
@@ -139,8 +139,8 @@ func (this ModelsResponder) Handle(method reflect.Value) interface{} {
 type WebsocketResponder func(*gin.Context) WsWriteMessage
 
 func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		this(context)
+	return func(ctx *gin.Context) {
+		this(ctx)
 	}
 }
 
