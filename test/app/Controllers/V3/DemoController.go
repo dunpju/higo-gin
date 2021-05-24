@@ -134,7 +134,7 @@ func (this *DemoController) Login1(ctx *gin.Context) {
 	this.Name = "1000"
 	fmt.Println(this)
 	fmt.Printf("%p\n", this)
-	responser.End(ctx).SuccessJson(this.Name, 10000, nil)
+	//responser.End(ctx).SuccessJson(this.Name, 10000, nil)
 	fmt.Println(11)
 	responser.End(ctx).ErrorJson(this.Name, 10000, nil)
 }
