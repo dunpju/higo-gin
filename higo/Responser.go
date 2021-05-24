@@ -33,6 +33,9 @@ func getResponderList() []IResponder {
 
 // 转换
 func Convert(handler interface{}) gin.HandlerFunc {
+	if handle, ok := handler.(func(*gin.Context)); ok {
+		return handle
+	}
 	hRef := reflect.ValueOf(handler)
 	for _, r := range getResponderList() {
 		rRef := reflect.TypeOf(r)

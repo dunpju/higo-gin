@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"github.com/gin-gonic/gin"
 	"reflect"
 )
 
@@ -15,6 +16,9 @@ func NewDispatch(class IClass, method string) *Dispatch {
 }
 
 func (this *Dispatch) Call(handler interface{}) interface{} {
+	if handle, ok := handler.(func(*gin.Context)); ok {
+		return handle
+	}
 	hRef := reflect.ValueOf(handler)
 	for _, r := range getResponderList() {
 		rRef := reflect.TypeOf(r)

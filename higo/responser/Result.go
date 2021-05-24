@@ -1,12 +1,11 @@
-package higo
+package responser
 
 import (
 	"fmt"
-	"gitee.com/dengpju/higo-code/code"
 	"gitee.com/dengpju/higo-parameter/parameter"
 	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"sync"
 )
 
@@ -65,10 +64,10 @@ func NewJsonResult(code int, message string, data interface{}) *JsonResult {
 	return &JsonResult{Code: code, Message: message, Data: data}
 }
 
-var ResultPool *sync.Pool
+var resultPool *sync.Pool
 
 func init() {
-	ResultPool = &sync.Pool{
+	resultPool = &sync.Pool{
 		New: func() interface{} {
 			return NewJsonResult(0, "", nil)
 		},
@@ -78,26 +77,18 @@ func init() {
 type ResultFunc func(message string, code int, data interface{}) func(output Output)
 type Output func(ctx *gin.Context, v interface{})
 
-func SuccessJson(data interface{}) Json {
-	result := utils.MapOperation(make(utils.MapString)).
-		Put("code", code.Message("20000@成功").Code).
-		Put("message", code.Message("20000@成功").Message).
-		Put("data", data)
-	return result
+func (this ResultFunc) SuccessJson(message string, code int, data interface{}) {
+	this(message, code, data)(OK)
 }
 
-func ErrorJson(data interface{}) Json {
-	result := utils.MapOperation(make(utils.MapString)).
-		Put("code", code.Message("20000@成功").Code).
-		Put("message", code.Message("20000@成功").Message).
-		Put("data", data)
-	return result
+func (this ResultFunc) ErrorJson(message string, code int, data interface{}) {
+	this(message, code, data)(Error)
 }
 
 func End(ctx *gin.Context) ResultFunc {
 	return func(message string, code int, data interface{}) func(output Output) {
-		r := ResultPool.Get().(*JsonResult)
-		defer ResultPool.Put(r)
+		r := resultPool.Get().(*JsonResult)
+		defer resultPool.Put(r)
 		r.Message = message
 		r.Code = code
 		r.Data = data
@@ -108,9 +99,11 @@ func End(ctx *gin.Context) ResultFunc {
 }
 
 func OK(ctx *gin.Context, v interface{}) {
-	ctx.JSON(200, v)
+	ctx.JSON(http.StatusOK, v)
+	panic(nil)
 }
 
 func Error(ctx *gin.Context, v interface{}) {
-	ctx.JSON(400, v)
+	ctx.JSON(http.StatusBadRequest, v)
+	panic(nil)
 }

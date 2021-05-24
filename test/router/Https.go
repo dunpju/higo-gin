@@ -40,6 +40,7 @@ func (this *Https) Api(hg *higo.Higo) {
 	hg.AddGroup("/https/v3", func() {
 		hg.AddGroup("/user", func() {
 			hg.Post("/login", V3.NewDemoController().Login, hg.Flag("Login"), hg.Desc("V3 登录"))
+			hg.Post("/login1", V3.NewDemoController().Login1, hg.Flag("Login"), hg.Desc("V3 登录1"))
 		})
 		hg.Post("/test_post", V3.NewDemoController().HttpsTestPost, hg.Flag("TestPost"), hg.Desc("V3 测试POST"))
 	})

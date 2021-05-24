@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/responser"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
@@ -80,7 +81,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	user.Uname = this.Age.String()
 	fmt.Println(user)
 	err := ctx.ShouldBindUri(user)
-	higo.Result(ctx.ShouldBindUri(user)).Unwrap()
+	responser.Result(ctx.ShouldBindUri(user)).Unwrap()
 	if err != nil {
 		log.Fatal("映射错误")
 	}
@@ -126,6 +127,16 @@ func (this *DemoController) Login(ctx *gin.Context) string {
 	fmt.Println(this)
 	fmt.Printf("%p\n", this)
 	return "登录成功11"
+}
+
+func (this *DemoController) Login1(ctx *gin.Context) {
+	fmt.Println(this)
+	this.Name = "1000"
+	fmt.Println(this)
+	fmt.Printf("%p\n", this)
+	responser.End(ctx).SuccessJson(this.Name, 10000, nil)
+	fmt.Println(11)
+	responser.End(ctx).ErrorJson(this.Name, 10000, nil)
 }
 
 func (this *DemoController) TestTask(params ...interface{}) {
