@@ -2,7 +2,6 @@ package Consts
 
 // CODE 常量,格式：code_TO_msg
 const (
-	// `vv`
 	SUCCESS          = "20000@成功"
 	SERVER_ERROR     = "50000@系统错误"
 	AUTH_ERROR       = "50001@认证错误"

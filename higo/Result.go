@@ -1,4 +1,4 @@
-package responser
+package higo
 
 import (
 	"fmt"
@@ -16,6 +16,7 @@ type ErrorResult struct {
 
 func (this *ErrorResult) Unwrap(parameters ...*parameter.Parameter) interface{} {
 	if this.err != nil {
+		checkErrors(this.err)
 		if len(parameters) > 0 {
 			tmp := make([]*parameter.Parameter, 0)
 			for _, p := range parameters {
@@ -28,7 +29,7 @@ func (this *ErrorResult) Unwrap(parameters ...*parameter.Parameter) interface{} 
 			}
 			exception.Throw(exception.Message(this.err))
 		} else {
-			exception.Throw(exception.Message(this.err), exception.RealMessage(this.err))
+			exception.Throw(exception.Message(this.err.Error()), exception.RealMessage(this.err.Error()))
 		}
 	}
 	return this.data
@@ -52,6 +53,25 @@ func Result(values ...interface{}) *ErrorResult {
 		}
 	}
 	return &ErrorResult{nil, fmt.Errorf("error result format")}
+}
+
+func checkErrors(errs error) {
+	if errs, ok := errs.(ValidateError); ok {
+		panic(errs)
+	}
+	//if errs, ok := errs.(validator.ValidationErrors); ok {
+	//	for _, err := range errs {
+	//		if v, ok := validatorErrors[err.Tag()]; ok {
+	//			fmt.Println(err.ActualTag())
+	//			fmt.Println(err.Tag())
+	//			fmt.Println(err.StructNamespace())
+	//			fmt.Println(err.Namespace())
+	//			fmt.Println(err.Field())
+	//			fmt.Println(err.StructField())
+	//			panic(v)
+	//		}
+	//	}
+	//}
 }
 
 type JsonResult struct {
@@ -85,7 +105,7 @@ func (this ResultFunc) ErrorJson(message string, code int, data interface{}) {
 	this(message, code, data)(Error)
 }
 
-func End(ctx *gin.Context) ResultFunc {
+func Responser(ctx *gin.Context) ResultFunc {
 	return func(message string, code int, data interface{}) func(output Output) {
 		r := resultPool.Get().(*JsonResult)
 		defer resultPool.Put(r)

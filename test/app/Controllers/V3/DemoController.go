@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/responser"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
@@ -38,7 +37,7 @@ func (this *DemoController) Route(hg *higo.Higo) {
 		//	hg.Post("/login", this.Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		//})
 		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常"))
-		hg.Get("/test_get", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
+		hg.Post("/test_get", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
 	})
 }
 
@@ -80,8 +79,16 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	user := UserModel.New(UserModel.WithId(101))
 	user.Uname = this.Age.String()
 	fmt.Println(user)
+	user.InitValidator()
+	fmt.Println(higo.ValidContainer)
+	//注册校验
+	for _, valid := range higo.ValidContainer {
+		for tag, rule := range valid {
+			higo.RegisterValidation(tag, rule.ToFunc())
+		}
+	}
+	higo.Result(ctx.ShouldBindJSON(user)).Unwrap()
 	err := ctx.ShouldBindUri(user)
-	responser.Result(ctx.ShouldBindUri(user)).Unwrap()
 	if err != nil {
 		log.Fatal("映射错误")
 	}
@@ -134,9 +141,9 @@ func (this *DemoController) Login1(ctx *gin.Context) {
 	this.Name = "1000"
 	fmt.Println(this)
 	fmt.Printf("%p\n", this)
-	//responser.End(ctx).SuccessJson(this.Name, 10000, nil)
+	//higo.Responser(ctx).SuccessJson(this.Name, 10000, nil)
 	fmt.Println(11)
-	responser.End(ctx).ErrorJson(this.Name, 10000, nil)
+	higo.Responser(ctx).ErrorJson(this.Name, 10000, nil)
 }
 
 func (this *DemoController) TestTask(params ...interface{}) {
