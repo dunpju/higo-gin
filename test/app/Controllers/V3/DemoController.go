@@ -79,14 +79,6 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	user := UserModel.New(UserModel.WithId(101))
 	user.Uname = this.Age.String()
 	fmt.Println(user)
-	user.InitValidator()
-	fmt.Println(higo.ValidContainer)
-	//注册校验
-	for _, valid := range higo.ValidContainer {
-		for tag, rule := range valid {
-			higo.RegisterValidation(tag, rule.ToFunc())
-		}
-	}
 	higo.Result(ctx.ShouldBindJSON(user)).Unwrap()
 	err := ctx.ShouldBindUri(user)
 	if err != nil {

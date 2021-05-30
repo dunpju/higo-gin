@@ -242,6 +242,12 @@ func (this *Higo) IsRedisPool() *Higo {
 
 //启动
 func (this *Higo) Boot() {
+	//注册校验
+	for _, valid := range ValidContainer {
+		for tag, rule := range valid {
+			RegisterValidation(tag, rule.ToFunc())
+		}
+	}
 	//启动服务
 	for _, ser := range serves {
 		//初始化

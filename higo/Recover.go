@@ -34,6 +34,12 @@ func init() {
 				})
 			} else if MapString, ok := r.(utils.MapString); ok {
 				cxt.JSON(http.StatusOK, MapString)
+			} else if validate, ok := r.(*ValidateError); ok {
+				cxt.JSON(http.StatusOK, gin.H{
+					"code":    validate.Get().Code,
+					"message": validate.Get().Message,
+					"data":    nil,
+				})
 			} else {
 				cxt.JSON(http.StatusOK, gin.H{
 					"code":    0,

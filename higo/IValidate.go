@@ -2,6 +2,7 @@ package higo
 
 import (
 	"fmt"
+	"gitee.com/dengpju/higo-code/code"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"log"
@@ -43,21 +44,21 @@ func RegisterValid(class IClass) Valid {
 
 type ValidRule struct {
 	Rule    string
-	Message string
+	Message *code.Code
 }
 
-func Rule(rule string, message string) *ValidRule {
+func Rule(rule string, message *code.Code) *ValidRule {
 	return &ValidRule{Rule: rule, Message: message}
 }
 
 type ValidRules struct {
 	rule    string
-	message map[string]string
+	message map[string]*code.Code
 	Rules   []*ValidRule
 }
 
 func NewValidRules(rules ...*ValidRule) *ValidRules {
-	vr := &ValidRules{message: make(map[string]string), Rules: rules}
+	vr := &ValidRules{message: make(map[string]*code.Code), Rules: rules}
 	vr.setRule()
 	return vr
 }
@@ -98,13 +99,13 @@ func (this *ValidRules) Throw(v interface{}) {
 		if msg, ok := this.message[rule[0]]; ok {
 			panic(NewValidateError(msg))
 		}
-		panic(NewValidateError("validator error"))
+		panic("validator error")
 	}
 }
 
 func RegisterValidation(tag string, fn validator.Func) {
 	err := valid.RegisterValidation(tag, fn)
 	if err != nil {
-		panic(NewValidateError(fmt.Sprintf("register validator %s error, msg: %s", tag, err.Error())))
+		panic(fmt.Sprintf("register validator %s error, msg: %s", tag, err.Error()))
 	}
 }
