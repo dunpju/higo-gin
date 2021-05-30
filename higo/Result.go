@@ -59,19 +59,6 @@ func checkErrors(errs error) {
 	if errs, ok := errs.(ValidateError); ok {
 		panic(errs)
 	}
-	//if errs, ok := errs.(validator.ValidationErrors); ok {
-	//	for _, err := range errs {
-	//		if v, ok := validatorErrors[err.Tag()]; ok {
-	//			fmt.Println(err.ActualTag())
-	//			fmt.Println(err.Tag())
-	//			fmt.Println(err.StructNamespace())
-	//			fmt.Println(err.Namespace())
-	//			fmt.Println(err.Field())
-	//			fmt.Println(err.StructField())
-	//			panic(v)
-	//		}
-	//	}
-	//}
 }
 
 type JsonResult struct {
