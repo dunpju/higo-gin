@@ -20,10 +20,11 @@ func init() {
 	} else {
 		log.Fatal("error init validator")
 	}
+	code.IsSingle = false
 }
 
 type IValidate interface {
-	InitValidator() Valid
+	RegisterValidator()
 }
 
 type Valid map[string]*ValidRules
@@ -67,7 +68,7 @@ func (this *ValidRules) setRule() *ValidRules {
 	for _, vrs := range this.Rules {
 		this.rule += vrs.Rule + ","
 		key := strings.Split(vrs.Rule, "=")
-		if len(key) >= 1 {
+		if len(key) > 1 {
 			this.message[key[0]] = vrs.Message
 		} else {
 			this.message[vrs.Rule] = vrs.Message

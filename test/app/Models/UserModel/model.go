@@ -7,14 +7,14 @@ import (
 
 type UserModelImpl struct {
 	Id    int    `gorm:"column:id" json:"id" binding:"required"`
-	Utel  string `gorm:"column:u_tel" json:"utel" binding:"Utel"`
 	Uname string `gorm:"column:uname" json:"uname" binding:"UserName"`
+	Utel  string `gorm:"column:u_tel" json:"utel" binding:"Utel"`
 }
 
 func init() {
 	//初始化校验器
 	u := &UserModelImpl{}
-	u.InitValidator()
+	u.RegisterValidator()
 }
 
 func New(attrs ...higo.Property) *UserModelImpl {
@@ -32,11 +32,11 @@ func (this *UserModelImpl) Mutate(attrs ...higo.Property) higo.Model {
 	return this
 }
 
-func (this *UserModelImpl) InitValidator() higo.Valid {
-	return higo.RegisterValid(this).
+func (this *UserModelImpl) RegisterValidator() {
+	higo.RegisterValid(this).
 		Tag("UserName",
-			higo.Rule("required", code.Message("20000@UserName必须填")),
-			higo.Rule("min=5", code.Message("20000@UserName必须填大于5"))).
+			higo.Rule("required", code.Message("20000@UserName必须填1")),
+			higo.Rule("min=5", code.Message("20000@UserName大于5"))).
 		Tag("Utel",
 			higo.Rule("required", code.Message("20000@Utel必须填")),
 			higo.Rule("min=4", code.Message("20000@Utel大于4")))
