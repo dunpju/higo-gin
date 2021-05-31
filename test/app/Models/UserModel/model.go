@@ -13,8 +13,7 @@ type UserModelImpl struct {
 
 func init() {
 	//初始化校验器
-	u := &UserModelImpl{}
-	u.RegisterValidator()
+	New().RegisterValidator()
 }
 
 func New(attrs ...higo.Property) *UserModelImpl {
