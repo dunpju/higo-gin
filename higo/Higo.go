@@ -364,11 +364,10 @@ func (this *Higo) loadRoute() *Higo {
 }
 
 //register to di container
-func (this *Higo) Register(classs ...IClass) *Higo {
+func Register(classs ...IClass) {
 	for _, class := range classs {
 		AddContainer(class.New)
 	}
-	return this
 }
 
 func (this *Higo) register(conf injector.IBean) *Higo {
@@ -397,8 +396,8 @@ func (this *Higo) register(conf injector.IBean) *Higo {
 			if len(arguments) > 0 {
 				callRet := method.Call(arguments)
 				if callRet != nil && len(callRet) == 1 {
-					if ret, ok := callRet[0].Interface().(IClass); ok {
-						this.Register(ret)
+					if class, ok := callRet[0].Interface().(IClass); ok {
+						Register(class)
 					}
 					if controller, ok := callRet[0].Interface().(IController); ok {
 						this.Route(controller)
@@ -409,7 +408,7 @@ func (this *Higo) register(conf injector.IBean) *Higo {
 			callRet := method.Call(nil)
 			if callRet != nil && len(callRet) == 1 {
 				if class, ok := callRet[0].Interface().(IClass); ok {
-					this.Register(class)
+					Register(class)
 				}
 				if controller, ok := callRet[0].Interface().(IController); ok {
 					this.Route(controller)

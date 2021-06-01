@@ -9,7 +9,7 @@ import (
 )
 
 type RedisController struct {
-	*higo.Gorm `inject:"Bean.NewGorm()"`
+	*higo.Orm `inject:"Bean.NewOrm()"`
 	Redis      *higo.RedisAdapter `inject:"Bean.NewRedisAdapter()"`
 }
 

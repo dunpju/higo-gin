@@ -16,8 +16,8 @@ func (this *Bean) NewServe(conf string) *Serve {
 	return NewServe(conf)
 }
 
-func (this *Bean) NewGorm() *Gorm {
-	return NewGorm()
+func (this *Bean) NewOrm() *Orm {
+	return NewOrm()
 }
 
 func (this *Bean) NewRedisPool() *redis.Pool {

@@ -2,5 +2,5 @@
 # 注解配置
 value:
   user:
-    score: 100
-    age: 19
+    score: "100"
+    age: "19"

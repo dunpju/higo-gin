@@ -18,7 +18,7 @@ import (
 type DemoController struct {
 	Age         *anno.Value           `prefix:"user.age"`
 	DemoService *Services.DemoService `inject:"MyBean.DemoService()"`
-	*higo.Gorm  `inject:"Bean.NewGorm()"`
+	*higo.Orm   `inject:"Bean.NewOrm()"`
 	*redis.Pool `inject:"Bean.NewRedisPool()"`
 	Name        string
 }
@@ -84,9 +84,11 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	if err != nil {
 		log.Fatal("映射错误")
 	}
-	this.Table("ts_user").
-		Where("id=?", 3).
-		Find(user)
+	user.UserById(3, "*")
+	fmt.Println(user)
+	//this.Table("ts_user").
+	//	Where("id=?", 3).
+	//	Find(user)
 	higo.Task(this.TestTask, func() {
 		this.TestTaskDone(3)
 	}, user.Id)

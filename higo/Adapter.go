@@ -11,15 +11,17 @@ import (
 )
 
 var (
-	orm      *Gorm
+	orm      *Orm
 	onceGorm sync.Once
 )
 
-type Gorm struct {
+type Orm struct {
 	*gorm.DB
+	sql  string
+	args []interface{}
 }
 
-func NewGorm() *Gorm {
+func NewOrm() *Orm {
 	onceGorm.Do(func() {
 		confDefault := config.Db("DB.DEFAULT").(*config.Configure)
 		args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
@@ -39,7 +41,24 @@ func NewGorm() *Gorm {
 		db.SingularTable(true)
 		db.DB().SetMaxIdleConns(5)
 		db.DB().SetMaxOpenConns(10)
-		orm = &Gorm{DB: db}
+		orm = &Orm{DB: db}
 	})
 	return orm
+}
+
+func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
+	if err != nil {
+		panic(err.Error())
+	}
+	this.sql = sql
+	this.args = args
+	return this
+}
+
+func (this *Orm) Query() *gorm.DB {
+	return this.Raw(this.sql, this.args)
+}
+
+func (this *Orm) Execute() *gorm.DB {
+	return this.Exec(this.sql, this.args)
 }
