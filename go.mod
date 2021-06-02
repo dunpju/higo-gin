@@ -5,7 +5,7 @@ go 1.14
 require (
 	gitee.com/dengpju/higo-code v1.0.3
 	gitee.com/dengpju/higo-parameter v1.0.3
-	github.com/Masterminds/squirrel v1.5.0 // indirect
+	github.com/Masterminds/squirrel v1.5.0
 	github.com/dengpju/higo-annotation v1.0.4
 	github.com/dengpju/higo-config v1.0.8
 	github.com/dengpju/higo-ioc v1.0.2
