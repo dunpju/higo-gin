@@ -1,9 +1,11 @@
 package UserModel
 
 import (
+	"fmt"
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
 )
 
@@ -50,6 +52,7 @@ func (this *UserModelImpl) RegisterValidator() {
 }
 
 func (this *UserModelImpl) UserById(id int, columns ...string) {
+	fmt.Println(55, this.TableName())
 	this.Mapper(squirrel.
 		Select(columns...).
 		From(this.TableName()).
@@ -57,4 +60,18 @@ func (this *UserModelImpl) UserById(id int, columns ...string) {
 		ToSql()).
 		Query().
 		Scan(&this)
+}
+
+func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Orm {
+	return this.Mapper(squirrel.Insert(this.TableName()).
+		Columns("uname", "u_tel", "score").
+		Values(uname, tel, score).
+		ToSql())
+}
+
+func (this *UserModelImpl) Add(uname string, tel string, score int) {
+	u := this.AddUser(uname, tel, score)
+	coin := CoinModel.New().AddCoin(uname, score)
+	err := this.BeginTransaction(u, coin)
+	panic(err)
 }
