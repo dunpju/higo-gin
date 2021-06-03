@@ -92,13 +92,3 @@ func (this *Orm) apply(tx *gorm.DB) {
 		sql.setDB(tx)
 	}
 }
-
-func Mapper(sql string, args []interface{}, err error) *Orm {
-	if err != nil {
-		panic(err.Error())
-	}
-	cloneDB := newOrm()
-	cloneDB.sql = sql
-	cloneDB.args = args
-	return cloneDB
-}

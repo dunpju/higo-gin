@@ -4,53 +4,51 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type ISqlMapper interface {
-	Sql() string
-	Args() []interface{}
-	Orm() interface{}
+type SqlMapper struct {
+	Orm  *Orm
+	Sql  string
+	Args []interface{}
 }
 
-//func Mapper(sql string, args []interface{}, err error) *GormSqlMapperImpl {
-//	if err != nil {
-//		panic(err.Error())
-//	}
-//	return NewGormSqlMapper(sql, args)
-//}
-
-type SqlMapperAbstract struct {
-	orm  *Orm
-	sql  string
-	args []interface{}
+func Mapper(sql string, args []interface{}, err error) *SqlMapper {
+	if err != nil {
+		panic(err.Error())
+	}
+	sqlMapper := &SqlMapper{}
+	sqlMapper.Orm = newOrm()
+	sqlMapper.Sql = sql
+	sqlMapper.Args = args
+	return sqlMapper
 }
 
-func NewSqlMapperAbstract(orm *Orm, sql string, args []interface{}) *SqlMapperAbstract {
-	return &SqlMapperAbstract{orm: orm, sql: sql, args: args}
+func (this *SqlMapper) Query() *gorm.DB {
+	return this.Orm.Raw(this.Sql, this.Args)
 }
 
-func (this *SqlMapperAbstract) Sql() string {
-	return this.sql
+func (this *SqlMapper) Exec() *gorm.DB {
+	return this.Orm.Exec(this.Sql, this.Args)
 }
 
-func (this *SqlMapperAbstract) Args() []interface{} {
-	return this.args
+func (this *SqlMapper) setDB(db *gorm.DB) {
+	this.Orm.DB = db
 }
 
-func (this *SqlMapperAbstract) Orm() interface{} {
-	return this.orm
+func (this *SqlMapper) apply(orms ...*Orm) {
+	for _, orm := range orms {
+		orm.setDB(this.Orm.DB)
+	}
 }
 
-type GormSqlMapperImpl struct {
-	*SqlMapperAbstract
+func (this *SqlMapper) Transaction(fn func() error) {
+	err := this.Orm.DB.Transaction(func(tx *gorm.DB) error {
+		return fn()
+	})
+	panic(err)
 }
 
-func NewGormSqlMapper(sql string, args []interface{}) *GormSqlMapperImpl {
-	return &GormSqlMapperImpl{NewSqlMapperAbstract(NewOrm(), sql, args)}
-}
-
-func (this *GormSqlMapperImpl) Query() *gorm.DB {
-	return this.orm.Raw(this.sql, this.Args)
-}
-
-func (this *GormSqlMapperImpl) Exec() *gorm.DB {
-	return this.orm.Exec(this.sql, this.Args)
+func Begin(orms ...*Orm) *SqlMapper {
+	sqlMapper := &SqlMapper{}
+	sqlMapper.Orm = newOrm()
+	sqlMapper.apply(orms...)
+	return sqlMapper
 }
