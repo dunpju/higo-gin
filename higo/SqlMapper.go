@@ -10,12 +10,12 @@ type ISqlMapper interface {
 	Orm() interface{}
 }
 
-func Mapper(sql string, args []interface{}, err error) *GormSqlMapperImpl {
-	if err != nil {
-		panic(err.Error())
-	}
-	return NewGormSqlMapper(sql, args)
-}
+//func Mapper(sql string, args []interface{}, err error) *GormSqlMapperImpl {
+//	if err != nil {
+//		panic(err.Error())
+//	}
+//	return NewGormSqlMapper(sql, args)
+//}
 
 type SqlMapperAbstract struct {
 	orm  *Orm
