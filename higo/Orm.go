@@ -22,6 +22,14 @@ type Orm struct {
 	orms []*Orm
 }
 
+func (this *Orm) Args() []interface{} {
+	return this.args
+}
+
+func (this *Orm) Sql() string {
+	return this.sql
+}
+
 func newGorm() *gorm.DB {
 	confDefault := config.Db("DB.DEFAULT").(*config.Configure)
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
@@ -71,14 +79,11 @@ func (this *Orm) setDB(db *gorm.DB) {
 }
 
 func (this *Orm) Query() *gorm.DB {
-	return this.Raw(this.sql, this.args...)
+	return this.DB.Raw(this.sql, this.args...)
 }
 
-func (this *Orm) Execute() *gorm.DB {
-	if this.DB != nil {
-		return this.DB.Exec(this.sql, this.args...)
-	}
-	return this.Exec(this.sql, this.args...)
+func (this *Orm) Exec() *gorm.DB {
+	return this.DB.Exec(this.sql, this.args...)
 }
 
 func (this *Orm) Begin(orms ...*Orm) *gorm.DB {

@@ -73,35 +73,14 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 	u := this.AddUser(uname, tel, score)
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
-	//err := this.Begin(u, coin).Transaction(func(tx *gorm.DB) error {
-	//	err := u.Execute().Error
-	//	if err != nil {
-	//		return err
-	//	}
-	//	err = coin.Execute().Error
-	//	if err != nil {
-	//		return err
-	//	}
-	//	//coinModel.Create()
-	//	coin.Last(&coinModel)
-	//	fmt.Println(coinModel)
-	//	return nil
-	//})
-	//panic(err)
 	higo.Begin(u, coin).Transaction(func() error {
-		fmt.Println(u.DB)
-		fmt.Println(coin.DB)
-		err := u.Execute().Error
-		if err != nil {
-			return err
-		}
-		err = coin.Execute().Error
-		if err != nil {
-			return err
-		}
-		//coinModel.Create()
+		higo.Result(u.Exec().Error).Unwrap()
+		higo.Result(coin.Exec().Error).Unwrap()
+		fmt.Println(1)
 		coin.Last(&coinModel)
+		u.Last(this)
 		fmt.Println(coinModel)
+		fmt.Println(this)
 		return nil
 	})
 }

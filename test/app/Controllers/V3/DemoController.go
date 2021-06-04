@@ -93,8 +93,8 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	higo.Task(this.TestTask, func() {
 		this.TestTaskDone(3)
 	}, user.Id)
-	redisConn := this.Pool.Get()
-	fmt.Println(redis.String(redisConn.Do("get", "name")))
+	//redisConn := this.Pool.Get()
+	//fmt.Println(redis.String(redisConn.Do("get", "name")))
 	return user
 }
 
