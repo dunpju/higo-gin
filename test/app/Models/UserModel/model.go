@@ -70,17 +70,39 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 }
 
 func (this *UserModelImpl) Add(uname string, tel string, score int) {
+	u1 := this.New()
 	u := this.AddUser(uname, tel, score)
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
+	//方法一:
+
 	higo.Begin(u, coin).Transaction(func() error {
 		higo.Result(u.Exec().Error).Unwrap()
 		higo.Result(coin.Exec().Error).Unwrap()
 		fmt.Println(1)
 		coin.Last(&coinModel)
-		u.Last(this)
+		higo.Result(u.Last(&coinModel).Error).Unwrap()
+		fmt.Printf("%T\n", u1)
+		higo.Result(u.Last(u1).Error).Unwrap()
 		fmt.Println(coinModel)
-		fmt.Println(this)
+		fmt.Println(u1)
 		return nil
 	})
+
+	//方法二:
+	/**
+	this.Begin(u, coin).Transaction(func() error {
+		higo.Result(u.Exec().Error).Unwrap()
+		higo.Result(coin.Exec().Error).Unwrap()
+		fmt.Println(1)
+		coin.Last(&coinModel)
+		higo.Result(u.Last(&coinModel).Error).Unwrap()
+		fmt.Printf("%T\n", u1)
+		higo.Result(u.Last(u1).Error).Unwrap()
+		fmt.Println(coinModel)
+		fmt.Println(u1)
+		return nil
+	})
+
+	*/
 }
