@@ -98,6 +98,11 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	return user
 }
 
+//测试发布
+func (this *DemoController) TestPub(ctx *gin.Context) string {
+	return "测试发布"
+}
+
 // 测试post请求
 func (this *DemoController) HttpsTestPost(ctx *gin.Context) string {
 	fmt.Println(this)

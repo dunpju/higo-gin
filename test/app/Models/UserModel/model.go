@@ -78,8 +78,10 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 
 	higo.Begin(u, coin).Transaction(func() error {
 		higo.Result(u.Exec().Error).Unwrap()
-		higo.Result(coin.Exec().Error).Unwrap()
+		co := coin.Exec()
+		higo.Result(co.Error).Unwrap()
 		fmt.Println(1)
+		fmt.Println(co.Value)
 		coin.Last(&coinModel)
 		higo.Result(u.Last(&coinModel).Error).Unwrap()
 		fmt.Printf("%T\n", u1)
