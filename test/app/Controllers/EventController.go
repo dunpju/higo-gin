@@ -24,9 +24,12 @@ func (this *EventController) Route(hg *higo.Higo) {
 	})
 }
 
+//订阅数据
+var ev = event.NewEventBus() //需要全局
+
 func (this *EventController) Test(ctx *gin.Context) {
-	//订阅数据
-	ev := event.NewEventBus()
+
+	/**
 	ch := ev.Sub("user")
 	go func() {
 		//发布
@@ -34,9 +37,29 @@ func (this *EventController) Test(ctx *gin.Context) {
 	}()
 
 	higo.Responser(ctx).SuccessJson("success", 10000, ch.Data(time.Second*1))
+
+	*/
+
+	go func() {
+		//发布
+		ev.Pub("info", getUserInfo())
+	}()
+	ch := ev.Sub("info")
+	higo.Responser(ctx).SuccessJson("success", 10000, ch.Data(time.Second*1))
 }
 
 func testPub() interface{} {
 	time.Sleep(time.Second * 5)
 	return "商品列表"
+}
+
+func getInfo() string {
+	return "这是信息"
+}
+
+//分体
+func getUserInfo() interface{} {
+	ch := ev.Sub("info")
+	ev.Pub("info", getInfo())
+	return gin.H{"商品分体": ch.Data(time.Second * 1)}
 }
