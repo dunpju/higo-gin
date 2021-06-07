@@ -2,8 +2,6 @@ package higo
 
 import (
 	"fmt"
-	"gitee.com/dengpju/higo-parameter/parameter"
-	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
@@ -14,23 +12,10 @@ type ErrorResult struct {
 	err  error
 }
 
-func (this *ErrorResult) Unwrap(parameters ...*parameter.Parameter) interface{} {
+func (this *ErrorResult) Unwrap() interface{} {
 	if this.err != nil {
 		checkErrors(this.err)
-		if len(parameters) > 0 {
-			tmp := make([]*parameter.Parameter, 0)
-			for _, p := range parameters {
-				if p.Name == exception.MESSAGE {
-					tmp = append(tmp, p)
-					tmp = append(tmp, exception.RealMessage(this.err))
-				} else {
-					tmp = append(tmp, p)
-				}
-			}
-			exception.Throw(exception.Message(this.err))
-		} else {
-			exception.Throw(exception.Message(this.err.Error()), exception.RealMessage(this.err.Error()))
-		}
+		panic(this.err)
 	}
 	return this.data
 }

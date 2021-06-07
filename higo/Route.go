@@ -29,7 +29,7 @@ func (this RouterCollect) All() RouterCollect {
 func (this RouterCollect) Get(relativePath string) *router.Route {
 	route, ok := this[relativePath]
 	if !ok {
-		exception.Throw(exception.Message(relativePath+"未定义路由"), exception.Code(0))
+		exception.Throw(exception.Message(relativePath+" Undefined route"), exception.Code(0))
 	}
 	return route
 }

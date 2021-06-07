@@ -4,53 +4,42 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type ISqlMapper interface {
-	Sql() string
-	Args() []interface{}
-	Orm() interface{}
+type SqlMapper struct {
+	Orm  *Orm
+	orms []*Orm
 }
 
-//func Mapper(sql string, args []interface{}, err error) *GormSqlMapperImpl {
-//	if err != nil {
-//		panic(err.Error())
-//	}
-//	return NewGormSqlMapper(sql, args)
-//}
-
-type SqlMapperAbstract struct {
-	orm  *Orm
-	sql  string
-	args []interface{}
+func NewSqlMapper(orm *Orm, orms []*Orm) *SqlMapper {
+	return &SqlMapper{Orm: orm, orms: orms}
 }
 
-func NewSqlMapperAbstract(orm *Orm, sql string, args []interface{}) *SqlMapperAbstract {
-	return &SqlMapperAbstract{orm: orm, sql: sql, args: args}
+func Mapper(sql string, args []interface{}, err error) *SqlMapper {
+	if err != nil {
+		panic(err.Error())
+	}
+	sqlMapper := &SqlMapper{}
+	sqlMapper.Orm = MultiOrm()
+	sqlMapper.Orm.sql = sql
+	sqlMapper.Orm.args = args
+	return sqlMapper
 }
 
-func (this *SqlMapperAbstract) Sql() string {
-	return this.sql
+func (this *SqlMapper) Query() *gorm.DB {
+	return this.Orm.DB.Raw(this.Orm.sql, this.Orm.args)
 }
 
-func (this *SqlMapperAbstract) Args() []interface{} {
-	return this.args
+func (this *SqlMapper) Exec() *gorm.DB {
+	return this.Orm.DB.Exec(this.Orm.sql, this.Orm.args)
 }
 
-func (this *SqlMapperAbstract) Orm() interface{} {
-	return this.orm
+func (this *SqlMapper) setDB(db *gorm.DB) {
+	this.Orm.DB = db
 }
 
-type GormSqlMapperImpl struct {
-	*SqlMapperAbstract
+func (this *SqlMapper) Transaction(fn func() error) {
+	this.Orm.Begin(this.orms...).Transaction(fn)
 }
 
-func NewGormSqlMapper(sql string, args []interface{}) *GormSqlMapperImpl {
-	return &GormSqlMapperImpl{NewSqlMapperAbstract(NewOrm(), sql, args)}
-}
-
-func (this *GormSqlMapperImpl) Query() *gorm.DB {
-	return this.orm.Raw(this.sql, this.Args)
-}
-
-func (this *GormSqlMapperImpl) Exec() *gorm.DB {
-	return this.orm.Exec(this.sql, this.Args)
+func Begin(orms ...*Orm) *SqlMapper {
+	return NewSqlMapper(MultiOrm(), orms)
 }

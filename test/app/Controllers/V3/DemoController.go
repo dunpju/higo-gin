@@ -86,16 +86,21 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	}
 	user.UserById(3, "*")
 	fmt.Println(user)
-	user.Add("werwerwerg12345", "15987", 20)
+	user.Add("werwerwerg123456", "15987", 20)
 	//this.Table("ts_user").
 	//	Where("id=?", 3).
 	//	Find(user)
 	higo.Task(this.TestTask, func() {
 		this.TestTaskDone(3)
 	}, user.Id)
-	redisConn := this.Pool.Get()
-	fmt.Println(redis.String(redisConn.Do("get", "name")))
+	//redisConn := this.Pool.Get()
+	//fmt.Println(redis.String(redisConn.Do("get", "name")))
 	return user
+}
+
+//测试发布
+func (this *DemoController) TestPub(ctx *gin.Context) string {
+	return "测试发布"
 }
 
 // 测试post请求

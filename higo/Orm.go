@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-logger/logger"
+	"github.com/dengpju/higo-throw/exception"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
@@ -11,8 +13,9 @@ import (
 )
 
 var (
-	orm      *Orm
-	onceGorm sync.Once
+	orm         *Orm
+	onceGorm    sync.Once
+	confDefault *config.Configure
 )
 
 type Orm struct {
@@ -22,8 +25,16 @@ type Orm struct {
 	orms []*Orm
 }
 
+func (this *Orm) Args() []interface{} {
+	return this.args
+}
+
+func (this *Orm) Sql() string {
+	return this.sql
+}
+
 func newGorm() *gorm.DB {
-	confDefault := config.Db("DB.DEFAULT").(*config.Configure)
+	confDefault = config.Db("DB.DEFAULT").(*config.Configure)
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		confDefault.Get("USERNAME").(string),
 		confDefault.Get("PASSWORD").(string),
@@ -36,8 +47,6 @@ func newGorm() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", confDefault.Get("HOST").(string),
-		confDefault.Get("PORT").(string)))
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(5)
 	db.DB().SetMaxOpenConns(10)
@@ -51,8 +60,14 @@ func newOrm() *Orm {
 func NewOrm() *Orm {
 	onceGorm.Do(func() {
 		orm = newOrm()
+		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", confDefault.Get("HOST").(string),
+			confDefault.Get("PORT").(string)))
 	})
 	return orm
+}
+
+func MultiOrm() *Orm {
+	return newOrm()
 }
 
 func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
@@ -71,20 +86,16 @@ func (this *Orm) setDB(db *gorm.DB) {
 }
 
 func (this *Orm) Query() *gorm.DB {
-	return this.Raw(this.sql, this.args...)
+	return this.DB.Raw(this.sql, this.args...)
 }
 
-func (this *Orm) Execute() *gorm.DB {
-	if this.DB != nil {
-		return this.DB.Exec(this.sql, this.args...)
-	}
-	return this.Exec(this.sql, this.args...)
+func (this *Orm) Exec() *gorm.DB {
+	return this.DB.Exec(this.sql, this.args...)
 }
 
-func (this *Orm) Begin(orms ...*Orm) *gorm.DB {
+func (this *Orm) Begin(orms ...*Orm) *Orm {
 	this.orms = orms
-	this.apply(this.DB)
-	return this.DB
+	return this
 }
 
 func (this *Orm) apply(tx *gorm.DB) {
@@ -93,12 +104,26 @@ func (this *Orm) apply(tx *gorm.DB) {
 	}
 }
 
-func Mapper(sql string, args []interface{}, err error) *Orm {
+func (this *Orm) Transaction(fn func() error) {
+	err := this.DB.Transaction(func(tx *gorm.DB) (err error) {
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+				err = r.(error)
+				return
+			}
+		}()
+		this.apply(tx)
+		err = fn()
+		return
+	})
 	if err != nil {
-		panic(err.Error())
+		if e, ok := err.(*mysql.MySQLError); ok {
+			exception.Throw(exception.Message(e.Message),
+				exception.Code(int(e.Number)),
+				exception.Data(nil))
+		} else {
+			panic(err)
+		}
 	}
-	cloneDB := newOrm()
-	cloneDB.sql = sql
-	cloneDB.args = args
-	return cloneDB
 }

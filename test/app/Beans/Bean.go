@@ -2,6 +2,7 @@ package Beans
 
 import (
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
@@ -38,6 +39,10 @@ func (this *MyBean) NewRedisController() *V3.RedisController {
 
 func (this *MyBean) NewDemoController() *V3.DemoController {
 	return V3.NewDemoController()
+}
+
+func (this *MyBean) NewEventController() *Controllers.EventController {
+	return Controllers.NewEventController()
 }
 
 func (this *MyBean) NewUserModel() *UserModel.UserModelImpl {

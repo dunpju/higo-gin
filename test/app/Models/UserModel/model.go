@@ -7,7 +7,6 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
-	"github.com/jinzhu/gorm"
 )
 
 type UserModelImpl struct {
@@ -71,22 +70,41 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 }
 
 func (this *UserModelImpl) Add(uname string, tel string, score int) {
+	u1 := this.New()
 	u := this.AddUser(uname, tel, score)
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
-	err := this.Begin(u, coin).Transaction(func(tx *gorm.DB) error {
-		err := u.Execute().Error
-		if err != nil {
-			return err
-		}
-		err = coin.Execute().Error
-		if err != nil {
-			return err
-		}
-		//coinModel.Create()
+	//方法一:
+
+	higo.Begin(u, coin).Transaction(func() error {
+		higo.Result(u.Exec().Error).Unwrap()
+		co := coin.Exec()
+		higo.Result(co.Error).Unwrap()
+		fmt.Println(1)
+		fmt.Println(co.Value)
 		coin.Last(&coinModel)
+		higo.Result(u.Last(&coinModel).Error).Unwrap()
+		fmt.Printf("%T\n", u1)
+		higo.Result(u.Last(u1).Error).Unwrap()
 		fmt.Println(coinModel)
+		fmt.Println(u1)
 		return nil
 	})
-	panic(err)
+
+	//方法二:
+	/**
+	this.Begin(u, coin).Transaction(func() error {
+		higo.Result(u.Exec().Error).Unwrap()
+		higo.Result(coin.Exec().Error).Unwrap()
+		fmt.Println(1)
+		coin.Last(&coinModel)
+		higo.Result(u.Last(&coinModel).Error).Unwrap()
+		fmt.Printf("%T\n", u1)
+		higo.Result(u.Last(u1).Error).Unwrap()
+		fmt.Println(coinModel)
+		fmt.Println(u1)
+		return nil
+	})
+
+	*/
 }
