@@ -42,9 +42,9 @@ func (this *EventController) Test(ctx *gin.Context) {
 
 	go func() {
 		//发布
-		ev.Pub("info", getUserInfo())
+		ev.Pub("info", nil)
 	}()
-	ch := ev.Sub("info")
+	ch := ev.Sub("info", getUserInfo)//订阅
 	higo.Responser(ctx).SuccessJson("success", 10000, ch.Data(time.Second*1))
 }
 
@@ -58,8 +58,6 @@ func getInfo() string {
 }
 
 //分体
-func getUserInfo() interface{} {
-	ch := ev.Sub("info")
-	ev.Pub("info", getInfo())
-	return gin.H{"商品分体": ch.Data(time.Second * 1)}
+func getUserInfo(id int) interface{} {
+	return gin.H{"id": id, "商品分体": "ffff"}
 }
