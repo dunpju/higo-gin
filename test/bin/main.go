@@ -39,3 +39,27 @@ func main() {
 		Boot()
 
 }
+
+func tt()  {
+	ra := make(map[string]bool)
+	rb := make(map[string]bool)
+	for i := 0; i < 20; i++ {
+	begin_a:
+		decade1 := utils.NewRandom().BetweenInt(2, 11) //十位
+		unit1 := utils.NewRandom().BetweenInt(0, 8)    //个位
+		a := fmt.Sprintf("%d%d", decade1, unit1)
+		if _, ok := ra[a]; ok {
+			goto begin_a
+		}
+		ra[a] = true
+	begin_b:
+		decade2 := utils.NewRandom().BetweenInt(0, decade1-1) //十位
+		unit2 := utils.NewRandom().BetweenInt(unit1+1, 9)     //个位
+		b := fmt.Sprintf("%d%d", decade2, unit2)
+		if _, ok := rb[b]; ok {
+			goto begin_b
+		}
+		rb[b] = true
+		fmt.Printf("%s - %s\n", a, b)
+	}
+}
