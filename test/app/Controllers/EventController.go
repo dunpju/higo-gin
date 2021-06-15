@@ -3,6 +3,7 @@ package Controllers
 import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/event"
+	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -39,12 +40,16 @@ func (this *EventController) Test(ctx *gin.Context) {
 	higo.Responser(ctx).SuccessJson("success", 10000, ch.Data(time.Second*1))
 
 	*/
-
+	/**
 	go func() {
 		//发布
 		ev.Pub("info", nil)
 	}()
 	ch := ev.Sub("info", getUserInfo)//订阅
+	 */
+	ch := Services.GetDemoListCh()
+	Services.Bus.Pub(Services.GetDemoList, ch)
+	defer Services.Bus.UnSub(Services.GetDemoList, ch)
 	higo.Responser(ctx).SuccessJson("success", 10000, ch.Data(time.Second*1))
 }
 
