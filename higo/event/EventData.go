@@ -17,8 +17,8 @@ func NewEventData(data interface{}) *EventData {
 type EventDataChannel chan *EventData
 
 func (this EventDataChannel) Data(timeout time.Duration) interface{} {
-	ctx, cancle := context.WithTimeout(context.Background(), timeout)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 	select {
 	case <-ctx.Done(): //超时
 		return gin.H{"message": "timeout"}
