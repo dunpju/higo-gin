@@ -21,7 +21,7 @@ func NewHttp() *Http {
 func (this *Http) Loader(hg *higo.Higo) {
 
 	// 静态文件
-	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot().Separator(utils.PathSeparator())))
+	hg.StaticFile("/", fmt.Sprintf("%sdist", hg.GetRoot().Join(utils.PathSeparator())))
 	this.http(hg)
 }
 

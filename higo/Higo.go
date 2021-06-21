@@ -105,11 +105,11 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 	// 设置主目录
 	this.setRoot(root)
 	// 创建runtime
-	utils.Mkdir(this.GetRoot().Separator(pathSeparator) + "runtime")
+	utils.Mkdir(this.GetRoot().Join(pathSeparator) + "runtime")
 	// 日志
-	logger.Logrus.Root(this.GetRoot().Separator(pathSeparator)).File("higo").Init()
+	logger.Logrus.Root(this.GetRoot().Join(pathSeparator)).File("higo").Init()
 	// 装载env配置
-	env := this.GetRoot().Separator(pathSeparator) + "env"
+	env := this.GetRoot().Join(pathSeparator) + "env"
 	if ! utils.DirExist(env) {
 		utils.Mkdir(env)
 	}
@@ -143,7 +143,7 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 
 	config.Set(config.EnvConf, envConf)
 	this.loadConfigur()
-	SslOut = this.GetRoot().Separator(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
+	SslOut = this.GetRoot().Join(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
 	SslCrt = config.App("SSL.CRT").(string)
 	SslKey = config.App("SSL.KEY").(string)
 
@@ -157,11 +157,11 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 
 // 加载配置
 func (this *Higo) loadConfigur() *Higo {
-	if ! utils.DirExist(AppConfigDir.Separator(utils.PathSeparator())) {
-		utils.Mkdir(AppConfigDir.Separator(utils.PathSeparator()))
+	if ! utils.DirExist(AppConfigDir.Join(utils.PathSeparator())) {
+		utils.Mkdir(AppConfigDir.Join(utils.PathSeparator()))
 	}
 	conf := config.New()
-	filepathErr := filepath.Walk(AppConfigDir.Separator(utils.PathSeparator()),
+	filepathErr := filepath.Walk(AppConfigDir.Join(utils.PathSeparator()),
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
 				return err
