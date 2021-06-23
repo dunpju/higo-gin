@@ -33,12 +33,20 @@ func getResponderList() []IResponder {
 
 // 转换
 func Convert(handler interface{}) gin.HandlerFunc {
+	//if handle, ok := handler.(func(*gin.Context)); ok {
+	//	return handle
+	//}
 	if handle, ok := handler.(func(*gin.Context)); ok {
 		return handle
+	} else if handle, ok := handler.(func() string); ok {
+		return func(ctx *gin.Context) {
+			ctx.String(200, handle())
+		}
 	}
+
 	hRef := reflect.ValueOf(handler)
-	for _, r := range getResponderList() {
-		rRef := reflect.TypeOf(r)
+	for _, responder := range getResponderList() {
+		rRef := reflect.TypeOf(responder)
 		if hRef.Type().ConvertibleTo(rRef) {
 			return hRef.Convert(rRef).Interface().(IResponder).RespondTo()
 		}
@@ -79,12 +87,12 @@ func methodCall(ctx *gin.Context, method reflect.Value) interface{} {
 }
 
 type StringResponder func(*gin.Context) string
+
 func (this StringResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.String(200, getSyncHandler().handler(this, ctx).(string))
 	}
 }
-
 func (this StringResponder) Handle(method reflect.Value) interface{} {
 	return func(ctx *gin.Context) string {
 		return methodCall(ctx, method).(string)
@@ -93,6 +101,7 @@ func (this StringResponder) Handle(method reflect.Value) interface{} {
 
 type Json interface{}
 type JsonResponder func(*gin.Context) Json
+
 func (this JsonResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.JSON(200, getSyncHandler().handler(this, ctx))
@@ -105,6 +114,7 @@ func (this JsonResponder) Handle(method reflect.Value) interface{} {
 }
 
 type ModelResponder func(*gin.Context) Model
+
 func (this ModelResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.JSON(200, this(ctx))
@@ -117,6 +127,7 @@ func (this ModelResponder) Handle(method reflect.Value) interface{} {
 }
 
 type ModelsResponder func(*gin.Context) Models
+
 func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Writer.Header().Set("Content-typ", "application/json")
@@ -133,6 +144,7 @@ func (this ModelsResponder) Handle(method reflect.Value) interface{} {
 }
 
 type WebsocketResponder func(*gin.Context) WsWriteMessage
+
 func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		this(ctx)

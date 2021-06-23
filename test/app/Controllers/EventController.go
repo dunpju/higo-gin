@@ -22,7 +22,7 @@ func (this *EventController) New() higo.IClass {
 func (this *EventController) Route(hg *higo.Higo) {
 	hg.AddGroup("/event", func() {
 		hg.Get("/test", this.Test, hg.Flag("EventController.Test"), hg.Desc("事件测试"))
-		//hg.Get("/test1", this.Test1, hg.Flag("EventController.Test"), hg.Desc("事件测试"))
+		hg.Get("/test1", this.Test1, hg.Flag("EventController.Test"), hg.Desc("事件测试1"))
 	})
 }
 
