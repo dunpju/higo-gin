@@ -98,7 +98,6 @@ func (this JsonResponder) RespondTo() gin.HandlerFunc {
 		ctx.JSON(200, getSyncHandler().handler(this, ctx))
 	}
 }
-
 func (this JsonResponder) Handle(method reflect.Value) interface{} {
 	return func(ctx *gin.Context) Json {
 		return methodCall(ctx, method).(Json)
@@ -111,7 +110,6 @@ func (this ModelResponder) RespondTo() gin.HandlerFunc {
 		ctx.JSON(200, this(ctx))
 	}
 }
-
 func (this ModelResponder) Handle(method reflect.Value) interface{} {
 	return func(ctx *gin.Context) Model {
 		return methodCall(ctx, method).(Model)
@@ -128,7 +126,6 @@ func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 		}
 	}
 }
-
 func (this ModelsResponder) Handle(method reflect.Value) interface{} {
 	return func(ctx *gin.Context) Models {
 		return methodCall(ctx, method).(Models)
@@ -141,7 +138,6 @@ func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
 		this(ctx)
 	}
 }
-
 func (this WebsocketResponder) Handle(method reflect.Value) interface{} {
 	return func(ctx *gin.Context) WsWriteMessage {
 		return methodCall(ctx, method).(WsWriteMessage)

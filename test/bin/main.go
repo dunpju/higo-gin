@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-
+//tt();
 	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
 	fmt.Printf("%s", output)
@@ -44,6 +44,9 @@ func tt()  {
 	ra := make(map[string]bool)
 	rb := make(map[string]bool)
 	for i := 0; i < 20; i++ {
+		if i % 5 == 0 {
+			fmt.Println()
+		}
 	begin_a:
 		decade1 := utils.NewRandom().BetweenInt(2, 11) //十位
 		unit1 := utils.NewRandom().BetweenInt(0, 8)    //个位
