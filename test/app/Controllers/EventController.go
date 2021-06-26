@@ -1,9 +1,11 @@
 package Controllers
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/event"
 	"github.com/dengpju/higo-gin/test/app/Services"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -23,12 +25,28 @@ func (this *EventController) Route(hg *higo.Higo) {
 	hg.AddGroup("/event", func() {
 		hg.Get("/test", this.Test, hg.Flag("EventController.Test"), hg.Desc("事件测试"))
 		hg.Get("/test1", this.Test1, hg.Flag("EventController.Test"), hg.Desc("事件测试1"))
+		hg.Get("/test2", this.Test2, hg.Flag("EventController.Test"), hg.Desc("事件测试2"))
+		hg.Get("/test3", this.Test3, hg.Flag("EventController.Test"), hg.Desc("事件测试3"))
 	})
 }
 
 func (this *EventController) Test1() string {
 	return "Test1"
 }
+
+func (this *EventController) Test2() interface{} {
+	return "Test2"
+}
+
+func (this *EventController) Test3() {
+	time.Sleep(2 * time.Second)
+	ctx := higo.Request.Context()
+	fmt.Println(utils.GoroutineID())
+	tt := ctx.Query("tt")
+	fmt.Println(tt)
+	higo.Responser(ctx).SuccessJson("success", 10000, tt)
+}
+
 
 //订阅数据
 var ev = event.NewEventBus() //需要全局
