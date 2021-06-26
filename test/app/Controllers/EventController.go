@@ -40,6 +40,7 @@ func (this *EventController) Test2() interface{} {
 
 func (this *EventController) Test3() {
 	time.Sleep(2 * time.Second)
+	fmt.Println(len(higo.Request))
 	ctx := higo.Request.Context()
 	fmt.Println(utils.GoroutineID())
 	tt := ctx.Query("tt")
