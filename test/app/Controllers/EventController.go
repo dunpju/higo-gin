@@ -5,6 +5,7 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/event"
 	"github.com/dengpju/higo-gin/test/app/Services"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -45,6 +46,7 @@ func (this *EventController) Test3() {
 	fmt.Println(utils.GoroutineID())
 	tt := ctx.Query("tt")
 	fmt.Println(tt)
+	exception.Throw(exception.Message(tt),exception.Code(1) )
 	higo.Responser(ctx).SuccessJson("success", 10000, tt)
 }
 
