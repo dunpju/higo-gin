@@ -29,6 +29,7 @@ func (this *EventController) Route(hg *higo.Higo) {
 		hg.Get("/test1", this.Test1, hg.Flag("EventController.Test"), hg.Desc("事件测试1"))
 		hg.Get("/test2", this.Test2, hg.Flag("EventController.Test"), hg.Desc("事件测试2"))
 		hg.Get("/test3", this.Test3, hg.Flag("EventController.Test"), hg.Desc("事件测试3"))
+		hg.Get("/test4", Test4, hg.Flag("EventController.Test"), hg.Desc("事件测试4"))
 	})
 }
 
@@ -46,6 +47,16 @@ func (this *EventController) Test2() interface{} {
 
 func (this *EventController) Test3() {
 	time.Sleep(2 * time.Second)
+	fmt.Println(len(higo.Request))
+	ctx := request.Context()
+	fmt.Println(utils.GoroutineID())
+	tt := ctx.Query("tt")
+	fmt.Println(tt)
+	//exception.Throw(exception.Message(tt), exception.Code(1))
+	responser.SuccessJson("success", 10000, tt)
+}
+
+func Test4() {
 	fmt.Println(len(higo.Request))
 	ctx := request.Context()
 	fmt.Println(utils.GoroutineID())
