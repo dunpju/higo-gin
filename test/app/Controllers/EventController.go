@@ -7,7 +7,6 @@ import (
 	"github.com/dengpju/higo-gin/higo/request"
 	"github.com/dengpju/higo-gin/higo/responser"
 	"github.com/dengpju/higo-gin/test/app/Services"
-	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -38,7 +37,11 @@ func (this *EventController) Test1() string {
 }
 
 func (this *EventController) Test2() interface{} {
-	return "Test2"
+	fmt.Println(len(higo.Request))
+	fmt.Println(utils.GoroutineID())
+	ctx := request.Context()
+	tt := ctx.Query("tt")
+	return tt
 }
 
 func (this *EventController) Test3() {
@@ -48,7 +51,7 @@ func (this *EventController) Test3() {
 	fmt.Println(utils.GoroutineID())
 	tt := ctx.Query("tt")
 	fmt.Println(tt)
-	exception.Throw(exception.Message(tt), exception.Code(1))
+	//exception.Throw(exception.Message(tt), exception.Code(1))
 	responser.SuccessJson("success", 10000, tt)
 }
 
