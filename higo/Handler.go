@@ -48,7 +48,7 @@ func handleConvert(handler interface{}) interface{} {
 		return func(ctx *gin.Context) {
 			defer Request.Remove()
 			Request.Set(ctx)
-			ctx.String(200, handle())
+			ctx.String(http.StatusOK, handle())
 		}
 	} else if handle, ok := handler.(func() interface{}); ok {
 		return func(ctx *gin.Context) {
@@ -56,7 +56,7 @@ func handleConvert(handler interface{}) interface{} {
 			Request.Set(ctx)
 			result := handle()
 			if res, ok := result.(string); ok {
-				ctx.String(200, res)
+				ctx.String(http.StatusOK, res)
 			} else {
 				ctx.JSON(http.StatusOK, res)
 			}
