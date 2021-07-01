@@ -1,7 +1,6 @@
 package higo
 
 import (
-	"flag"
 	"fmt"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-config/config"
@@ -243,12 +242,7 @@ func (this *Higo) IsRedisPool() *Higo {
 
 //启动
 func (this *Higo) Boot() {
-	var r string
-	flag.StringVar(&r, "controller", "11", "generate controller")
-	//解析命令行参数
-	flag.Parse()
-	fmt.Println(r)
-	os.Exit(1)
+	NewTool().Execute()
 	//注册校验
 	for _, valid := range ValidContainer {
 		for tag, rule := range valid {

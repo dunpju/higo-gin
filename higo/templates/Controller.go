@@ -5,19 +5,22 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"text/template"
 )
 
 type TplEngine interface {
 	Template() string
+	Generate()
 }
 
 type Controller struct {
 	Package string
 	Name    string
+	File    string
 }
 
-func NewController() *Controller {
-	return &Controller{}
+func NewController(pak string, name string, file string) *Controller {
+	return &Controller{Package: pak, Name: name, File: file}
 }
 
 func (this *Controller) Template() string {
@@ -32,4 +35,22 @@ func (this *Controller) Template() string {
 		panic(err)
 	}
 	return string(context)
+}
+
+func (this *Controller) Generate() {
+	fi, err := os.OpenFile(this.File, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		panic(err)
+	}
+	defer fi.Close()
+
+	tpl := this.Template()
+	tmpl, err := template.New("Controller").Parse(tpl)
+	if err != nil {
+		panic(err)
+	}
+	err = tmpl.Execute(fi, this)
+	if err != nil {
+		panic(err)
+	}
 }

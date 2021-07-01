@@ -16,6 +16,7 @@ func (this *{{.Name}}Controller) New() higo.IClass {
 }
 
 func (this *{{.Name}}Controller) Route(hg *higo.Higo) {
+    //TODO::example
 	/**
 	//route example
 	hg.Get("/relative", this.Example, hg.Flag("unique flag"), hg.Desc("description"))
