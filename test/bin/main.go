@@ -3,15 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/templates"
 	"github.com/dengpju/higo-gin/test/app/Beans"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
 	"github.com/dengpju/higo-utils/utils"
+	"os"
 	"os/exec"
+	"text/template"
 )
 
 func main() {
-//tt();
+	//tt();
 	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
 	fmt.Printf("%s", output)
@@ -40,11 +43,35 @@ func main() {
 
 }
 
-func tt()  {
+func testAction() {
+	fi, err := os.OpenFile("./tt.go", os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		panic(err)
+	}
+	defer fi.Close()
+
+
+	controller := templates.NewController()
+	controller.Package = "Controller"
+	controller.Name = "Event"
+	tpl := templates.NewController().Template()
+	fmt.Println(tpl)
+
+	tmpl, err := template.New("Controller").Parse(tpl)
+	if err != nil {
+		panic(err)
+	}
+	err = tmpl.Execute(fi, controller)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func tt() {
 	ra := make(map[string]bool)
 	rb := make(map[string]bool)
 	for i := 0; i < 20; i++ {
-		if i % 5 == 0 {
+		if i%5 == 0 {
 			fmt.Println()
 		}
 	begin_a:
