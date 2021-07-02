@@ -100,6 +100,12 @@ func testPub() interface{} {
 }
 
 func getInfo() string {
+	type example_model struct {
+		Id   int
+		Name string
+	}
+	var models []*example_model
+	models = append(models, &example_model{Id: 1, Name: "foo"}, &example_model{Id: 1, Name: "bar"})
 	return "这是信息"
 }
 
