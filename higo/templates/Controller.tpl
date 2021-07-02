@@ -60,16 +60,16 @@ func (this *{{.Name}}Controller) Example3() interface{} {
 }
 
 //example Model
-type {{.Name}}Model struct {
+type {{.Name}}ExampleModel struct {
 	Id   int
 	Name string
 }
 
-func (this *{{.Name}}Model) New() higo.IClass {
-	return &{{.Name}}Model{}
+func (this *{{.Name}}ExampleModel) New() higo.IClass {
+	return &{{.Name}}ExampleModel{}
 }
 
-func (this *{{.Name}}Model) Mutate(attrs ...higo.Property) higo.Model {
+func (this *{{.Name}}ExampleModel) Mutate(attrs ...higo.Property) higo.Model {
 	higo.Propertys(attrs).Apply(this)
 	return this
 }
@@ -77,22 +77,22 @@ func (this *{{.Name}}Model) Mutate(attrs ...higo.Property) higo.Model {
 //responser Model
 func (this *{{.Name}}Controller) Example4(ctx *gin.Context) higo.Model {
     //TODO::example code
-	model := &{{.Name}}Model{Id: 1, Name: "foo"}
+	model := &{{.Name}}ExampleModel{Id: 1, Name: "foo"}
 	return model
 }
 
 //responser Models
 func (this *{{.Name}}Controller) Example5(ctx *gin.Context) higo.Models {
     //TODO::example code
-	var models []*{{.Name}}Model
-	models = append(models, &{{.Name}}Model{Id: 1, Name: "foo"}, &{{.Name}}Model{Id: 2, Name: "bar"})
+	var models []*{{.Name}}ExampleModel
+	models = append(models, &{{.Name}}ExampleModel{Id: 1, Name: "foo"}, &{{.Name}}ExampleModel{Id: 2, Name: "bar"})
 	return higo.MakeModels(models)
 }
 
 //responser Json
 func (this *{{.Name}}Controller) Example6(ctx *gin.Context) higo.Json {
     //TODO::example code
-	var models []*{{.Name}}Model
-	models = append(models, &{{.Name}}Model{Id: 1, Name: "foo"}, &{{.Name}}Model{Id: 2, Name: "bar"})
+	var models []*{{.Name}}ExampleModel
+	models = append(models, &{{.Name}}ExampleModel{Id: 1, Name: "foo"}, &{{.Name}}ExampleModel{Id: 2, Name: "bar"})
 	return models
 }
