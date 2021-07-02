@@ -10,6 +10,9 @@ MODE: debug
 # 项目根目录
 ROOT: .
 
+# Bean目录
+BEAN_ROOT: ./../app/Beans
+
 # ssl证书输出目录(默认拼接跟目录) eg: ssl/higo.crt.pem
 SSL:
   # 输出目录
