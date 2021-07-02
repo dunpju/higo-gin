@@ -2,7 +2,6 @@ package higo
 
 import (
 	"flag"
-	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates"
 	"github.com/dengpju/higo-utils/utils"
 	"os"
@@ -31,13 +30,9 @@ func (this *Tool) Execute() {
 	flag.Parse()
 	if "" != this.Gen {
 		if controller == this.Gen {
-			fmt.Println(this.Gen)
-			fmt.Println(this.Name)
-			fmt.Println(this.Out)
 			this.Package = utils.Basename(this.Out)
-			fmt.Println(utils.Basename(this.Out))
 			//go run test\bin\main.go -gen=controller -name=Test -out=test\app\Controllers
-			templates.NewController(this.Package, this.Name, this.Out+"\\"+this.Name+"Controller.go").Generate()
+			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		}
 		os.Exit(1)
 	}

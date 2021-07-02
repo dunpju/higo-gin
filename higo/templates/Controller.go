@@ -1,17 +1,14 @@
 package templates
 
 import (
+	"github.com/dengpju/higo-logger/logger"
+	"github.com/dengpju/higo-utils/utils"
 	"io/ioutil"
 	"os"
 	"runtime"
 	"strings"
 	"text/template"
 )
-
-type TplEngine interface {
-	Template() string
-	Generate()
-}
 
 type Controller struct {
 	Package string
@@ -20,6 +17,9 @@ type Controller struct {
 }
 
 func NewController(pak string, name string, file string) *Controller {
+	name = utils.Ucfirst(name)
+	name = name + controller
+	file = file + utils.PathSeparator() + strings.Trim(name, controller) + controller + ".go"
 	return &Controller{Package: pak, Name: name, File: file}
 }
 
@@ -45,7 +45,7 @@ func (this *Controller) Generate() {
 	defer fi.Close()
 
 	tpl := this.Template()
-	tmpl, err := template.New("Controller").Parse(tpl)
+	tmpl, err := template.New(controller).Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
@@ -53,4 +53,7 @@ func (this *Controller) Generate() {
 	if err != nil {
 		panic(err)
 	}
+	logger.Logrus.Info("package: ", this.Package)
+	logger.Logrus.Info("controller name: ", this.Name)
+	logger.Logrus.Info("out file: ", this.File)
 }

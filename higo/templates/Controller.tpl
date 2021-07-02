@@ -7,18 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type {{.Name}}Controller struct {
+type {{.Name}} struct {
 }
 
-func NewTestController() *{{.Name}}Controller {
-	return &{{.Name}}Controller{}
+func New{{.Name}}() *{{.Name}} {
+	return &{{.Name}}{}
 }
 
-func (this *{{.Name}}Controller) New() higo.IClass {
-	return New{{.Name}}Controller()
+func (this *{{.Name}}) New() higo.IClass {
+	return New{{.Name}}()
 }
 
-func (this *{{.Name}}Controller) Route(hg *higo.Higo) {
+func (this *{{.Name}}) Route(hg *higo.Higo) {
     //TODO::example
 	//route example
 	hg.Get("/relative1", this.Example1, hg.Flag("this.Example1"), hg.Desc("Example1"))
@@ -32,7 +32,7 @@ func (this *{{.Name}}Controller) Route(hg *higo.Higo) {
     })
 }
 
-func (this *{{.Name}}Controller) Example1() {
+func (this *{{.Name}}) Example1() {
     //TODO::example code
 	ctx := request.Context()
 	//get parameter
@@ -42,7 +42,7 @@ func (this *{{.Name}}Controller) Example1() {
 }
 
 //responser string
-func (this *{{.Name}}Controller) Example2() string {
+func (this *{{.Name}}) Example2() string {
     //TODO::example code
     ctx := request.Context()
     //get parameter
@@ -51,7 +51,7 @@ func (this *{{.Name}}Controller) Example2() string {
 }
 
 //responser interface{}
-func (this *{{.Name}}Controller) Example3() interface{} {
+func (this *{{.Name}}) Example3() interface{} {
     //TODO::example code
     ctx := request.Context()
     //get parameter
@@ -75,14 +75,14 @@ func (this *{{.Name}}ExampleModel) Mutate(attrs ...higo.Property) higo.Model {
 }
 
 //responser Model
-func (this *{{.Name}}Controller) Example4(ctx *gin.Context) higo.Model {
+func (this *{{.Name}}) Example4(ctx *gin.Context) higo.Model {
     //TODO::example code
 	model := &{{.Name}}ExampleModel{Id: 1, Name: "foo"}
 	return model
 }
 
 //responser Models
-func (this *{{.Name}}Controller) Example5(ctx *gin.Context) higo.Models {
+func (this *{{.Name}}) Example5(ctx *gin.Context) higo.Models {
     //TODO::example code
 	var models []*{{.Name}}ExampleModel
 	models = append(models, &{{.Name}}ExampleModel{Id: 1, Name: "foo"}, &{{.Name}}ExampleModel{Id: 2, Name: "bar"})
@@ -90,7 +90,7 @@ func (this *{{.Name}}Controller) Example5(ctx *gin.Context) higo.Models {
 }
 
 //responser Json
-func (this *{{.Name}}Controller) Example6(ctx *gin.Context) higo.Json {
+func (this *{{.Name}}) Example6(ctx *gin.Context) higo.Json {
     //TODO::example code
 	var models []*{{.Name}}ExampleModel
 	models = append(models, &{{.Name}}ExampleModel{Id: 1, Name: "foo"}, &{{.Name}}ExampleModel{Id: 2, Name: "bar"})
