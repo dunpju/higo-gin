@@ -8,6 +8,7 @@ import (
 )
 
 type {{.Name}} struct {
+    A string
 }
 
 func New{{.Name}}() *{{.Name}} {

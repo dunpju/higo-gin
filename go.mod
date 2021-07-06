@@ -23,6 +23,7 @@ require (
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/win5do/go-lib v0.0.0-20210605160512-fc41c9687eae
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/tools v0.1.4
 	gopkg.in/yaml.v2 v2.2.8
 )

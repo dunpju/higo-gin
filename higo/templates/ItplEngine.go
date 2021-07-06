@@ -2,9 +2,10 @@ package templates
 
 const (
 	controller = "Controller"
+	NewFuncDecl = "NewFuncDecl"
 )
 
 type ItplEngine interface {
-	Template() string
+	Template(tplfile string) string
 	Generate()
 }

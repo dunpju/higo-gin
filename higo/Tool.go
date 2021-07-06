@@ -9,6 +9,7 @@ import (
 
 const (
 	controller = "controller"
+	model      = "model"
 )
 
 type Tool struct {
@@ -23,9 +24,9 @@ func NewTool() *Tool {
 }
 
 func (this *Tool) Execute() {
-	flag.StringVar(&this.Gen, "gen", "", "generate")
-	flag.StringVar(&this.Name, "name", "", "name")
-	flag.StringVar(&this.Out, "out", "", "out path")
+	flag.StringVar(&this.Gen, "gen", "", "explain: Generate Controller or Model \n --option[controller | model]")
+	flag.StringVar(&this.Name, "name", "", "explain: Generate Name")
+	flag.StringVar(&this.Out, "out", "", "explain: Generate file output path")
 	//解析命令行参数
 	flag.Parse()
 	if "" != this.Gen {
@@ -33,6 +34,10 @@ func (this *Tool) Execute() {
 			this.Package = utils.Basename(this.Out)
 			//go run test\bin\main.go -gen=controller -name=Test -out=test\app\Controllers
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
+		} else if model == this.Gen {
+
+		} else {
+			panic("gen error; option controller or model")
 		}
 		os.Exit(1)
 	}
