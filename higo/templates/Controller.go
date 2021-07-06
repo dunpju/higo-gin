@@ -156,7 +156,7 @@ func (this *Controller) Generate() {
 					newFuncDeclFormat = fmt.Sprintf(funcDecl, recvTypeSpec.Name.String(),
 						funcName, newImptSpec.Name.String()+".", this.Name)
 					newFuncDecl.Recv = recvTypeSpec.Name.String()
-					newFuncDecl.FuncName = funcName + this.Name
+					newFuncDecl.FuncName = funcName
 					newFuncDecl.Results = newImptSpec.Name.String() + "." + this.Name
 					newFuncDecl.Returns = newImptSpec.Name.String() + ".New" + this.Name + "()"
 				})
@@ -165,7 +165,7 @@ func (this *Controller) Generate() {
 					newFuncDeclFormat = fmt.Sprintf(funcDecl, recvTypeSpec.Name.String(),
 						funcName, this.Package+".", this.Name)
 					newFuncDecl.Recv = recvTypeSpec.Name.String()
-					newFuncDecl.FuncName = funcName + this.Name
+					newFuncDecl.FuncName = funcName
 					newFuncDecl.Results = this.Package + "." + this.Name
 					newFuncDecl.Returns = this.Package + ".New" + this.Name + "()"
 				})
@@ -196,12 +196,12 @@ func (this *Controller) Generate() {
 		if err != nil {
 			panic(err)
 		}
-		n, err := newBeansFile.Write(newBuffer.Bytes())
+		_, err = newBeansFile.Write(newBuffer.Bytes())
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(n)
 	}
+	fmt.Println("generate controller success!")
 	//fmt.Println(os.Stdout.Write(buffer.Bytes()))
 }
 
