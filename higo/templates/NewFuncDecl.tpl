@@ -1,3 +1,3 @@
-func (this *{{.Recv}}) New{{.FuncName}}() *{{.Results}} {
-	return *{{.Returns}}
+func (this *{{.Recv}}) {{.FuncName}}() *{{.Results}} {
+	return {{.Returns}}
 }

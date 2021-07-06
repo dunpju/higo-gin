@@ -93,17 +93,19 @@ func (this *Controller) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	//log.Println("package name: ", this.Package)
-	//log.Println("controller name: ", this.Name)
-	//log.Println("output file: ", this.File)
 	newPkgPath := GetModName() + "/" + strings.ReplaceAll(utils.Dirname(this.File), "\\", "/")
+	funcName := strings.ReplaceAll(newPkgPath, "/", "_")
+	funcName = strings.ReplaceAll(funcName, ".", "8")
+	funcName = "New_gen_" + strings.ReplaceAll(funcName, "-", "9") + "_" + this.Name
 	buffer := bytes.NewBufferString("")
 	//import
 	isImptHandle := false
 	newImptSpec := &ast.ImportSpec{}
 	recvTypeSpec := &ast.TypeSpec{}
-	var newFuncDeclOnce sync.Once
-	newFuncDeclFormat := funcDecl
+	var (
+		newFuncDeclOnce   sync.Once
+		newFuncDeclFormat string
+	)
 	hasFuncDecl := false
 	newFuncDecl := &FuncDecl{}
 	ast.Inspect(f, func(n ast.Node) bool {
@@ -143,7 +145,7 @@ func (this *Controller) Generate() {
 			}
 			_ = astToGo(buffer, n)
 		case *ast.FuncDecl:
-			//判断还是是否存在，不能重复
+			//判断是否存在，不能重复
 			funcDeclBuf := bytes.NewBufferString("")
 			err := format.Node(funcDeclBuf, token.NewFileSet(), n)
 			if err != nil {
@@ -151,19 +153,19 @@ func (this *Controller) Generate() {
 			}
 			if newImptSpec.Name != nil {
 				newFuncDeclOnce.Do(func() {
-					newFuncDeclFormat = fmt.Sprintf(newFuncDeclFormat, recvTypeSpec.Name.String(),
-						this.Name, newImptSpec.Name.String()+".", this.Name)
+					newFuncDeclFormat = fmt.Sprintf(funcDecl, recvTypeSpec.Name.String(),
+						funcName, newImptSpec.Name.String()+".", this.Name)
 					newFuncDecl.Recv = recvTypeSpec.Name.String()
-					newFuncDecl.FuncName = this.Name
+					newFuncDecl.FuncName = funcName + this.Name
 					newFuncDecl.Results = newImptSpec.Name.String() + "." + this.Name
 					newFuncDecl.Returns = newImptSpec.Name.String() + ".New" + this.Name + "()"
 				})
 			} else {
 				newFuncDeclOnce.Do(func() {
-					newFuncDeclFormat = fmt.Sprintf(newFuncDeclFormat, recvTypeSpec.Name.String(),
-						this.Name, this.Package+".", this.Name)
+					newFuncDeclFormat = fmt.Sprintf(funcDecl, recvTypeSpec.Name.String(),
+						funcName, this.Package+".", this.Name)
 					newFuncDecl.Recv = recvTypeSpec.Name.String()
-					newFuncDecl.FuncName = this.Name
+					newFuncDecl.FuncName = funcName + this.Name
 					newFuncDecl.Results = this.Package + "." + this.Name
 					newFuncDecl.Returns = this.Package + ".New" + this.Name + "()"
 				})
@@ -183,14 +185,13 @@ func (this *Controller) Generate() {
 		if err != nil {
 			panic(err)
 		}
-		newFuncDeclBuffer := bytes.NewBufferString("")
 		//生成controller
+		newFuncDeclBuffer := bytes.NewBufferString("")
 		err = tmpl.Execute(newFuncDeclBuffer, newFuncDecl)
 		if err != nil {
 			panic(err)
 		}
 		newBuffer := bytes.NewBufferString(buffer.String() + "\n" + newFuncDeclBuffer.String())
-		fmt.Println(newBuffer.String())
 		newBeansFile, err := os.OpenFile(beansGofile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 		if err != nil {
 			panic(err)

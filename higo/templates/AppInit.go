@@ -10,7 +10,7 @@ import (
 
 const (
 	module = "module "
-	funcDecl = "func (this *%s) New%s() *%s%s"
+	funcDecl = "func (this *%s) %s() *%s%s"
 )
 
 var (
