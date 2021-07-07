@@ -242,7 +242,7 @@ func (this *Higo) IsRedisPool() *Higo {
 
 //启动
 func (this *Higo) Boot() {
-	NewTool().Execute()
+	NewTool().Cmd()
 	//注册校验
 	for _, valid := range ValidContainer {
 		for tag, rule := range valid {

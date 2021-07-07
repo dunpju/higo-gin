@@ -9,6 +9,7 @@ import (
 	"go/parser"
 	"go/token"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"runtime"
@@ -42,7 +43,7 @@ func (this *Controller) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
 	file = strings.TrimRight(file, ".go") + ".tpl"
 	if tplfile == "NewFuncDecl.tpl" {
-		file = path.Dir(file) + "/" + tplfile
+		file = path.Dir(file) + utils.PathSeparator() + tplfile
 	}
 	f, err := os.Open(file)
 	if err != nil {
@@ -56,18 +57,22 @@ func (this *Controller) Template(tplfile string) string {
 }
 
 func (this *Controller) Generate() {
-	controllerTpl, err := os.OpenFile(this.File, os.O_RDWR|os.O_CREATE, 0755)
+	outfile := utils.File{Name: this.File}
+	if outfile.Exist() {
+		log.Fatalln(this.File + " already existed")
+	}
+	outFile, err := os.OpenFile(this.File, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
 	}
-	defer controllerTpl.Close()
+	defer outFile.Close()
 	tpl := this.Template("")
 	tmpl, err := template.New(controller).Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
 	//生成controller
-	err = tmpl.Execute(controllerTpl, this)
+	err = tmpl.Execute(outFile, this)
 	if err != nil {
 		panic(err)
 	}
@@ -75,6 +80,10 @@ func (this *Controller) Generate() {
 	_, mainfile, _, _ := runtime.Caller(3)
 	app := strings.Trim(mainfile, "main.go") + ".." + utils.PathSeparator() + "app"
 	beansGofile := app + utils.PathSeparator() + "Beans" + utils.PathSeparator() + "Bean.go"
+	utifile := utils.File{Name: beansGofile}
+	if !utifile.Exist() {
+		log.Fatalln("Bean.go file non-existent, bean route cannot auto-load")
+	}
 	beansFile, err := os.OpenFile(beansGofile, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
