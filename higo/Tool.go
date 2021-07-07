@@ -24,9 +24,9 @@ func NewTool() *Tool {
 }
 
 func (this *Tool) Execute() {
-	flag.StringVar(&this.Gen, "gen", "", "explain: Generate Controller or Model \n --option[controller | model]")
-	flag.StringVar(&this.Name, "name", "", "explain: Generate Name")
-	flag.StringVar(&this.Out, "out", "", "explain: Generate file output path")
+	flag.StringVar(&this.Gen, "gen", "", "explain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")
+	flag.StringVar(&this.Name, "name", "", "explain: Generate Name \neg:-name=Test")
+	flag.StringVar(&this.Out, "out", "", "explain: Generate file output path \neg:-out=test\\app\\Controllers")
 	//解析命令行参数
 	flag.Parse()
 	if "" != this.Gen {
