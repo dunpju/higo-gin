@@ -47,6 +47,20 @@ func (this *Model) Template(tplfile string) string {
 }
 
 func (this *Model) Generate() {
+	this.Fields = this.GetFields(this.TableName)
+	fields := make([]TplField, 0)
+	for _, f := range this.Fields {
+		if f.Key == "PRI" {
+			TplField{
+				Field:   generator.CamelCase(f.Field),
+				Type:    getFiledType(f),
+				DbField: f.Field,
+			}
+		}
+		fields = append(fields, )
+
+	}
+	log.Fatalln(this.Fields)
 	// 目录不存在，并创建
 	if _, err := os.Stat(this.Dir); os.IsNotExist(err) {
 		if os.Mkdir(this.Dir, os.ModePerm) != nil {
@@ -95,6 +109,12 @@ func (this *Model) GetFields(tableName string) []Field {
 type Table struct {
 	Name    string `gorm:"column:Name"`
 	Comment string `gorm:"column:Comment"`
+}
+
+type TplField struct {
+	Field   string
+	Type    string
+	DbField string
 }
 
 type Field struct {

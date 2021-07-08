@@ -8,7 +8,8 @@ import (
 
 type {{.ModelImpl}} struct {
 	*higo.Orm `inject:"Bean.NewOrm()"`
-	{{range _, $v := .Fields}}
+	{{range .Fields}}
+	{{.}}        int    `gorm:"column:id" json:"id"`
     {{end}}
 	Id        int    `gorm:"column:id" json:"id"`
 	Uname     string `gorm:"column:uname" json:"uname"`
