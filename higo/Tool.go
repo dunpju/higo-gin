@@ -2,6 +2,7 @@ package higo
 
 import (
 	"flag"
+	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates"
 	"github.com/dengpju/higo-utils/utils"
 	"log"
@@ -31,21 +32,29 @@ func (this *Tool) Cmd() {
 	//解析命令行参数
 	flag.Parse()
 	if "" != this.Gen {
+		var tplEngine templates.ItplEngine
 		if controller == this.Gen {
 			if this.Name == "" {
-				log.Fatalln("name unable empty eg:-name=Test")
+				log.Fatalln("name unable empty eg: -name=Test")
 			}
 			if this.Out == "" {
-				log.Fatalln("out unable empty eg:-out=test\\app\\Controllers")
+				log.Fatalln("out unable empty eg: -out=test\\app\\Controllers")
 			}
 			this.Package = utils.Basename(this.Out)
-			//go run test\bin\main.go -gen=controller -name=Test -out=test\app\Controllers
-			templates.NewController(this.Package, this.Name, this.Out).Generate()
+			tplEngine = templates.NewController(this.Package, this.Name, this.Out)
 		} else if model == this.Gen {
-
+			if this.Name == "" {
+				log.Fatalln("name unable empty eg: -name=ts_user")
+			}
+			if this.Out == "" {
+				log.Fatalln("out unable empty eg: -out=test\\app\\Models")
+			}
+			tplEngine = templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+			fmt.Println(tplEngine)
 		} else {
 			log.Fatalln("gen error option controller or model \neg:-gen=controller")
 		}
+		tplEngine.Generate()
 		os.Exit(1)
 	}
 }

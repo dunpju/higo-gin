@@ -13,16 +13,33 @@ import (
 )
 
 var (
-	orm         *Orm
-	onceGorm    sync.Once
-	confDefault *config.Configure
+	orm          *Orm
+	onceGorm     sync.Once
+	dbConfigOnce sync.Once
+	confDefault  *config.Configure
+	dbConfig     *Dbconfig
 )
+
+type Dbconfig struct {
+	Username string
+	Password string
+	Host     string
+	Port     string
+	Database string
+	Charset  string
+	Driver   string
+	Prefix   string
+}
 
 type Orm struct {
 	*gorm.DB
 	sql  string
 	args []interface{}
 	orms []*Orm
+}
+
+func GetDbConfig() *Dbconfig {
+	return dbConfig
 }
 
 func (this *Orm) Args() []interface{} {
@@ -34,16 +51,27 @@ func (this *Orm) Sql() string {
 }
 
 func newGorm() *gorm.DB {
-	confDefault = config.Db("DB.DEFAULT").(*config.Configure)
+	dbConfigOnce.Do(func() {
+		confDefault = config.Db("DB.DEFAULT").(*config.Configure)
+		dbConfig = &Dbconfig{Username: confDefault.Get("USERNAME").(string),
+			Password: confDefault.Get("PASSWORD").(string),
+			Host:     confDefault.Get("HOST").(string),
+			Port:     confDefault.Get("PORT").(string),
+			Database: confDefault.Get("DATABASE").(string),
+			Charset:  confDefault.Get("CHARSET").(string),
+			Driver:   confDefault.Get("DRIVER").(string),
+			Prefix:   confDefault.Get("PREFIX").(string),
+		}
+	})
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
-		confDefault.Get("USERNAME").(string),
-		confDefault.Get("PASSWORD").(string),
-		confDefault.Get("HOST").(string),
-		confDefault.Get("PORT").(string),
-		confDefault.Get("DATABASE").(string),
-		confDefault.Get("CHARSET").(string),
+		dbConfig.Username,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.Database,
+		dbConfig.Charset,
 	)
-	db, err := gorm.Open(confDefault.Get("DRIVER").(string), args)
+	db, err := gorm.Open(dbConfig.Driver, args)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,8 +88,8 @@ func newOrm() *Orm {
 func NewOrm() *Orm {
 	onceGorm.Do(func() {
 		orm = newOrm()
-		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", confDefault.Get("HOST").(string),
-			confDefault.Get("PORT").(string)))
+		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", dbConfig.Host,
+			dbConfig.Port))
 	})
 	return orm
 }

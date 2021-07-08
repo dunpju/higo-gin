@@ -7,6 +7,7 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gomodule/redigo/redis"
+	"github.com/dengpju/higo-gin/test/app/Controllers/V2"
 )
 
 type MyBean struct{ higo.Bean }
@@ -49,4 +50,12 @@ func (this *MyBean) NewUserModel() *UserModel.UserModelImpl {
 
 func (this *MyBean) New_gen_github8com_dengpju_higo9gin_test_app_Controllers_TestController() *a.TestController {
 	return a.NewTestController()
+}
+
+func (this *MyBean) New_gen_github8com_dengpju_higo9gin_test_app_Controllers_V3_TestController() *V3.TestController {
+	return V3.NewTestController()
+}
+
+func (this *MyBean) New_gen_github8com_dengpju_higo9gin_test_app_Controllers_V2_TestController() *V2.TestController {
+	return V2.NewTestController()
 }

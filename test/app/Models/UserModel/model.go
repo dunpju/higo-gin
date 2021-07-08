@@ -42,6 +42,9 @@ func (this *UserModelImpl) Mutate(attrs ...higo.Property) higo.Model {
 }
 
 func (this *UserModelImpl) RegisterValidator() {
+	//The custom tag
+	//require import "gitee.com/dengpju/higo-code/code"
+	// example
 	higo.RegisterValid(this).
 		Tag("UserName",
 			higo.Rule("required", code.Message("20000@UserName必须填1")),
@@ -108,3 +111,4 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 
 	*/
 }
+
