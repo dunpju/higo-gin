@@ -2,7 +2,6 @@ package higo
 
 import (
 	"flag"
-	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates"
 	"github.com/dengpju/higo-utils/utils"
 	"log"
@@ -50,7 +49,6 @@ func (this *Tool) Cmd() {
 				log.Fatalln("out unable empty eg: -out=test\\app\\Models")
 			}
 			tplEngine = templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
-			fmt.Println(tplEngine)
 		} else {
 			log.Fatalln("gen error option controller or model \neg:-gen=controller")
 		}

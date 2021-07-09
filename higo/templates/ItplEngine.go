@@ -1,8 +1,10 @@
 package templates
 
 const (
-	controller = "Controller"
-	NewFuncDecl = "NewFuncDecl"
+	controller  = "controller"
+	model       = "model"
+	attributes  = "attributes"
+	NewFuncDecl = "func_decl"
 )
 
 type ItplEngine interface {

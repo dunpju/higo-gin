@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"github.com/jinzhu/gorm"
@@ -14,14 +15,15 @@ import (
 )
 
 type Model struct {
-	DB        *gorm.DB
-	database  string
-	prefix    string
-	TableName string
-	Package   string
-	Dir       string
-	ModelImpl string
-	Fields    []Field
+	DB            *gorm.DB
+	database      string
+	prefix        string
+	TableName     string
+	Package       string
+	Dir           string
+	ModelImpl     string
+	Fields        []Field
+	TplFields     []TplField
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
@@ -31,10 +33,7 @@ func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
 
 func (this *Model) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = strings.TrimRight(file, ".go") + ".tpl"
-	if tplfile == "NewFuncDecl.tpl" {
-		file = path.Dir(file) + utils.PathSeparator() + tplfile
-	}
+	file = path.Dir(file) + utils.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
@@ -48,19 +47,17 @@ func (this *Model) Template(tplfile string) string {
 
 func (this *Model) Generate() {
 	this.Fields = this.GetFields(this.TableName)
-	fields := make([]TplField, 0)
 	for _, f := range this.Fields {
-		if f.Key == "PRI" {
-			TplField{
-				Field:   generator.CamelCase(f.Field),
-				Type:    getFiledType(f),
-				DbField: f.Field,
-			}
+		tField := TplField{
+			Field:   generator.CamelCase(f.Field),
+			Type:    getFiledType(f),
+			DbField: f.Field,
 		}
-		fields = append(fields, )
-
+		if f.Key == "PRI" {
+			tField.Field = "ID"
+		}
+		this.TplFields = append(this.TplFields, tField)
 	}
-	log.Fatalln(this.Fields)
 	// 目录不存在，并创建
 	if _, err := os.Stat(this.Dir); os.IsNotExist(err) {
 		if os.Mkdir(this.Dir, os.ModePerm) != nil {
@@ -70,21 +67,42 @@ func (this *Model) Generate() {
 	if outfile.Exist() {
 		log.Fatalln(outfile.Name + " already existed")
 	}
-	outFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+	modelFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
 	}
-	defer outFile.Close()
-	tpl := this.Template("")
-	tmpl, err := template.New(controller).Parse(tpl)
+	defer modelFile.Close()
+	tpl := this.Template("model.tpl")
+	tmpl, err := template.New(model).Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
 	//生成model.go
-	err = tmpl.Execute(outFile, this)
+	err = tmpl.Execute(modelFile, this)
 	if err != nil {
 		panic(err)
 	}
+
+	outfile = utils.File{Name: this.Dir + utils.PathSeparator() + "attributes.go"}
+	if outfile.Exist() {
+		log.Fatalln(outfile.Name + " already existed")
+	}
+	attributesFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		panic(err)
+	}
+	defer attributesFile.Close()
+	tpl = this.Template("attributes.tpl")
+	tmpl, err = template.New(attributes).Parse(tpl)
+	if err != nil {
+		panic(err)
+	}
+	//生成attributes.go
+	err = tmpl.Execute(attributesFile, this)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("generate model success!")
 }
 
 func (this *Model) GetTables(tableNames ...string) []Table {

@@ -8,12 +8,9 @@ import (
 
 type {{.ModelImpl}} struct {
 	*higo.Orm `inject:"Bean.NewOrm()"`
-	{{range .Fields}}
-	{{.}}        int    `gorm:"column:id" json:"id"`
-    {{end}}
-	Id        int    `gorm:"column:id" json:"id"`
-	Uname     string `gorm:"column:uname" json:"uname"`
-	Utel      string `gorm:"column:u_tel" json:"utel"`
+	{{- range .TplFields}}
+	{{.Field}}        {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}"`
+    {{- end}}
 }
 
 func init() {

@@ -41,10 +41,7 @@ func NewController(pkg string, name string, file string) *Controller {
 
 func (this *Controller) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = strings.TrimRight(file, ".go") + ".tpl"
-	if tplfile == "NewFuncDecl.tpl" {
-		file = path.Dir(file) + utils.PathSeparator() + tplfile
-	}
+	file = path.Dir(file) + utils.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
@@ -66,7 +63,7 @@ func (this *Controller) Generate() {
 		panic(err)
 	}
 	defer outFile.Close()
-	tpl := this.Template("")
+	tpl := this.Template("controller.tpl")
 	tmpl, err := template.New(controller).Parse(tpl)
 	if err != nil {
 		panic(err)
@@ -183,7 +180,7 @@ func (this *Controller) Generate() {
 	})
 	//追加
 	if !hasFuncDecl {
-		tpl := this.Template("NewFuncDecl.tpl")
+		tpl := this.Template("func_decl.tpl")
 		tmpl, err := template.New(NewFuncDecl).Parse(tpl)
 		if err != nil {
 			panic(err)
