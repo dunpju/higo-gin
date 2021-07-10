@@ -1,12 +1,15 @@
 package templates
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"github.com/jinzhu/gorm"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"runtime"
@@ -15,15 +18,15 @@ import (
 )
 
 type Model struct {
-	DB            *gorm.DB
-	database      string
-	prefix        string
-	TableName     string
-	Package       string
-	Dir           string
-	ModelImpl     string
-	Fields        []Field
-	TplFields     []TplField
+	DB        *gorm.DB
+	database  string
+	prefix    string
+	TableName string
+	Package   string
+	Dir       string
+	ModelImpl string
+	Fields    []Field
+	TplFields []TplField
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
@@ -63,31 +66,85 @@ func (this *Model) Generate() {
 		if os.Mkdir(this.Dir, os.ModePerm) != nil {
 		}
 	}
-	outfile := utils.File{Name: this.Dir + utils.PathSeparator() + "model.go"}
-	if outfile.Exist() {
-		log.Fatalln(outfile.Name + " already existed")
-	}
-	modelFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		panic(err)
-	}
-	defer modelFile.Close()
 	tpl := this.Template("model.tpl")
 	tmpl, err := template.New(model).Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
-	//生成model.go
-	err = tmpl.Execute(modelFile, this)
-	if err != nil {
-		panic(err)
-	}
-
-	outfile = utils.File{Name: this.Dir + utils.PathSeparator() + "attributes.go"}
+	outfile := utils.File{Name: this.Dir + utils.PathSeparator() + "model.go"}
 	if outfile.Exist() {
-		log.Fatalln(outfile.Name + " already existed")
+		newbuf := new(bytes.Buffer)
+		err = tmpl.Execute(newbuf, this)
+		//fmt.Println(newbuf.String())
+		newFset := token.NewFileSet()
+		newfd, err := parser.ParseFile(newFset, "", newbuf.String(), 0)
+		if err != nil {
+			panic(err)
+		}
+		var newNode *ast.TypeSpec
+		ast.Inspect(newfd, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.TypeSpec:
+				newNode = x
+			}
+			return true
+		})
+		oldFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+		if err != nil {
+			panic(err)
+		}
+		oldsrc, err := ioutil.ReadAll(oldFile)
+		if err != nil {
+			panic(err)
+		}
+		oldFset := token.NewFileSet()
+		oldfd, err := parser.ParseFile(oldFset, "", oldsrc, 0)
+		if err != nil {
+			panic(err)
+		}
+		newFileBuf := bytes.NewBufferString("")
+		ast.Inspect(oldfd, func(n ast.Node) bool {
+			switch oldNode := n.(type) {
+			case *ast.File:
+				newFileBuf = bytes.NewBufferString(`package ` + oldNode.Name.Name + "\n")
+			case *ast.GenDecl:
+				if oldNode.Tok == token.TYPE {
+					for i, oldn := range oldNode.Specs {
+						if oldn.(*ast.TypeSpec).Name.Name == "ModelImpl" {
+							oldNode.Specs[i] = newNode
+						}
+					}
+				}
+				astToGo(newFileBuf, n)
+			case *ast.FuncDecl:
+				astToGo(newFileBuf, n)
+			}
+			return true
+		})
+		//ast.Print(oldFset, oldfd)
+		//fmt.Println(newFileBuf)
+		newFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		if err != nil {
+			panic(err)
+		}
+		_, err = newFile.Write(newFileBuf.Bytes())
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		modelFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+		if err != nil {
+			panic(err)
+		}
+		defer modelFile.Close()
+		//生成model.go
+		err = tmpl.Execute(modelFile, this)
+		if err != nil {
+			panic(err)
+		}
 	}
-	attributesFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+	outfile = utils.File{Name: this.Dir + utils.PathSeparator() + "attributes.go"}
+	attributesFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
