@@ -16,6 +16,10 @@ type {{.ModelImpl}} struct {
     {{- end}}
 }
 
+var (
+    Models []*{{.ModelImpl}}
+)
+
 func init() {
 	//init Validator
 	New().RegisterValidator()
