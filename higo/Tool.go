@@ -33,19 +33,19 @@ func (this *Tool) Cmd() {
 	if "" != this.Gen {
 		if controller == this.Gen {
 			if this.Name == "" {
-				log.Fatalln("name unable empty eg: -name=Test")
+				log.Fatalln("name unable empty \neg: -name=Test")
 			}
 			if this.Out == "" {
-				log.Fatalln("out unable empty eg: -out=test\\app\\Controllers")
+				log.Fatalln("out unable empty \neg: -out=test\\app\\Controllers")
 			}
 			this.Package = utils.Basename(this.Out)
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
-				log.Fatalln("name unable empty eg: -name=ts_user")
+				log.Fatalln("name unable empty \neg: -name=ts_user")
 			}
 			if this.Out == "" {
-				log.Fatalln("out unable empty eg: -out=test\\app\\Models")
+				log.Fatalln("out unable empty \neg: -out=test\\app\\Models")
 			}
 			if this.Name == "all" {
 				newModel := templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)

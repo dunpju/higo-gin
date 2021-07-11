@@ -4,12 +4,15 @@ import (
 	//"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-ioc/injector"
+	{{- range $impo := .Imports}}
+    {{$impo}}
+    {{- end}}
 )
 
 type {{.ModelImpl}} struct {
 	*higo.Orm `inject:"Bean.NewOrm()"`
 	{{- range .TplFields}}
-	{{.Field}}        {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}"`
+	{{.Field}}        {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}" comment:"{{.Comment}}"`
     {{- end}}
 }
 

@@ -27,11 +27,15 @@ type Model struct {
 	ModelImpl string
 	Fields    []Field
 	TplFields []TplField
+	Imports   map[string]string
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
 	pkg := generator.CamelCase(strings.TrimLeft(name, pre)) + "Model"
-	return &Model{DB: DB, TableName: name, Package: pkg, ModelImpl: "ModelImpl", Dir: dir + utils.PathSeparator() + pkg, database: db, prefix: pre}
+	return &Model{DB: DB, TableName: name, Package: pkg, ModelImpl: "ModelImpl",
+		Dir: dir + utils.PathSeparator() + pkg, database: db, prefix: pre,
+		Imports: make(map[string]string),
+	}
 }
 
 func (this *Model) Template(tplfile string) string {
@@ -55,9 +59,15 @@ func (this *Model) Generate() {
 			Field:   generator.CamelCase(f.Field),
 			Type:    getFiledType(f),
 			DbField: f.Field,
+			Comment: f.Comment,
 		}
 		if f.Key == "PRI" {
 			tField.Field = "ID"
+		}
+		if tField.Type == "time.Time" {
+			if _, ok := this.Imports[tField.Type]; !ok {
+				this.Imports[tField.Type] = "\"time\""
+			}
 		}
 		this.TplFields = append(this.TplFields, tField)
 	}
@@ -67,7 +77,7 @@ func (this *Model) Generate() {
 		}
 	}
 	tpl := this.Template("model.tpl")
-	tmpl, err := template.New(model).Parse(tpl)
+	tmpl, err := template.New("model.tpl").Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
@@ -159,7 +169,7 @@ func (this *Model) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("generate model success!")
+	fmt.Println("model: " + this.Dir + " generate success!")
 }
 
 func (this *Model) GetTables(tableNames ...string) []Table {
@@ -190,12 +200,13 @@ type TplField struct {
 	Field   string
 	Type    string
 	DbField string
+	Comment string
 }
 
 type Field struct {
 	Field      string `gorm:"column:Field"`
 	Type       string `gorm:"column:Type"`
-	Null       string `gorm:"column:Null"`
+	Null       string `gorm:"column:Null"` //非空 YES/NO
 	Key        string `gorm:"column:Key"`
 	Default    string `gorm:"column:Default"`
 	Extra      string `gorm:"column:Extra"`
@@ -205,6 +216,9 @@ type Field struct {
 
 //获取字段类型
 func getFiledType(field Field) string {
+	if field.Null == "YES" {
+		return "interface{}"
+	}
 	types := strings.Split(field.Type, "(")
 	switch types[0] {
 	case "int":
@@ -239,6 +253,8 @@ func getFiledType(field Field) string {
 		return "time.Time"
 	case "time":
 		return "time.Time"
+	case "binary":
+		return "[]byte"
 	default:
 		return "string"
 	}

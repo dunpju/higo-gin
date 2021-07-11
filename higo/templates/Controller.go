@@ -20,9 +20,10 @@ import (
 )
 
 type Controller struct {
-	Package string
-	Name    string
-	File    string
+	Package   string
+	Name      string
+	OutStruct string
+	File      string
 }
 
 type FuncDecl struct {
@@ -35,8 +36,9 @@ type FuncDecl struct {
 func NewController(pkg string, name string, file string) *Controller {
 	name = utils.Ucfirst(name)
 	name = name + controller
-	file = file + utils.PathSeparator() + strings.Trim(name, controller) + controller + ".go"
-	return &Controller{Package: pkg, Name: name, File: file}
+	outStruct := file + utils.PathSeparator() + strings.Trim(name, controller) + controller
+	file = outStruct + ".go"
+	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, File: file}
 }
 
 func (this *Controller) Template(tplfile string) string {
@@ -64,7 +66,7 @@ func (this *Controller) Generate() {
 	}
 	defer outFile.Close()
 	tpl := this.Template("controller.tpl")
-	tmpl, err := template.New(controller).Parse(tpl)
+	tmpl, err := template.New("controller.tpl").Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
@@ -200,7 +202,7 @@ func (this *Controller) Generate() {
 			panic(err)
 		}
 	}
-	fmt.Println("generate controller success!")
+	fmt.Println("controller: " + this.OutStruct + " generate success!")
 }
 
 func astToGo(dst *bytes.Buffer, node interface{}) {

@@ -2,6 +2,9 @@ package {{.Package}}
 
 import (
 	"github.com/dengpju/higo-gin/higo"
+	{{- range $impo := .Imports}}
+    {{$impo}}
+    {{- end}}
 )
 
 {{range .TplFields}}
