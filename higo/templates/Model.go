@@ -31,7 +31,7 @@ type Model struct {
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
-	pkg := generator.CamelCase(strings.TrimLeft(name, pre)) + "Model"
+	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + "Model"
 	return &Model{DB: DB, TableName: name, Package: pkg, ModelImpl: "ModelImpl",
 		Dir: dir + utils.PathSeparator() + pkg, database: db, prefix: pre,
 		Imports: make(map[string]string),
