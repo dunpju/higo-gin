@@ -31,7 +31,6 @@ func (this *Tool) Cmd() {
 	//解析命令行参数
 	flag.Parse()
 	if "" != this.Gen {
-		var tplEngine templates.ItplEngine
 		if controller == this.Gen {
 			if this.Name == "" {
 				log.Fatalln("name unable empty eg: -name=Test")
@@ -40,7 +39,7 @@ func (this *Tool) Cmd() {
 				log.Fatalln("out unable empty eg: -out=test\\app\\Controllers")
 			}
 			this.Package = utils.Basename(this.Out)
-			tplEngine = templates.NewController(this.Package, this.Name, this.Out)
+			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
 				log.Fatalln("name unable empty eg: -name=ts_user")
@@ -48,11 +47,18 @@ func (this *Tool) Cmd() {
 			if this.Out == "" {
 				log.Fatalln("out unable empty eg: -out=test\\app\\Models")
 			}
-			tplEngine = templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+			if this.Name == "all" {
+				newModel := templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+				tables := newModel.GetTables()
+				for _, table := range tables {
+					templates.NewModel(newGorm(), table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
+				}
+			} else {
+				templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
+			}
 		} else {
 			log.Fatalln("gen error option controller or model \neg:-gen=controller")
 		}
-		tplEngine.Generate()
 		os.Exit(1)
 	}
 }
