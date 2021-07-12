@@ -20,8 +20,8 @@ var (
     Models []*{{.ModelImpl}}
 )
 
+//init Validator
 func init() {
-	//init Validator
 	New().RegisterValidator()
 }
 
@@ -45,12 +45,13 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 	return this
 }
 
+//The custom tag, binding tag eg: binding:"custom_tag_name"
+//require import "gitee.com/dengpju/higo-code/code"
+//example code:
+//higo.RegisterValid(this).
+//	Tag("custom_tag_name",
+//		higo.Rule("required", code.Message("20000@custom_message")),
+//		higo.Rule("min=5", code.Message("20000@custom_message")))
 func (this *{{.ModelImpl}}) RegisterValidator() {
-	//The custom tag, binding tag eg: binding:"custom_tag_name"
-	//require import "gitee.com/dengpju/higo-code/code"
-	// example
-	//higo.RegisterValid(this).
-	//	Tag("custom_tag_name",
-	//		higo.Rule("required", code.Message("20000@custom_message")),
-	//		higo.Rule("min=5", code.Message("20000@custom_message")))
+
 }
