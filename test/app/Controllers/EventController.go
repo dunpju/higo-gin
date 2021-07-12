@@ -9,6 +9,7 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/sys/windows"
 	"time"
 )
 
@@ -46,12 +47,17 @@ func (this *EventController) Test2() interface{} {
 }
 
 func (this *EventController) Test3() {
-	time.Sleep(2 * time.Second)
-	fmt.Println(len(higo.Request))
+	if utils.GoroutineID()%2 == 0 {
+		fmt.Printf("线程:%d  %d 协成: %d  %s\n", windows.GetCurrentThreadId(), utils.ThreadID(), utils.GoroutineID(), "休眠")
+		time.Sleep(2 * time.Second)
+	}
+	//fmt.Println(len(higo.Request))
 	ctx := request.Context()
-	fmt.Println(utils.GoroutineID())
 	tt := ctx.Query("tt")
-	fmt.Println(tt)
+	fmt.Printf("线程: %d %d 协成: %d  %s\n",windows.GetCurrentThreadId(), utils.ThreadID(), utils.GoroutineID(), tt)
+	go func() {
+		fmt.Printf("线程: %d %d 子协成: %d 数据:%s\n",windows.GetCurrentThreadId(), utils.ThreadID(), utils.GoroutineID(), tt)
+	}()
 	//exception.Throw(exception.Message(tt), exception.Code(1))
 	responser.SuccessJson("success", 10000, tt)
 }

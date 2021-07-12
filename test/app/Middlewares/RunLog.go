@@ -3,7 +3,9 @@ package Middlewares
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 // 运行日志
@@ -16,7 +18,9 @@ func NewRunLog() *RunLog {
 
 func (this *RunLog) Middle(hg *higo.Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
-		fmt.Printf("RunLog:%s\n",higo.RouterContainer.Get(cxt.Request.URL.Path).Desc())
+		tt := cxt.Query("tt")
+		fmt.Printf("RunLog:%s\n",
+			higo.RouterContainer.Get(cxt.Request.URL.Path).Desc() + "-" +strconv.FormatUint(utils.GoroutineID(), 10) + "-" + tt)
 		cxt.Next()
 	}
 }
