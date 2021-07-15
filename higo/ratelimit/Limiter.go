@@ -6,7 +6,7 @@ import (
 )
 
 func Limiter(cap int) func(handler gin.HandlerFunc) gin.HandlerFunc {
-	limiter := NewBucket(cap)
+	limiter := NewBucket(cap, 1)
 	return func(handler gin.HandlerFunc) gin.HandlerFunc {
 		return func(ctx *gin.Context) {
 			if limiter.IsAccept() {
