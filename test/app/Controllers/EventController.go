@@ -44,11 +44,16 @@ func (this *EventController) Test2() interface{} {
 	tt := ctx.Query("tt")
 	return tt
 }
-
+var i = 0
 func (this *EventController) Test3() {
+	fmt.Println("请求数量", len(higo.Request))
 	if utils.GoroutineID()%2 == 0 {
 		fmt.Printf("线程: %d 协成: %d  %s\n", utils.ThreadID(), utils.GoroutineID(), "休眠")
 		time.Sleep(2 * time.Second)
+		i++
+		if i == 1 {
+			panic("测试异常")
+		}
 	}
 	//fmt.Println(len(higo.Request))
 	ctx := request.Context()
