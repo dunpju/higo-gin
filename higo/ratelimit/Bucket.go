@@ -6,28 +6,19 @@ import (
 )
 
 type Bucket struct {
-	cap    int //令牌数量
-	tokens int // token数量
-	lock   sync.Mutex
-	rate   int // 令牌速率，每秒生成多少个令牌
+	cap      int64 //令牌数量
+	tokens   int64 // token数量
+	lock     sync.Mutex
+	rate     int64 // 令牌速率，每秒生成多少个令牌
+	lastTime int64
 }
 
-func NewBucket(cap, rate int) *Bucket {
+func NewBucket(cap, rate int64) *Bucket {
 	if cap <= 0 || rate <= 0 {
 		panic("error cap")
 	}
 	bucket := &Bucket{cap: cap, tokens: cap, rate: rate}
-	bucket.start()
 	return bucket
-}
-
-func (this *Bucket) start() {
-	go func() {
-		for {
-			time.Sleep(time.Second)
-			this.addToken()
-		}
-	}()
 }
 
 func (this *Bucket) addToken() {
@@ -43,6 +34,12 @@ func (this *Bucket) addToken() {
 func (this *Bucket) IsAccept() bool {
 	this.lock.Lock()
 	defer this.lock.Unlock()
+	now := time.Now().Unix()
+	this.tokens = this.tokens + (now-this.lastTime)*this.rate
+	if this.tokens > this.cap {
+		this.tokens = this.cap
+	}
+	this.lastTime = now
 	if this.tokens > 0 {
 		this.tokens--
 		return true
