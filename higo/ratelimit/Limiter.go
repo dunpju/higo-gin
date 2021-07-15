@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-func Limiter(cap int64) func(handler gin.HandlerFunc) gin.HandlerFunc {
-	limiter := NewBucket(cap, 1)
+func Limiter(cap, rate int64) func(handler gin.HandlerFunc) gin.HandlerFunc {
+	limiter := NewBucket(cap, rate)
 	return func(handler gin.HandlerFunc) gin.HandlerFunc {
 		return func(ctx *gin.Context) {
 			if limiter.IsAccept() {
