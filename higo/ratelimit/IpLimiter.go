@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 )
 
 type LimiterCache struct {
@@ -13,11 +14,11 @@ type LimiterCache struct {
 }
 
 var (
-	IpCache *LimiterCache
+	IpCache *GCache
 )
 
 func init() {
-	IpCache = &LimiterCache{}
+	IpCache = NewGCache(WithMax(10000))
 }
 
 func IpLimiter(cap, rate int64, key string) func(handler gin.HandlerFunc) gin.HandlerFunc {
@@ -25,11 +26,11 @@ func IpLimiter(cap, rate int64, key string) func(handler gin.HandlerFunc) gin.Ha
 		return func(ctx *gin.Context) {
 			ip := ClientIP(ctx.Request)
 			var limiter *Bucket
-			if v, ok := IpCache.data.Load(ip); ok {
+			if v := IpCache.Get(ip); v != nil {
 				limiter = v.(*Bucket)
 			} else {
 				limiter = NewBucket(cap, rate)
-				IpCache.data.Store(ip, limiter)
+				IpCache.Set(ip, limiter, time.Second*5)
 			}
 			if ctx.Query(key) != "" {
 				if limiter.IsAccept() {
