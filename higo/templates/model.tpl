@@ -2,6 +2,7 @@ package {{.Package}}
 
 import (
 	//"gitee.com/dengpju/higo-code/code"
+	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-ioc/injector"
 	{{- range $impo := .Imports}}
@@ -45,13 +46,25 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 	return this
 }
 
-//The custom tag, binding tag eg: binding:"custom_tag_name"
+//The custom tag, binding the tag eg: binding:"custom_tag_name"
 //require import "gitee.com/dengpju/higo-code/code"
+//
 //example code:
-//higo.RegisterValid(this).
-//	Tag("custom_tag_name",
-//		higo.Rule("required", code.Message("20000@custom_message")),
-//		higo.Rule("min=5", code.Message("20000@custom_message")))
-func (this *{{.ModelImpl}}) RegisterValidator() {
+//func (this *ModelImpl) RegisterValidator() {
+//	higo.RegisterValid(this).
+//		Tag("custom_tag_name",
+//			higo.Rule("required", code.Message("20000@custom_message")),
+//			higo.Rule("min=5", code.Message("20000@custom_message")))
+//}
+func (this *ModelImpl) RegisterValidator() {
+}
 
+func (this *ModelImpl) GetById(id int, columns ...string) {
+	this.Mapper(squirrel.
+		Select(columns...).
+		From(this.TableName()).
+		Where("id=?", id).
+		ToSql()).
+		Query().
+		Scan(&this)
 }

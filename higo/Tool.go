@@ -25,12 +25,11 @@ func NewTool() *Tool {
 }
 
 func (this *Tool) Cmd() {
-	flag.StringVar(&this.Gen, "gen", "", "explain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")
-	flag.StringVar(&this.Name, "name", "", "explain: Generate Name \neg:-name=Test")
-	flag.StringVar(&this.Out, "out", "", "explain: Generate file output path \neg:-out=test\\app\\Controllers")
-	//解析命令行参数
-	flag.Parse()
-	if "" != this.Gen {
+	if len(os.Args) >= 2 {
+		flag.StringVar(&this.Gen, "gen", "", "explain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")
+		flag.StringVar(&this.Name, "name", "", "explain: Generate Name \neg:-name=Test")
+		flag.StringVar(&this.Out, "out", "", "explain: Generate file output path \neg:-out=test\\app\\Controllers")
+		flag.Parse()
 		if controller == this.Gen {
 			if this.Name == "" {
 				log.Fatalln("name unable empty \neg: -name=Test")
@@ -42,10 +41,10 @@ func (this *Tool) Cmd() {
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
-				log.Fatalln("name unable empty \neg: -name=ts_user")
+				log.Fatalln("\ntable name unable empty \neg: -name=ts_user")
 			}
 			if this.Out == "" {
-				log.Fatalln("out unable empty \neg: -out=test\\app\\Models")
+				log.Fatalln("\noutput directory unable empty \neg: -out=test\\app\\Models")
 			}
 			if this.Name == "all" {
 				newModel := templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
@@ -57,7 +56,7 @@ func (this *Tool) Cmd() {
 				templates.NewModel(newGorm(), this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
 			}
 		} else {
-			log.Fatalln("gen error option controller or model \neg:-gen=controller")
+			log.Fatalln("\n gen Arguments Error! \nExplain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")
 		}
 		os.Exit(1)
 	}

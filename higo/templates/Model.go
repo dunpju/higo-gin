@@ -71,7 +71,6 @@ func (this *Model) Generate() {
 		}
 		this.TplFields = append(this.TplFields, tField)
 	}
-	// 目录不存在，并创建
 	if _, err := os.Stat(this.Dir); os.IsNotExist(err) {
 		if os.Mkdir(this.Dir, os.ModePerm) != nil {
 		}
@@ -85,7 +84,6 @@ func (this *Model) Generate() {
 	if outfile.Exist() {
 		newbuf := new(bytes.Buffer)
 		err = tmpl.Execute(newbuf, this)
-		//fmt.Println(newbuf.String())
 		newFset := token.NewFileSet()
 		newfd, err := parser.ParseFile(newFset, "", newbuf.String(), 0)
 		if err != nil {
@@ -108,7 +106,7 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 		oldFset := token.NewFileSet()
-		oldfd, err := parser.ParseFile(oldFset, "", oldsrc, 0)
+		oldfd, err := parser.ParseFile(oldFset, "", oldsrc, parser.ParseComments)
 		if err != nil {
 			panic(err)
 		}
@@ -127,7 +125,20 @@ func (this *Model) Generate() {
 				}
 				astToGo(newFileBuf, n)
 			case *ast.FuncDecl:
-				astToGo(newFileBuf, n)
+				if oldNode.Doc != nil {
+					length := len(oldNode.Doc.List)
+					for i, doc := range oldNode.Doc.List {
+						if i == 0 {
+							newFileBuf.WriteString("\n" + doc.Text + "\n")
+						} else if i == (length - 1) {
+							newFileBuf.WriteString(doc.Text)
+						} else {
+							newFileBuf.WriteString(doc.Text + "\n")
+						}
+					}
+					oldNode.Doc = nil
+				}
+				astToGo(newFileBuf, oldNode)
 			}
 			return true
 		})
@@ -174,11 +185,17 @@ func (this *Model) Generate() {
 
 func (this *Model) GetTables(tableNames ...string) []Table {
 	db := this.DB
-	var tables []Table
+	var (
+		tables []Table
+		d      *gorm.DB
+	)
 	if len(tableNames) == 0 {
-		db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE table_schema='" + this.database + "';").Find(&tables)
+		d = db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE table_schema='" + this.database + "';").Find(&tables)
 	} else {
-		db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE TABLE_NAME IN (" + strings.Join(tableNames, ",") + ") AND table_schema='" + this.database + "';").Find(&tables)
+		d = db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE TABLE_NAME IN (" + strings.Join(tableNames, ",") + ") AND table_schema='" + this.database + "';").Find(&tables)
+	}
+	if d.Error != nil {
+		panic(d.Error.Error())
 	}
 	return tables
 }
@@ -187,7 +204,10 @@ func (this *Model) GetTables(tableNames ...string) []Table {
 func (this *Model) GetFields(tableName string) []Field {
 	db := this.DB
 	var fields []Field
-	db.Raw("show FULL COLUMNS from " + tableName + ";").Find(&fields)
+	d := db.Raw("show FULL COLUMNS from " + tableName + ";").Find(&fields)
+	if d.Error != nil {
+		panic(d.Error.Error())
+	}
 	return fields
 }
 
