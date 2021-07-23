@@ -3,8 +3,10 @@ package {{.Package}}
 import (
 	//"gitee.com/dengpju/higo-code/code"
 	"github.com/Masterminds/squirrel"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-ioc/injector"
+    "github.com/dengpju/higo-gin/higo"
+    "github.com/dengpju/higo-ioc/injector"
+    "github.com/jinzhu/gorm"
+    "strings"
 	{{- range $impo := .Imports}}
     {{$impo}}
     {{- end}}
@@ -59,12 +61,10 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 func (this *ModelImpl) RegisterValidator() {
 }
 
-func (this *ModelImpl) GetById(id int, columns ...string) {
-	this.Mapper(squirrel.
-		Select(columns...).
-		From(this.TableName()).
-		Where("id=?", id).
-		ToSql()).
-		Query().
-		Scan(&this)
+func (this *ModelImpl) GetByID(ID {{.PriType}}, columns ...string) {
+	this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` = ?", ID).ToSql()).Query().Scan(&this)
+}
+
+func (this *ModelImpl) GetByIDS(IDS []string, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` IN(?)", strings.Join(IDS, ",")).ToSql()).Query()
 }
