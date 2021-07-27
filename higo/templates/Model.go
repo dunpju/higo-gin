@@ -25,6 +25,8 @@ type Model struct {
 	Package   string
 	Dir       string
 	ModelImpl string
+	PRI       string
+	PriType   string
 	Fields    []Field
 	TplFields []TplField
 	Imports   map[string]string
@@ -62,6 +64,8 @@ func (this *Model) Generate() {
 			Comment: f.Comment,
 		}
 		if f.Key == "PRI" {
+			this.PRI = tField.DbField
+			this.PriType = tField.Type
 			tField.Field = "ID"
 		}
 		if tField.Type == "time.Time" {
@@ -128,7 +132,9 @@ func (this *Model) Generate() {
 				if oldNode.Doc != nil {
 					length := len(oldNode.Doc.List)
 					for i, doc := range oldNode.Doc.List {
-						if i == 0 {
+						if i == 0 && 1 == length {
+							newFileBuf.WriteString("\n" + doc.Text)
+						} else if i == 0 {
 							newFileBuf.WriteString("\n" + doc.Text + "\n")
 						} else if i == (length - 1) {
 							newFileBuf.WriteString(doc.Text)
