@@ -7,11 +7,9 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
-	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
-	"log"
 	"time"
 )
 
@@ -73,10 +71,13 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
+	/**
 	fmt.Println(injector.BeanFactory.Get(this))
 	fmt.Println(this)
 	fmt.Printf("%p\n", this)
+	*/
 	user := UserModel.New(UserModel.WithId(101))
+	/**
 	user.Uname = this.Age.String()
 	fmt.Println(user)
 	higo.Result(ctx.ShouldBindJSON(user)).Unwrap()
@@ -86,6 +87,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	}
 	user.UserById(3, "*")
 	fmt.Println(user)
+	*/
 	user.Add("werwerwerg123456", "15987", 20)
 	//this.Table("ts_user").
 	//	Where("id=?", 3).

@@ -7,7 +7,7 @@ import (
 )
 
 type CoinModelImpl struct {
-	//*higo.Orm `inject:"Bean.NewOrm()"`
+	*higo.Orm `inject:"Bean.NewOrm()"`
 	Id    int    `gorm:"column:id"`
 	Uname string `gorm:"column:uname"`
 	Coin  int    `gorm:"column:coin"`

@@ -155,3 +155,109 @@ func (this *Orm) Transaction(fn func() error) {
 		}
 	}
 }
+
+type Pager struct {
+	tableName string
+	Total,
+	CurrentPage,
+	LastPage,
+	PerPage int64
+	Items interface{}
+}
+
+func NewPager(items interface{}, perPage, page int64) *Pager {
+	return &Pager{Items: items, CurrentPage: page, PerPage: perPage}
+}
+
+func (this *Orm) Paginate(pager *Pager) {
+	this.DB.Table("ts_coin").
+		Count(&pager.Total).
+		Limit(pager.PerPage).
+		Offset((pager.CurrentPage - 1) * pager.PerPage).
+		Find(&pager.Items)
+}
+
+func (this *Orm) Where(query interface{}, args ...interface{}) *Orm {
+	this.DB.Where(query, args...)
+	return this
+}
+
+func (this *Orm) Or(query interface{}, args ...interface{}) *Orm {
+	this.DB.Or(query, args...)
+	return this
+}
+
+func (this *Orm) Not(query interface{}, args ...interface{}) *Orm {
+	this.DB.Not(query, args...)
+	return this
+}
+
+func (this *Orm) Limit(limit interface{}) *Orm {
+	this.DB.Not(limit)
+	return this
+}
+
+func (this *Orm) Offset(offset interface{}) *Orm {
+	this.DB.Not(offset)
+	return this
+}
+
+func (this *Orm) Order(value interface{}, reorder ...bool) *Orm {
+	this.DB.Order(value, reorder...)
+	return this
+}
+
+func (this *Orm) Select(query interface{}, args ...interface{}) *Orm {
+	this.DB.Select(query, args...)
+	return this
+}
+
+func (this *Orm) Omit(columns ...string) *Orm {
+	this.DB.Omit(columns...)
+	return this
+}
+
+func (this *Orm) Group(query string) *Orm {
+	this.DB.Group(query)
+	return this
+}
+
+func (this *Orm) Having(query interface{}, values ...interface{}) *Orm {
+	this.DB.Having(query, values...)
+	return this
+}
+
+func (this *Orm) Joins(query string, args ...interface{}) *Orm {
+	this.DB.Joins(query, args...)
+	return this
+}
+
+func (this *Orm) First(out interface{}, where ...interface{}) *Orm {
+	this.DB.First(out, where...)
+	return this
+}
+
+func (this *Orm) Take(out interface{}, where ...interface{}) *Orm {
+	this.DB.Take(out, where...)
+	return this
+}
+
+func (this *Orm) Last(out interface{}, where ...interface{}) *Orm {
+	this.DB.Last(out, where...)
+	return this
+}
+
+func (this *Orm) Find(out interface{}, where ...interface{}) *Orm {
+	this.DB.Find(out, where...)
+	return this
+}
+
+func (this *Orm) Pluck(column string, value interface{}) *Orm {
+	this.DB.Pluck(column, value)
+	return this
+}
+
+func (this *Orm) Count(value interface{}) *Orm {
+	this.DB.Count(value)
+	return this
+}

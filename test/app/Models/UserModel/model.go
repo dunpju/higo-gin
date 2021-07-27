@@ -7,6 +7,7 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
+	"log"
 )
 
 type UserModelImpl struct {
@@ -77,8 +78,11 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 	u := this.AddUser(uname, tel, score)
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
+	var coins []*CoinModel.CoinModelImpl
+	pager := higo.NewPager(&coins, 10, 1)
+	coin.Paginate(pager)
+	log.Fatalln(pager)
 	//方法一:
-
 	higo.Begin(u, coin).Transaction(func() error {
 		higo.Result(u.Exec().Error).Unwrap()
 		co := coin.Exec()
@@ -111,4 +115,3 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 
 	*/
 }
-
