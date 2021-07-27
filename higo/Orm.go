@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
+	"math"
 	"sync"
 )
 
@@ -33,9 +34,10 @@ type Dbconfig struct {
 
 type Orm struct {
 	*gorm.DB
-	sql  string
-	args []interface{}
-	orms []*Orm
+	sql   string
+	args  []interface{}
+	orms  []*Orm
+	table string
 }
 
 func GetDbConfig() *Dbconfig {
@@ -157,11 +159,10 @@ func (this *Orm) Transaction(fn func() error) {
 }
 
 type Pager struct {
-	tableName string
 	Total,
 	CurrentPage,
-	LastPage,
-	PerPage int64
+	PerPage,
+	LastPage int64
 	Items interface{}
 }
 
@@ -170,11 +171,25 @@ func NewPager(items interface{}, perPage, page int64) *Pager {
 }
 
 func (this *Orm) Paginate(pager *Pager) {
-	this.DB.Table("ts_coin").
-		Count(&pager.Total).
+	if pager.CurrentPage <= 0 {
+		panic("Current Page: Can't be less than or equal to 0")
+	}
+	if pager.PerPage <= 0 {
+		panic("Per Page: Can't be less than or equal to 0")
+	}
+	this.DB.Table(this.table).Count(&pager.Total).
 		Limit(pager.PerPage).
 		Offset((pager.CurrentPage - 1) * pager.PerPage).
-		Find(&pager.Items)
+		Find(pager.Items)
+	if this.DB.Error != nil {
+		panic(this.DB.Error)
+	}
+	pager.LastPage = int64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
+}
+
+func (this *Orm) Table(name string) *Orm {
+	this.table = name
+	return this
 }
 
 func (this *Orm) Where(query interface{}, args ...interface{}) *Orm {

@@ -73,15 +73,27 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 		ToSql())
 }
 
+func (this *UserModelImpl) Paginate(perPage, page int64) *higo.Pager {
+	var models []*UserModelImpl
+	pager := higo.NewPager(&models, perPage, page)
+	this.Table(this.TableName()).Paginate(pager)
+	return pager
+}
+
 func (this *UserModelImpl) Add(uname string, tel string, score int) {
 	u1 := this.New()
 	u := this.AddUser(uname, tel, score)
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
-	var coins []*CoinModel.CoinModelImpl
-	pager := higo.NewPager(&coins, 10, 1)
-	coin.Paginate(pager)
-	log.Fatalln(pager)
+	var users []*UserModelImpl
+	pager := higo.NewPager(&users, 3, 1)
+	user := this.New()
+	this.Find(user)
+	fmt.Println(user)
+	fmt.Println(this.TableName())
+	this.Table(this.TableName()).Paginate(pager)
+	fmt.Println(pager)
+	log.Fatalln(pager.Items)
 	//方法一:
 	higo.Begin(u, coin).Transaction(func() error {
 		higo.Result(u.Exec().Error).Unwrap()
