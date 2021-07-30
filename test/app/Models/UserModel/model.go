@@ -42,7 +42,7 @@ func (this *UserModelImpl) Mutate(attrs ...higo.Property) higo.Model {
 	return this
 }
 
-func (this *UserModelImpl) RegisterValidator() {
+func (this *UserModelImpl) RegisterValidator() *UserModelImpl {
 	//The custom tag
 	//require import "gitee.com/dengpju/higo-code/code"
 	// example
@@ -53,6 +53,7 @@ func (this *UserModelImpl) RegisterValidator() {
 		Tag("Utel",
 			higo.Rule("required", code.Message("20000@Utel必须填")),
 			higo.Rule("min=4", code.Message("20000@Utel大于4")))
+	return this
 }
 
 func (this *UserModelImpl) UserById(id int, columns ...string) {
@@ -73,10 +74,21 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 		ToSql())
 }
 
-func (this *UserModelImpl) Paginate(perPage, page int64) *higo.Pager {
+func (this *UserModelImpl) Paginate(perPage, page uint64) *higo.Pager {
 	var models []*UserModelImpl
 	pager := higo.NewPager(&models, perPage, page)
-	this.Table(this.TableName()).Paginate(pager)
+	this.Mapper(squirrel.Select("*").
+		From(this.TableName()).
+		Where("uname like ?", "%werwerwer%").
+		Limit(pager.PerPage).
+		Offset((pager.CurrentPage - 1) * pager.PerPage).
+		OrderBy("id desc").
+		ToSql()).Paginate(pager)
+	//this.Table(this.TableName()).Where("uname like ?", "%werwerwer%").Paginate(pager)
+	fmt.Println(pager)
+	for _, v := range *(pager.Items.(*[]*UserModelImpl)) {
+		fmt.Println(v)
+	}
 	return pager
 }
 
@@ -91,9 +103,11 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 	this.Find(user)
 	fmt.Println(user)
 	fmt.Println(this.TableName())
-	this.Table(this.TableName()).Paginate(pager)
+	//this.Table(this.TableName()).Paginate(pager)
 	fmt.Println(pager)
-	log.Fatalln(pager.Items)
+	fmt.Println(pager.Items)
+	this.Paginate(2, 1)
+	log.Fatalln("wanc")
 	//方法一:
 	higo.Begin(u, coin).Transaction(func() error {
 		higo.Result(u.Exec().Error).Unwrap()

@@ -162,11 +162,11 @@ type Pager struct {
 	Total,
 	CurrentPage,
 	PerPage,
-	LastPage int64
+	LastPage uint64
 	Items interface{}
 }
 
-func NewPager(items interface{}, perPage, page int64) *Pager {
+func NewPager(items interface{}, perPage, page uint64) *Pager {
 	return &Pager{Items: items, CurrentPage: page, PerPage: perPage}
 }
 
@@ -177,102 +177,106 @@ func (this *Orm) Paginate(pager *Pager) {
 	if pager.PerPage <= 0 {
 		panic("Per Page: Can't be less than or equal to 0")
 	}
-	this.DB.Table(this.table).Count(&pager.Total).
-		Limit(pager.PerPage).
-		Offset((pager.CurrentPage - 1) * pager.PerPage).
+	fmt.Println(this.sql)
+	this.Query().
+		//Count(&pager.Total).
+		//Limit(pager.PerPage).
+		//Offset((pager.CurrentPage - 1) * pager.PerPage).
 		Find(pager.Items)
+	this.sql = "SELECT * FROM ts_user WHERE uname like '%werwerwer%' ORDER BY id desc LIMIT 2 OFFSET 0"
+	this.Query().Count(&pager.Total)
 	if this.DB.Error != nil {
 		panic(this.DB.Error)
 	}
-	pager.LastPage = int64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
+	pager.LastPage = uint64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
 }
 
 func (this *Orm) Table(name string) *Orm {
-	this.table = name
+	this.DB = this.DB.Table(name)
 	return this
 }
 
 func (this *Orm) Where(query interface{}, args ...interface{}) *Orm {
-	this.DB.Where(query, args...)
+	this.DB = this.DB.Where(query, args...)
 	return this
 }
 
 func (this *Orm) Or(query interface{}, args ...interface{}) *Orm {
-	this.DB.Or(query, args...)
+	this.DB = this.DB.Or(query, args...)
 	return this
 }
 
 func (this *Orm) Not(query interface{}, args ...interface{}) *Orm {
-	this.DB.Not(query, args...)
+	this.DB = this.DB.Not(query, args...)
 	return this
 }
 
 func (this *Orm) Limit(limit interface{}) *Orm {
-	this.DB.Not(limit)
+	this.DB = this.DB.Not(limit)
 	return this
 }
 
 func (this *Orm) Offset(offset interface{}) *Orm {
-	this.DB.Not(offset)
+	this.DB = this.DB.Not(offset)
 	return this
 }
 
 func (this *Orm) Order(value interface{}, reorder ...bool) *Orm {
-	this.DB.Order(value, reorder...)
+	this.DB = this.DB.Order(value, reorder...)
 	return this
 }
 
 func (this *Orm) Select(query interface{}, args ...interface{}) *Orm {
-	this.DB.Select(query, args...)
+	this.DB = this.DB.Select(query, args...)
 	return this
 }
 
 func (this *Orm) Omit(columns ...string) *Orm {
-	this.DB.Omit(columns...)
+	this.DB = this.DB.Omit(columns...)
 	return this
 }
 
 func (this *Orm) Group(query string) *Orm {
-	this.DB.Group(query)
+	this.DB = this.DB.Group(query)
 	return this
 }
 
 func (this *Orm) Having(query interface{}, values ...interface{}) *Orm {
-	this.DB.Having(query, values...)
+	this.DB = this.DB.Having(query, values...)
 	return this
 }
 
 func (this *Orm) Joins(query string, args ...interface{}) *Orm {
-	this.DB.Joins(query, args...)
+	this.DB = this.DB.Joins(query, args...)
 	return this
 }
 
 func (this *Orm) First(out interface{}, where ...interface{}) *Orm {
-	this.DB.First(out, where...)
+	this.DB = this.DB.First(out, where...)
 	return this
 }
 
 func (this *Orm) Take(out interface{}, where ...interface{}) *Orm {
-	this.DB.Take(out, where...)
+	this.DB = this.DB.Take(out, where...)
 	return this
 }
 
 func (this *Orm) Last(out interface{}, where ...interface{}) *Orm {
-	this.DB.Last(out, where...)
+	this.DB = this.DB.Last(out, where...)
 	return this
 }
 
 func (this *Orm) Find(out interface{}, where ...interface{}) *Orm {
-	this.DB.Find(out, where...)
+	this.DB = this.DB.Find(out, where...)
 	return this
 }
 
 func (this *Orm) Pluck(column string, value interface{}) *Orm {
-	this.DB.Pluck(column, value)
+	this.DB = this.DB.Pluck(column, value)
 	return this
 }
 
 func (this *Orm) Count(value interface{}) *Orm {
-	this.DB.Count(value)
+	this.DB = this.DB.Count(value)
 	return this
 }
