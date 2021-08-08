@@ -19,6 +19,7 @@ var (
 	dbConfigOnce sync.Once
 	confDefault  *config.Configure
 	dbConfig     *Dbconfig
+	logMode      bool
 )
 
 type Dbconfig struct {
@@ -64,6 +65,7 @@ func newGorm() *gorm.DB {
 			Driver:   confDefault.Get("DRIVER").(string),
 			Prefix:   confDefault.Get("PREFIX").(string),
 		}
+		logMode = confDefault.Get("LOG_MODE").(bool)
 	})
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		dbConfig.Username,
@@ -77,10 +79,35 @@ func newGorm() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.LogMode(logMode)
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(5)
 	db.DB().SetMaxOpenConns(10)
+	db.Callback().Query().Before("gorm:row").Register("row", rowCallback)
+	db.Callback().RowQuery().Before("gorm:count").Register("count", countCallback)
 	return db
+}
+
+func countCallback(scope *gorm.Scope) {
+	// scope.SQL   我们需要拿到的sql，无参数
+	// scope.SQLVars 	sql的参数值
+	// scope.TableName()		sql对应的表名
+	// scope.PrimaryKeyValue()	sql对应的主键值
+	// 处理sql 拼装sql和value
+	fmt.Println(97, scope.SQL)
+	fmt.Println(scope.SQLVars)
+	//os.Exit(1)
+}
+
+func rowCallback(scope *gorm.Scope) {
+	// scope.SQL   我们需要拿到的sql，无参数
+	// scope.SQLVars 	sql的参数值
+	// scope.TableName()		sql对应的表名
+	// scope.PrimaryKeyValue()	sql对应的主键值
+	// 处理sql 拼装sql和value
+	fmt.Println(108, scope.SQL)
+	fmt.Println(scope.SQLVars)
+	//os.Exit(1)
 }
 
 func newOrm() *Orm {
@@ -177,14 +204,11 @@ func (this *Orm) Paginate(pager *Pager) {
 	if pager.PerPage <= 0 {
 		panic("Per Page: Can't be less than or equal to 0")
 	}
-	fmt.Println(this.sql)
-	this.Query().
-		//Count(&pager.Total).
-		//Limit(pager.PerPage).
-		//Offset((pager.CurrentPage - 1) * pager.PerPage).
+	this.DB.
+		Count(&pager.Total).
+		Limit(pager.PerPage).
+		Offset((pager.CurrentPage - 1) * pager.PerPage).
 		Find(pager.Items)
-	this.sql = "SELECT * FROM ts_user WHERE uname like '%werwerwer%' ORDER BY id desc LIMIT 2 OFFSET 0"
-	this.Query().Count(&pager.Total)
 	if this.DB.Error != nil {
 		panic(this.DB.Error)
 	}

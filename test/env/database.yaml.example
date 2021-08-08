@@ -11,6 +11,7 @@ DB:
     CHARSET: "utf8mb4"
     COLLATION: "utf8mb4_unicode_ci"
     PREFIX: ""
+    LOG_MODE: true
 
 REDIS:
   DEFAULT:
