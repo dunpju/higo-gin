@@ -10,6 +10,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
 	"math"
+	"reflect"
+	"strings"
 	"sync"
 )
 
@@ -53,7 +55,7 @@ func (this *Orm) Sql() string {
 	return this.sql
 }
 
-func newGorm() *gorm.DB {
+func newGorm(mapper bool) *gorm.DB {
 	dbConfigOnce.Do(func() {
 		confDefault = config.Db("DB.DEFAULT").(*config.Configure)
 		dbConfig = &Dbconfig{Username: confDefault.Get("USERNAME").(string),
@@ -83,35 +85,46 @@ func newGorm() *gorm.DB {
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(5)
 	db.DB().SetMaxOpenConns(10)
-	db.Callback().Query().Before("gorm:row").Register("row", rowCallback)
-	db.Callback().RowQuery().Before("gorm:count").Register("count", countCallback)
+	if mapper == false {
+		if db.Callback().Query().Get("gorm:Query") == nil {
+			db.Callback().Query().Before("gorm:Query").Register("Query", sqlReplace)
+		}
+		if db.Callback().RowQuery().Get("gorm:Query") == nil {
+			db.Callback().RowQuery().Before("gorm:RowQuery").Register("RowQuery", sqlReplace)
+		}
+		if db.Callback().Create().Get("gorm:Create") == nil {
+			db.Callback().Create().Before("gorm:Create").Register("Create", sqlReplace)
+		}
+		if db.Callback().Update().Get("gorm:Update") == nil {
+			db.Callback().Update().Before("gorm:Update").Register("Update", sqlReplace)
+		}
+		if db.Callback().Delete().Get("gorm:Delete") == nil {
+			db.Callback().Delete().Before("gorm:Delete").Register("Delete", sqlReplace)
+		}
+	}
 	return db
 }
 
-func countCallback(scope *gorm.Scope) {
-	// scope.SQL   我们需要拿到的sql，无参数
-	// scope.SQLVars 	sql的参数值
-	// scope.TableName()		sql对应的表名
-	// scope.PrimaryKeyValue()	sql对应的主键值
-	// 处理sql 拼装sql和value
-	fmt.Println(97, scope.SQL)
-	fmt.Println(scope.SQLVars)
-	//os.Exit(1)
-}
-
-func rowCallback(scope *gorm.Scope) {
-	// scope.SQL   我们需要拿到的sql，无参数
-	// scope.SQLVars 	sql的参数值
-	// scope.TableName()		sql对应的表名
-	// scope.PrimaryKeyValue()	sql对应的主键值
-	// 处理sql 拼装sql和value
-	fmt.Println(108, scope.SQL)
-	fmt.Println(scope.SQLVars)
-	//os.Exit(1)
+func sqlReplace(scope *gorm.Scope) {
+	sql := scope.SQL
+	s := reflect.ValueOf(scope.SQLVars)
+	if orm, ok := scope.Value.(*Orm); ok {
+		sql = orm.sql
+		s = reflect.ValueOf(orm.args)
+	}
+	for i := 0; i < s.Len(); i++ {
+		sql = strings.Replace(sql, "?", "'%v'", 1)
+		sql = fmt.Sprintf(sql, s.Index(i))
+	}
+	fmt.Println(sql)
 }
 
 func newOrm() *Orm {
-	return &Orm{DB: newGorm(), orms: make([]*Orm, 0)}
+	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0)}
+}
+
+func mapperOrm() *Orm {
+	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0)}
 }
 
 func NewOrm() *Orm {
@@ -124,18 +137,17 @@ func NewOrm() *Orm {
 }
 
 func MultiOrm() *Orm {
-	return newOrm()
+	return mapperOrm()
 }
 
 func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
 	if err != nil {
 		panic(err.Error())
 	}
-	cloneDB := newOrm()
-	cloneDB.DB = orm.DB
-	cloneDB.sql = sql
-	cloneDB.args = args
-	return cloneDB
+	this.DB = orm.DB
+	this.sql = sql
+	this.args = args
+	return this
 }
 
 func (this *Orm) setDB(db *gorm.DB) {
@@ -143,10 +155,12 @@ func (this *Orm) setDB(db *gorm.DB) {
 }
 
 func (this *Orm) Query() *gorm.DB {
+	sqlReplace(this.NewScope(this))
 	return this.DB.Raw(this.sql, this.args...)
 }
 
 func (this *Orm) Exec() *gorm.DB {
+	sqlReplace(this.NewScope(this))
 	return this.DB.Exec(this.sql, this.args...)
 }
 
@@ -193,11 +207,11 @@ type Pager struct {
 	Items interface{}
 }
 
-func NewPager(items interface{}, perPage, page uint64) *Pager {
-	return &Pager{Items: items, CurrentPage: page, PerPage: perPage}
+func NewPager(perPage, page uint64) *Pager {
+	return &Pager{CurrentPage: page, PerPage: perPage}
 }
 
-func (this *Orm) Paginate(pager *Pager) {
+func (this *Orm) Paginate(pager *Pager, items interface{}) {
 	if pager.CurrentPage <= 0 {
 		panic("Current Page: Can't be less than or equal to 0")
 	}
@@ -208,7 +222,7 @@ func (this *Orm) Paginate(pager *Pager) {
 		Count(&pager.Total).
 		Limit(pager.PerPage).
 		Offset((pager.CurrentPage - 1) * pager.PerPage).
-		Find(pager.Items)
+		Find(items)
 	if this.DB.Error != nil {
 		panic(this.DB.Error)
 	}
