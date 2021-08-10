@@ -46,14 +46,15 @@ func (this *Tool) Cmd() {
 			if this.Out == "" {
 				log.Fatalln("\noutput directory unable empty \neg: -out=test\\app\\Models")
 			}
+			db := mapperOrm().DB
 			if this.Name == "all" {
-				newModel := templates.NewModel(newOrm().DB, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+				newModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 				tables := newModel.GetTables()
 				for _, table := range tables {
-					templates.NewModel(newOrm().DB, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
+					templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
 				}
 			} else {
-				templates.NewModel(newOrm().DB, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
+				templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
 			}
 		} else {
 			log.Fatalln("\n gen Arguments Error! \nExplain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")

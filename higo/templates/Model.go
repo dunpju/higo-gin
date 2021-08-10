@@ -129,7 +129,6 @@ func (this *Model) Generate() {
 				}
 				astToGo(newFileBuf, n)
 			case *ast.FuncDecl:
-				ast.Print(oldFset, n)
 				if oldNode.Doc != nil {
 					length := len(oldNode.Doc.List)
 					for i, doc := range oldNode.Doc.List {
