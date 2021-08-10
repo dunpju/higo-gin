@@ -71,9 +71,10 @@ func (this *ModelImpl) GetByIDS(IDS []string, columns ...string) *gorm.DB {
 	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` IN(?)", strings.Join(IDS, ",")).ToSql()).Query()
 }
 
-func (this *ModelImpl) Paginate(perPage, page int64) *higo.Pager {
+func (this *ModelImpl) Paginate(perPage, page uint64) *higo.Pager {
 	var models []*ModelImpl
-	pager := higo.NewPager(&models, perPage, page)
-	this.Table(this.TableName()).Paginate(pager)
+	pager := higo.NewPager(perPage, page)
+	this.Table(this.TableName()). /**Where().*/ Paginate(pager, &models)
+	pager.Items = models
 	return pager
 }
