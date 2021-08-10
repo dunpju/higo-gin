@@ -19,10 +19,6 @@ type {{.ModelImpl}} struct {
     {{- end}}
 }
 
-var (
-    Models []*{{.ModelImpl}}
-)
-
 //init Validator
 func init() {
 	New().RegisterValidator()
@@ -71,7 +67,7 @@ func (this *ModelImpl) GetByIDS(IDS []string, columns ...string) *gorm.DB {
 }
 
 func (this *ModelImpl) Paginate(perPage, page uint64) *higo.Pager {
-	var models []*ModelImpl
+	models := make([]*ModelImpl, 0)
 	pager := higo.NewPager(perPage, page)
 	this.Table(this.TableName()). /**Where().*/ Paginate(pager, &models)
 	pager.Items = models
