@@ -22,6 +22,8 @@ var (
 	confDefault  *config.Configure
 	dbConfig     *Dbconfig
 	logMode      bool
+	maxIdle      int
+	maxOpen      int
 )
 
 type Dbconfig struct {
@@ -68,6 +70,8 @@ func newGorm(mapper bool) *gorm.DB {
 			Prefix:   confDefault.Get("PREFIX").(string),
 		}
 		logMode = confDefault.Get("LOG_MODE").(bool)
+		maxIdle = confDefault.Get("MAX_IDLE").(int)
+		maxOpen = confDefault.Get("MAX_OPEN").(int)
 	})
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		dbConfig.Username,
@@ -83,8 +87,8 @@ func newGorm(mapper bool) *gorm.DB {
 	}
 	db.LogMode(logMode)
 	db.SingularTable(true)
-	db.DB().SetMaxIdleConns(5)
-	db.DB().SetMaxOpenConns(10)
+	db.DB().SetMaxIdleConns(maxIdle)
+	db.DB().SetMaxOpenConns(maxOpen)
 	if mapper == false {
 		if db.Callback().Query().Get("gorm:Query") == nil {
 			db.Callback().Query().Before("gorm:Query").Register("Query", sqlReplace)
@@ -116,7 +120,9 @@ func sqlReplace(scope *gorm.Scope) {
 		sql = strings.Replace(sql, "?", "'%v'", 1)
 		sql = fmt.Sprintf(sql, s.Index(i))
 	}
-	fmt.Println(sql)
+	if logMode {
+		logger.Logrus.Debugln(sql)
+	}
 }
 
 func newOrm() *Orm {
@@ -144,10 +150,11 @@ func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
 	if err != nil {
 		panic(err.Error())
 	}
-	this.DB = orm.DB
-	this.sql = sql
-	this.args = args
-	return this
+	clone := mapperOrm()
+	clone.DB = orm.DB
+	clone.sql = sql
+	clone.args = args
+	return clone
 }
 
 func (this *Orm) setDB(db *gorm.DB) {

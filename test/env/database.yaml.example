@@ -12,6 +12,8 @@ DB:
     COLLATION: "utf8mb4_unicode_ci"
     PREFIX: ""
     LOG_MODE: true
+    MAX_IDLE: 5
+    MAX_OPEN: 10
 
 REDIS:
   DEFAULT:
