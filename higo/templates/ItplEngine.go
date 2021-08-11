@@ -1,8 +1,8 @@
 package templates
 
 const (
-	controller  = "controller"
-	model       = "model"
+	controller  = "Controller"
+	model       = "Model"
 	attributes  = "attributes"
 	NewFuncDecl = "func_decl"
 )
