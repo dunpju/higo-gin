@@ -32,8 +32,8 @@ func init() {
 					"message": msg.Message,
 					"data":    nil,
 				})
-			} else if MapString, ok := r.(utils.MapString); ok {
-				cxt.JSON(http.StatusOK, MapString)
+			} else if arrayMap, ok := r.(utils.ArrayMap); ok {
+				cxt.JSON(http.StatusOK, arrayMap.String())
 			} else if validate, ok := r.(*ValidateError); ok {
 				cxt.JSON(http.StatusOK, gin.H{
 					"code":    validate.Get().Code,

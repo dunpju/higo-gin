@@ -23,12 +23,8 @@ func WsRespString(messageData string) WsWriteMessage {
 	return WsWriteMessage{MessageType: WsRespstring, MessageData: []byte(messageData)}
 }
 
-func WsRespMap(messageData utils.MapString) WsWriteMessage {
-	mjson, err := json.Marshal(messageData)
-	if err != nil {
-		panic(err)
-	}
-	return WsWriteMessage{MessageType: WsRespmap, MessageData: mjson}
+func WsRespMap(messageData utils.ArrayMap) WsWriteMessage {
+	return WsWriteMessage{MessageType: WsRespmap, MessageData: []byte(messageData.String())}
 }
 
 func WsRespStruct(messageData interface{}) WsWriteMessage {

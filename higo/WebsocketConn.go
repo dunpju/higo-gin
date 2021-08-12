@@ -25,15 +25,15 @@ func init() {
 	wsRecoverOnce.Do(func() {
 		WsRecoverHandle = func(r interface{}) (respMsg string) {
 			if msg, ok := r.(*code.Code); ok {
-				respMsg = make(utils.MapString).
+				respMsg = utils.Array().
 					Put("code", msg.Code).
 					Put("message", msg.Message).
 					Put("data", nil).
 					String()
-			} else if MapString, ok := r.(utils.MapString); ok {
-				respMsg = MapString.String()
+			} else if arrayMap, ok := r.(utils.ArrayMap); ok {
+				respMsg = arrayMap.String()
 			} else {
-				respMsg = make(utils.MapString).
+				respMsg = utils.Array().
 					Put("code", 0).
 					Put("message", exception.ErrorToString(r)).
 					Put("data", nil).
