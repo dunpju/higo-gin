@@ -44,7 +44,6 @@ func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
 }
 
 func (this *WebsocketController) Echo(ctx *gin.Context) higo.WsWriteMessage {
-
 	return higo.WsRespString("echo")
 }
 

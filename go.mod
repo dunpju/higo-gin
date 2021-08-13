@@ -11,8 +11,8 @@ require (
 	github.com/dengpju/higo-ioc v1.0.2
 	github.com/dengpju/higo-logger v1.0.7
 	github.com/dengpju/higo-router v1.0.19
-	github.com/dengpju/higo-throw v1.0.11
-	github.com/dengpju/higo-utils v1.0.36
+	github.com/dengpju/higo-throw v1.0.12
+	github.com/dengpju/higo-utils v1.0.37
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/go-sql-driver/mysql v1.5.0

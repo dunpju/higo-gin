@@ -33,7 +33,7 @@ func init() {
 					"data":    nil,
 				})
 			} else if arrayMap, ok := r.(utils.ArrayMap); ok {
-				cxt.JSON(http.StatusOK, arrayMap.String())
+				cxt.JSON(http.StatusOK, arrayMap.Value())
 			} else if validate, ok := r.(*ValidateError); ok {
 				cxt.JSON(http.StatusOK, gin.H{
 					"code":    validate.Get().Code,
