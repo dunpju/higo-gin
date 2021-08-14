@@ -32,7 +32,7 @@ func init() {
 					"message": msg.Message,
 					"data":    nil,
 				})
-			} else if arrayMap, ok := r.(utils.ArrayMap); ok {
+			} else if arrayMap, ok := r.(*utils.ArrayMap); ok {
 				cxt.JSON(http.StatusOK, arrayMap.Value())
 			} else if validate, ok := r.(*ValidateError); ok {
 				cxt.JSON(http.StatusOK, gin.H{
@@ -40,10 +40,16 @@ func init() {
 					"message": validate.Get().Message,
 					"data":    nil,
 				})
+			} else if err, ok := r.(error); ok {
+				cxt.JSON(http.StatusOK, gin.H{
+					"code":    0,
+					"message": exception.ErrorToString(err),
+					"data":    nil,
+				})
 			} else {
 				cxt.JSON(http.StatusOK, gin.H{
 					"code":    0,
-					"message": exception.ErrorToString(r),
+					"message": r,
 					"data":    nil,
 				})
 			}

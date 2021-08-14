@@ -34,7 +34,7 @@ func (this *DemoController) Route(hg *higo.Higo) {
 		//hg.AddGroup("/user", func() {
 		//	hg.Post("/login", this.Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		//})
-		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常"))
+		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
 		hg.Post("/test_get", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
 	})
 }
