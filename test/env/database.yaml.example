@@ -15,17 +15,19 @@ DB:
     MAX_IDLE: 5
     MAX_OPEN: 10
 
-REDIS:
-  DEFAULT:
-    HOST: "192.168.8.99"
-    AUTH: "1qaz2wsx"
-    PORT: "6379"
-    DB: 0
-    POOL:
-      MIN_CONNECTIONS: 1
-      MAX_CONNECTIONS: 10
-      CONNECT_TIMEOUT: 10.0
-      WAIT_TIMEOUT: 3.0
-      HEARTBEAT: -1
-      MAX_IDLE: 3
-      MAX_IDLE_TIME: 60
+Redis:
+  Default:
+    Host: "192.168.8.99"
+    Auth: "1qaz2wsx"
+    Port: 6379
+    Db: 0
+    Pool:
+      Min_Connections: 1
+      Max_Connections: 10
+      Connect_Timeout: 10.0
+      Wait_Timeout: 3.0
+      Heartbeat: -1
+      Max_Idle: 3
+      Max_Idle_Time: 60
+      Max_Conn_Lifetime: 10
+      Wait: true

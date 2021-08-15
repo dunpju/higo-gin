@@ -17,9 +17,8 @@ func CacheDecorator(h gin.HandlerFunc, param string, format string, empty interf
 			if !exists {
 				dbResult = empty
 			}
-
 			retData, _ := ffjson.Marshal(dbResult)
-			Redis.Setex(key, 20, retData)
+			Redis.Setex(key, retData, 20)
 			context.JSON(200, retData)
 		} else {
 			_ = ffjson.Unmarshal(ret, &empty)

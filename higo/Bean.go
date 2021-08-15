@@ -1,8 +1,10 @@
 package higo
 
-import "github.com/gomodule/redigo/redis"
+import (
+	"github.com/gomodule/redigo/redis"
+)
 
-type Bean struct{
+type Bean struct {
 	Middleware
 }
 
