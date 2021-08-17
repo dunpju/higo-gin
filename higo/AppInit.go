@@ -121,10 +121,10 @@ func middleAuthFunc(cxt *gin.Context) {
 	if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
 		if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
 			if "" == cxt.GetHeader("X-Token") {
-				exception.Throw(exception.Message(code.Message(Consts.INVALID_TOKEN).Message), exception.Code(code.Message(Consts.INVALID_TOKEN).Code))
+				exception.Throw(exception.Message(code.Message(Consts.InvalidToken).Message), exception.Code(code.Message(Consts.InvalidToken).Code))
 			}
 		}
 	} else {
-		exception.Throw(exception.Message(code.Message(Consts.INVALID_API).Message), exception.Code(code.Message(Consts.INVALID_API).Code))
+		exception.Throw(exception.Message(code.Message(Consts.InvalidApi).Message), exception.Code(code.Message(Consts.InvalidApi).Code))
 	}
 }

@@ -1,18 +1,69 @@
 package Consts
 
-// CODE 常量,格式：code_TO_msg
+import "github.com/dengpju/higo-enum/enum"
+
+type SuccessConst int
+
 const (
-	SUCCESS          = "20000@成功"
-	SERVER_ERROR     = "50000@系统错误"
-	AUTH_ERROR       = "50001@认证错误"
-	UNKNOWN_ERROR    = "50002@未知错误"
-	RSA_ERROR        = "50003@解密错误"
-	PARAMETER_ERROR  = "50004@参数错误"
-	NOT_FOUND        = "50005@未找到"
-	CODE_ERROR       = "50006@失败"
-	INVALID_TOKEN    = "50007@无效token"
-	INVALID_API      = "50008@无效api"
-	INVALID_MAP      = "50009@无效api映射"
-	// 业务异常从51000开始
-	TEST_ERROR       = "51000@测试异常"
+	Success SuccessConst = iota + 20000
 )
+
+func (this SuccessConst) String() string {
+	switch this {
+	case Success:
+		return "成功"
+	}
+	return "未定义"
+}
+
+func (this SuccessConst) Message() *enum.CodeDoc {
+	return enum.New(this)
+}
+
+type DemoConst int
+
+const (
+	ServerError DemoConst = iota + 50000
+	AuthError
+	UnknownError
+	RsaError
+	ParameterError
+	NotFound
+	CodeError
+	InvalidToken
+	InvalidApi
+	InvalidMap
+	TestError
+)
+
+func (this DemoConst) String() string {
+	switch this {
+	case ServerError:
+		return "系统错误"
+	case AuthError:
+		return "认证错误"
+	case UnknownError:
+		return "未知错误"
+	case RsaError:
+		return "解密错误"
+	case ParameterError:
+		return "参数错误"
+	case NotFound:
+		return "未找到"
+	case CodeError:
+		return "失败"
+	case InvalidToken:
+		return "无效token"
+	case InvalidApi:
+		return "无效api"
+	case InvalidMap:
+		return "无效api映射"
+	case TestError:
+		return "测试异常"
+	}
+	return "未定义"
+}
+
+func (this DemoConst) Message() *enum.CodeDoc {
+	return enum.New(this)
+}
