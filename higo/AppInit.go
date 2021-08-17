@@ -1,7 +1,6 @@
 package higo
 
 import (
-	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-gin/test/app/Consts"
 	"github.com/dengpju/higo-router/router"
@@ -121,10 +120,10 @@ func middleAuthFunc(cxt *gin.Context) {
 	if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
 		if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
 			if "" == cxt.GetHeader("X-Token") {
-				exception.Throw(exception.Message(code.Message(Consts.InvalidToken).Message), exception.Code(code.Message(Consts.InvalidToken).Code))
+				exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken.Code())))
 			}
 		}
 	} else {
-		exception.Throw(exception.Message(code.Message(Consts.InvalidApi).Message), exception.Code(code.Message(Consts.InvalidApi).Code))
+		exception.Throw(exception.Message(Consts.InvalidApi.Message()), exception.Code(int(Consts.InvalidApi.Code())))
 	}
 }

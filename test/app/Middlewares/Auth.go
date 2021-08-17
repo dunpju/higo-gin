@@ -1,7 +1,6 @@
 package Middlewares
 
 import (
-	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Consts"
 	"github.com/dengpju/higo-throw/exception"
@@ -22,12 +21,12 @@ func (this *Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
 			// TODO::非静态页面需要鉴权
 			if !higo.IsNotAuth(route.Flag()) && !route.IsStatic() {
 				if "" == cxt.GetHeader("X-Token") {
-					exception.Throw(exception.Message(code.Message(Consts.InvalidToken).Message), exception.Code(code.Message(Consts.InvalidToken).Code))
+					exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken.Code())))
 				}
 			}
 			cxt.Next()
 		} else {
-			exception.Throw(exception.Message(code.Message(Consts.InvalidApi).Message), exception.Code(code.Message(Consts.InvalidApi).Code))
+			exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken.Code())))
 		}
 	}
 }

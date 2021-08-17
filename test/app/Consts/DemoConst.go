@@ -16,8 +16,12 @@ func (this SuccessConst) String() string {
 	return "未定义"
 }
 
-func (this SuccessConst) Message() *enum.CodeDoc {
-	return enum.New(this)
+func (this SuccessConst) Code() int64 {
+	return enum.New(this).Code
+}
+
+func (this SuccessConst) Message() string {
+	return enum.New(this).Doc
 }
 
 type DemoConst int
@@ -64,6 +68,10 @@ func (this DemoConst) String() string {
 	return "未定义"
 }
 
-func (this DemoConst) Message() *enum.CodeDoc {
-	return enum.New(this)
+func (this DemoConst) Code() int64 {
+	return enum.New(this).Code
+}
+
+func (this DemoConst) Message() string {
+	return enum.New(this).Doc
 }
