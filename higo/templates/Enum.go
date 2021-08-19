@@ -19,29 +19,23 @@ import (
 	"text/template"
 )
 
-type Controller struct {
+type Enum struct {
 	Package   string
 	Name      string
 	OutStruct string
 	File      string
+	Enums     []*utils.KeyValue
 }
 
-type FuncDecl struct {
-	Recv     string
-	FuncName string
-	Results  string
-	Returns  string
-}
-
-func NewController(pkg string, name string, file string) *Controller {
+func NewEnum(pkg string, name string, file string) *Enum {
 	name = utils.Ucfirst(name)
-	name = name + controller
-	outStruct := file + utils.PathSeparator() + strings.Trim(name, controller) + controller
+	name = name + enum
+	outStruct := file + utils.PathSeparator() + strings.Trim(name, enum) + enum
 	file = outStruct + ".go"
-	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, File: file}
+	return &Enum{Package: pkg, Name: name, OutStruct: outStruct, File: file}
 }
 
-func (this *Controller) Template(tplfile string) string {
+func (this *Enum) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
 	file = path.Dir(file) + utils.PathSeparator() + tplfile
 	f, err := os.Open(file)
@@ -55,7 +49,7 @@ func (this *Controller) Template(tplfile string) string {
 	return string(context)
 }
 
-func (this *Controller) Generate() {
+func (this *Enum) Generate() {
 	outfile := utils.File{Name: this.File}
 	if outfile.Exist() {
 		log.Fatalln(this.File + " already existed")

@@ -3,6 +3,7 @@ package templates
 const (
 	controller  = "Controller"
 	model       = "Model"
+	enum        = "Enum"
 	attributes  = "attributes"
 	NewFuncDecl = "func_decl"
 )

@@ -2,6 +2,9 @@ package templates
 
 import (
 	"bufio"
+	"bytes"
+	"go/format"
+	"go/token"
 	"io"
 	"os"
 	"strings"
@@ -42,4 +45,19 @@ func init() {
 
 func GetModName() string {
 	return moduleName
+}
+
+func astToGo(dst *bytes.Buffer, node interface{}) {
+	addNewline := func() {
+		err := dst.WriteByte('\n') // add newline
+		if err != nil {
+			panic(err)
+		}
+	}
+	addNewline()
+	err := format.Node(dst, token.NewFileSet(), node)
+	if err != nil {
+		panic(err)
+	}
+	addNewline()
 }

@@ -16,7 +16,7 @@ func (this {{.Name}}) Message() string {
 const (
 	{{- range $i, $v := .Enums}}
 	{{if eq 0 $i}}
-	{{$v}} = iota + {{.InitIncr}}
+	{{$v.Key}} = iota + {{.InitIncr}}
 	{{else}}
 	{{$v}}
     {{end}}
@@ -25,8 +25,10 @@ const (
 
 func (this {{.Name}}) String() string {
 	switch this {
-	case Example:
-		return "示例枚举"
+	{{- range _, $v := .Enums}}
+	case {{$v.Key}}:
+    		return "{{$v.Value}}"
+    {{- end}}
 	}
 	return "未定义"
 }
