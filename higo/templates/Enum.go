@@ -59,8 +59,8 @@ func (this *Enum) Generate() {
 		panic(err)
 	}
 	defer outFile.Close()
-	tpl := this.Template("controller.tpl")
-	tmpl, err := template.New("controller.tpl").Parse(tpl)
+	tpl := this.Template("enum.tpl")
+	tmpl, err := template.New("enum.tpl").Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
