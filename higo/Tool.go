@@ -11,6 +11,7 @@ import (
 const (
 	controller = "controller"
 	model      = "model"
+	enum       = "enum"
 )
 
 type Tool struct {
@@ -26,25 +27,53 @@ func NewTool() *Tool {
 
 func (this *Tool) Cmd() {
 	if len(os.Args) >= 2 {
-		flag.StringVar(&this.Gen, "gen", "", "explain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")
-		flag.StringVar(&this.Name, "name", "", "explain: Generate Name \neg:-name=Test")
-		flag.StringVar(&this.Out, "out", "", "explain: Generate file output path \neg:-out=test\\app\\Controllers")
+		flag.StringVar(&this.Gen, "gen", "", `
+explain: Generate Controller or Model or Enum
+--option[controller | model | enum]
+eg:-gen=controller`)
+		flag.StringVar(&this.Name, "name", "", `
+explain: Generate Name 
+eg:-name=Test`)
+		flag.StringVar(&this.Out, "out", "", `
+explain: Generate file output path 
+eg:-out=test\\app\\Controllers`)
 		flag.Parse()
 		if controller == this.Gen {
 			if this.Name == "" {
-				log.Fatalln("name unable empty \neg: -name=Test")
+				log.Fatalln(`
+name unable empty 
+eg: -name=Test`)
 			}
 			if this.Out == "" {
-				log.Fatalln("out unable empty \neg: -out=test\\app\\Controllers")
+				log.Fatalln(`
+out unable empty 
+eg: -out=test\\app\\Controllers`)
+			}
+			this.Package = utils.Basename(this.Out)
+			templates.NewController(this.Package, this.Name, this.Out).Generate()
+		} else if enum == this.Gen {
+			if this.Name == "" {
+				log.Fatalln(`
+name unable empty 
+eg: -name=Test`)
+			}
+			if this.Out == "" {
+				log.Fatalln(`
+out unable empty 
+eg: -out=test\\app\\Enums`)
 			}
 			this.Package = utils.Basename(this.Out)
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
-				log.Fatalln("\ntable name unable empty \neg: -name=ts_user")
+				log.Fatalln(`
+table name unable empty 
+eg: -name=ts_user`)
 			}
 			if this.Out == "" {
-				log.Fatalln("\noutput directory unable empty \neg: -out=test\\app\\Models")
+				log.Fatalln(`
+output directory unable empty 
+eg: -out=test\\app\\Models`)
 			}
 			db := mapperOrm().DB
 			if this.Name == "all" {
@@ -57,7 +86,11 @@ func (this *Tool) Cmd() {
 				templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
 			}
 		} else {
-			log.Fatalln("\n gen Arguments Error! \nExplain: Generate Controller or Model \n --option[controller | model] \n eg:-gen=controller")
+			log.Fatalln(`
+gen Arguments Error! 
+Explain: Generate Controller or Model 
+--option[controller | model | enum] 
+eg:-gen=controller`)
 		}
 		os.Exit(1)
 	}
