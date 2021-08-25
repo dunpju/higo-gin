@@ -24,7 +24,7 @@ func (this {{.Name}}) String() string {
 	switch this {
 	{{- range $v := .EnumMap}}
 	case {{$.RealName}}{{$v.Key}}:
-    		return "{{$v.Doc}}"
+    	return "{{$v.Doc}}"
     {{- end}}
 	}
 	return "未定义"
