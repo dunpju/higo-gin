@@ -15,11 +15,7 @@ func (this {{.Name}}) Message() string {
 
 const (
 	{{- range $i, $v := .Enums}}
-	{{if eq 0 $i}}
-	{{$v.Key}} = iota + {{.InitIncr}}
-	{{else}}
-	{{$v}}
-    {{end}}
+	{{$v.Key}} = {{$v.Value}}
     {{- end}}
 )
 

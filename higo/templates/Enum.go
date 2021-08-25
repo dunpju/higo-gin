@@ -9,6 +9,7 @@ import (
 	"path"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 	"text/template"
 )
@@ -51,8 +52,12 @@ func NewEnum(pkg string, name string, file string) *Enum {
 		e.Doc = doc
 		es := strings.Split(docs[1], ",")
 		for _, v := range es {
-			strings.Split(v, )
-			e.Enums = append(e.Enums, NewEnumMap())
+			em := strings.Split(v, "-")
+			em1, err := strconv.Atoi(em[1])
+			if err != nil {
+				panic(err)
+			}
+			e.Enums = append(e.Enums, NewEnumMap(em[0], em1, em[2]))
 		}
 	}
 	name = utils.Ucfirst(name)
