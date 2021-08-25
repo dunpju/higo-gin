@@ -9,19 +9,18 @@ import (
 	"path"
 	"regexp"
 	"runtime"
-	"strconv"
 	"strings"
 	"text/template"
 )
 
 type EnumMap struct {
 	Key   string
-	Value int
+	Value interface{}
 	Doc   string
 }
 
-func NewEnumMap(key string, value int, doc string) *EnumMap {
-	return &EnumMap{Key: key, Value: value, Doc: doc}
+func NewEnumMap(key string, value interface{}, doc string) *EnumMap {
+	return &EnumMap{Key: utils.Ucfirst(utils.CaseToCamel(key)), Value: value, Doc: doc}
 }
 
 type Enum struct {
@@ -30,14 +29,46 @@ type Enum struct {
 	OutStruct string
 	File      string
 	Doc       string
-	Enums     []*EnumMap
+	RealName  string
+	EnumMap   []*EnumMap
+	Enums     []*Enum
 }
 
 func NewEnum(pkg string, name string, file string) *Enum {
-	reg := regexp.MustCompile(`(-e=[a-zA-Z]+\s*-f=).*`)
+	reg := regexp.MustCompile(`(-e=[a-zA-Z_]+\s*-f=).*`)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
+	e := &Enum{}
+	if fs := reg.FindString(name); fs != "" {
+		e.Enums = append(e.Enums, newEnum(pkg, name, file))
+	} else {
+		outfile := utils.NewFile(name)
+		if !outfile.Exist() {
+			log.Fatalln(name + " configure file non-exist")
+		}
+		outfile.ForEach(func(line int, s string) {
+			s = strings.Replace(s, "\\", "", -1)
+			s = strings.Trim(s, "\n")
+			s = strings.Trim(s, "\r")
+			s = strings.Trim(s, "")
+			if "" != s {
+				e.Enums = append(e.Enums, newEnum(pkg, s, file))
+			}
+		})
+	}
+	return e
+}
+
+func newEnum(pkg string, name string, file string) *Enum {
+	reg := regexp.MustCompile(`(-e=[a-zA-Z_]+\s*-f=).*`)
+	if reg == nil {
+		log.Fatalln("regexp err")
+	}
+	name = strings.Replace(name, "\\", "", -1)
+	name = strings.Trim(name, "\n")
+	name = strings.Trim(name, "\r")
+	name = strings.Trim(name, "")
 	e := &Enum{}
 	if fs := reg.FindString(name); fs != "" {
 		name = strings.Trim(fs, " ")
@@ -46,26 +77,28 @@ func NewEnum(pkg string, name string, file string) *Enum {
 		if len(names) != 2 {
 			log.Fatalln("name err")
 		}
-		name = strings.Trim(names[0], " ")
+		name = strings.Trim(names[0], "")
 		docs := strings.Split(names[1], ":")
-		doc := strings.Trim(docs[0], " ")
+		doc := strings.Trim(docs[0], "")
 		e.Doc = doc
 		es := strings.Split(docs[1], ",")
 		for _, v := range es {
 			em := strings.Split(v, "-")
-			em1, err := strconv.Atoi(em[1])
-			if err != nil {
-				panic(err)
-			}
-			e.Enums = append(e.Enums, NewEnumMap(em[0], em1, em[2]))
+			e.EnumMap = append(e.EnumMap,
+				NewEnumMap(strings.Trim(em[0], ""),
+					strings.Trim(em[1], ""),
+					strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), " ")))
 		}
+		name = utils.Ucfirst(utils.CaseToCamel(name))
+		e.Name = enum + name
+		e.RealName = name
+		e.OutStruct = file + utils.PathSeparator() + enum + strings.Trim(name, enum)
+		e.File = e.OutStruct + ".go"
+		e.Package = pkg
+		return e
+	} else {
+		log.Fatalln(`name format error: ` + name)
 	}
-	name = utils.Ucfirst(name)
-	e.Name = name + enum
-	e.OutStruct = file + utils.PathSeparator() + enum + strings.Trim(name, enum)
-	e.File = e.OutStruct + ".go"
-	e.Package = pkg
-	log.Fatalln(e)
 	return e
 }
 
@@ -84,11 +117,13 @@ func (this *Enum) Template(tplfile string) string {
 }
 
 func (this *Enum) Generate() {
-	outfile := utils.File{Name: this.File}
-	if outfile.Exist() {
-		log.Fatalln(this.File + " already existed")
+	for _, e := range this.Enums {
+		e.generate()
 	}
-	outFile, err := os.OpenFile(this.File, os.O_RDWR|os.O_CREATE, 0755)
+}
+
+func (this *Enum) generate() {
+	outFile, err := os.OpenFile(this.File, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
 	}
