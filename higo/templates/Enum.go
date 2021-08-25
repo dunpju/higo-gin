@@ -7,25 +7,61 @@ import (
 	"log"
 	"os"
 	"path"
+	"regexp"
 	"runtime"
 	"strings"
 	"text/template"
 )
+
+type EnumMap struct {
+	Key   string
+	Value int
+	Doc   string
+}
+
+func NewEnumMap(key string, value int, doc string) *EnumMap {
+	return &EnumMap{Key: key, Value: value, Doc: doc}
+}
 
 type Enum struct {
 	Package   string
 	Name      string
 	OutStruct string
 	File      string
-	Enums     []*utils.KeyValue
+	Doc       string
+	Enums     []*EnumMap
 }
 
 func NewEnum(pkg string, name string, file string) *Enum {
+	reg := regexp.MustCompile(`(-e=[a-zA-Z]+\s*-f=).*`)
+	if reg == nil {
+		log.Fatalln("regexp err")
+	}
+	e := &Enum{}
+	if fs := reg.FindString(name); fs != "" {
+		name = strings.Trim(fs, " ")
+		name = strings.Trim(name, "-e=")
+		names := strings.Split(name, "-f=")
+		if len(names) != 2 {
+			log.Fatalln("name err")
+		}
+		name = strings.Trim(names[0], " ")
+		docs := strings.Split(names[1], ":")
+		doc := strings.Trim(docs[0], " ")
+		e.Doc = doc
+		es := strings.Split(docs[1], ",")
+		for _, v := range es {
+			strings.Split(v, )
+			e.Enums = append(e.Enums, NewEnumMap())
+		}
+	}
 	name = utils.Ucfirst(name)
-	name = name + enum
-	outStruct := file + utils.PathSeparator() + strings.Trim(name, enum) + enum
-	file = outStruct + ".go"
-	return &Enum{Package: pkg, Name: name, OutStruct: outStruct, File: file}
+	e.Name = name + enum
+	e.OutStruct = file + utils.PathSeparator() + enum + strings.Trim(name, enum)
+	e.File = e.OutStruct + ".go"
+	e.Package = pkg
+	log.Fatalln(e)
+	return e
 }
 
 func (this *Enum) Template(tplfile string) string {
