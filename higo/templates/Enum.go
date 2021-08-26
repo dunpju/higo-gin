@@ -27,6 +27,7 @@ type Enum struct {
 	Package   string
 	Name      string
 	OutStruct string
+	OutDir    string
 	File      string
 	Doc       string
 	RealName  string
@@ -71,7 +72,7 @@ func newEnum(pkg string, name string, file string) *Enum {
 	name = strings.Trim(name, "")
 	e := &Enum{}
 	if fs := reg.FindString(name); fs != "" {
-		name = strings.Trim(fs, " ")
+		name = strings.Trim(fs, "")
 		name = strings.Trim(name, "-e=")
 		names := strings.Split(name, "-f=")
 		if len(names) != 2 {
@@ -87,14 +88,16 @@ func newEnum(pkg string, name string, file string) *Enum {
 			e.EnumMap = append(e.EnumMap,
 				NewEnumMap(strings.Trim(em[0], ""),
 					strings.Trim(em[1], ""),
-					strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), " ")))
+					strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), "")))
 		}
 		name = utils.Ucfirst(utils.CaseToCamel(name))
 		e.Name = enum + name
 		e.RealName = name
-		e.OutStruct = file + utils.PathSeparator() + enum + strings.Trim(name, enum)
-		e.File = e.OutStruct + ".go"
-		e.Package = pkg
+		e.OutDir = file + utils.PathSeparator() + enum + e.RealName
+		e.OutStruct = e.OutDir + utils.PathSeparator() + enum + strings.Trim(name, enum)
+		e.File = e.OutDir + utils.PathSeparator() + "enum.go"
+		e.Package = enum + name
+		fmt.Println(e)
 		return e
 	} else {
 		log.Fatalln(`name format error: ` + name)
@@ -123,10 +126,11 @@ func (this *Enum) Generate() {
 }
 
 func (this *Enum) generate() {
-	outFile, err := os.OpenFile(this.File, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0755)
-	if err != nil {
-		panic(err)
-	}
+	utils.Dir(this.OutDir).Create()
+	utils.FileFlag = os.O_WRONLY | os.O_TRUNC | os.O_CREATE
+	utils.SetModePerm(0755)
+	utils.NewFile(this.File)
+	outFile := utils.NewFile(this.File)
 	defer outFile.Close()
 	tpl := this.Template("enum.tpl")
 	tmpl, err := template.New("enum.tpl").Parse(tpl)
@@ -134,7 +138,7 @@ func (this *Enum) generate() {
 		panic(err)
 	}
 	//生成enum
-	err = tmpl.Execute(outFile, this)
+	err = tmpl.Execute(outFile.File(), this)
 	if err != nil {
 		panic(err)
 	}

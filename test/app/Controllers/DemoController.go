@@ -1,6 +1,8 @@
 package Controllers
 
 import (
+	"fmt"
+	"github.com/dengpju/higo-gin/test/app/Enums/EnumState"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +16,7 @@ func HttpsTestThrow(ctx *gin.Context) string  {
 
 // 测试get请求
 func HttpsTestGet(ctx *gin.Context) string  {
+	fmt.Println(EnumState.Draft)
 	return "https_test_get"
 }
 

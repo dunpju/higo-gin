@@ -16,14 +16,14 @@ func (this {{.Name}}) Message() string {
 
 const (
 	{{- range $v := .EnumMap}}
-	{{$.RealName}}{{$v.Key}} = {{$v.Value}} //{{$v.Doc}}
+	{{$v.Key}} = {{$v.Value}} //{{$v.Doc}}
     {{- end}}
 )
 
 func (this {{.Name}}) String() string {
 	switch this {
 	{{- range $v := .EnumMap}}
-	case {{$.RealName}}{{$v.Key}}:
+	case {{$v.Key}}:
     	return "{{$v.Doc}}"
     {{- end}}
 	}
