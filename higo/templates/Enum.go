@@ -97,7 +97,6 @@ func newEnum(pkg string, name string, file string) *Enum {
 		e.OutStruct = e.OutDir + utils.PathSeparator() + enum + strings.Trim(name, enum)
 		e.File = e.OutDir + utils.PathSeparator() + "enum.go"
 		e.Package = enum + name
-		fmt.Println(e)
 		return e
 	} else {
 		log.Fatalln(`name format error: ` + name)
