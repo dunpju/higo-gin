@@ -1,30 +1,25 @@
 package Consts
 
-import "github.com/dengpju/higo-enum/enum"
+import (
+	"gitee.com/dengpju/higo-code/code"
+)
 
-type SuccessConst int
+type SuccessConst int64
 
 const (
 	Success SuccessConst = iota + 20000
 )
 
-func (this SuccessConst) String() string {
-	switch this {
-	case Success:
-		return "成功"
-	}
-	return "未定义"
-}
-
-func (this SuccessConst) Code() int64 {
-	return enum.New(this).Code
-}
-
 func (this SuccessConst) Message() string {
-	return enum.New(this).Doc
+	return code.Get(this)
 }
 
-type DemoConst int
+func (this SuccessConst) Register() code.Message {
+	return code.Container().
+		Put(Success, "成功")
+}
+
+type DemoConst int64
 
 const (
 	ServerError DemoConst = iota + 50000
@@ -40,38 +35,21 @@ const (
 	TestError
 )
 
-func (this DemoConst) String() string {
-	switch this {
-	case ServerError:
-		return "系统错误"
-	case AuthError:
-		return "认证错误"
-	case UnknownError:
-		return "未知错误"
-	case RsaError:
-		return "解密错误"
-	case ParameterError:
-		return "参数错误"
-	case NotFound:
-		return "未找到"
-	case CodeError:
-		return "失败"
-	case InvalidToken:
-		return "无效token"
-	case InvalidApi:
-		return "无效api"
-	case InvalidMap:
-		return "无效api映射"
-	case TestError:
-		return "测试异常"
-	}
-	return "未定义"
-}
-
-func (this DemoConst) Code() int64 {
-	return enum.New(this).Code
-}
-
 func (this DemoConst) Message() string {
-	return enum.New(this).Doc
+	return code.Get(this)
+}
+
+func (this DemoConst) Register() code.Message {
+	return code.Container().
+		Put(ServerError, "系统错误").
+		Put(AuthError, "认证错误").
+		Put(UnknownError, "未知错误").
+		Put(RsaError, "解密错误").
+		Put(ParameterError, "参数错误").
+		Put(NotFound, "未找到").
+		Put(CodeError, "失败").
+		Put(InvalidToken, "无效token").
+		Put(InvalidApi, "无效api").
+		Put(InvalidMap, "无效api映射").
+		Put(TestError, "测试异常")
 }

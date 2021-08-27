@@ -3,17 +3,17 @@ package higo
 import "gitee.com/dengpju/higo-code/code"
 
 type ValidateError struct {
-	error *code.Code
+	error code.ICode
 }
 
-func NewValidateError(error *code.Code) *ValidateError {
+func NewValidateError(error code.ICode) *ValidateError {
 	return &ValidateError{error: error}
 }
 
 func (this ValidateError) Error() string {
-	return this.error.String()
+	return this.error.Message()
 }
 
-func (this ValidateError) Get() *code.Code {
+func (this ValidateError) Get() code.ICode {
 	return this.error
 }

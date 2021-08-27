@@ -16,11 +16,7 @@ func (this {{.Name}}) Message() string {
 
 const (
 	{{- range $i,$v := .EnumMap}}
-	{{- if eq 0 $i}}
 	{{$v.Key}} {{$.Name}} = {{$v.Value}} //{{$v.Doc}}
-	{{- else}}
-	{{$v.Key}} = {{$v.Value}} //{{$v.Doc}}
-	{{- end}}
     {{- end}}
 )
 

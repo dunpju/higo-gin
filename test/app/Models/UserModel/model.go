@@ -2,9 +2,9 @@ package UserModel
 
 import (
 	"fmt"
-	"gitee.com/dengpju/higo-code/code"
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/test/app/Consts"
 	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
 	"log"
@@ -48,11 +48,11 @@ func (this *UserModelImpl) RegisterValidator() *UserModelImpl {
 	// example
 	higo.RegisterValid(this).
 		Tag("UserName",
-			higo.Rule("required", code.Message("20000@UserName必须填1")),
-			higo.Rule("min=5", code.Message("20000@UserName大于5"))).
+			higo.Rule("required", Consts.CodeError),
+			higo.Rule("min=5", Consts.CodeError)).
 		Tag("Utel",
-			higo.Rule("required", code.Message("20000@Utel必须填")),
-			higo.Rule("min=4", code.Message("20000@Utel大于4")))
+			higo.Rule("required", Consts.CodeError),
+			higo.Rule("min=4", Consts.CodeError))
 	return this
 }
 

@@ -20,7 +20,6 @@ func init() {
 	} else {
 		log.Fatal("error init validator")
 	}
-	code.IsSingle = false
 }
 
 type IValidate interface {
@@ -44,22 +43,22 @@ func RegisterValid(class IClass) Valid {
 }
 
 type ValidRule struct {
-	Rule    string
-	Message *code.Code
+	Rule string
+	Code code.ICode
 }
 
-func Rule(rule string, message *code.Code) *ValidRule {
-	return &ValidRule{Rule: rule, Message: message}
+func Rule(rule string, code code.ICode) *ValidRule {
+	return &ValidRule{Rule: rule, Code: code}
 }
 
 type ValidRules struct {
 	rule    string
-	message map[string]*code.Code
+	message map[string]code.ICode
 	Rules   []*ValidRule
 }
 
 func NewValidRules(rules ...*ValidRule) *ValidRules {
-	vr := &ValidRules{message: make(map[string]*code.Code), Rules: rules}
+	vr := &ValidRules{message: make(map[string]code.ICode), Rules: rules}
 	vr.setRule()
 	return vr
 }
@@ -69,9 +68,9 @@ func (this *ValidRules) setRule() *ValidRules {
 		this.rule += vrs.Rule + ","
 		key := strings.Split(vrs.Rule, "=")
 		if len(key) > 1 {
-			this.message[key[0]] = vrs.Message
+			this.message[key[0]] = vrs.Code
 		} else {
-			this.message[vrs.Rule] = vrs.Message
+			this.message[vrs.Rule] = vrs.Code
 		}
 	}
 	this.rule = strings.Trim(this.rule, ",")

@@ -1,7 +1,7 @@
 package higo
 
 import (
-	hienum "github.com/dengpju/higo-enum/enum"
+	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
@@ -26,10 +26,10 @@ func init() {
 			//封装通用json返回
 			if h, ok := r.(gin.H); ok {
 				cxt.JSON(http.StatusOK, h)
-			} else if cd, ok := r.(*hienum.CodeDoc); ok {
+			} else if cd, ok := r.(*code.CodeMessage); ok {
 				cxt.JSON(http.StatusOK, gin.H{
 					"code":    cd.Code,
-					"message": cd.Doc,
+					"message": cd.Message,
 					"data":    nil,
 				})
 			} else if arrayMap, ok := r.(*utils.ArrayMap); ok {
