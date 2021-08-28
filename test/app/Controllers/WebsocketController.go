@@ -3,7 +3,9 @@ package Controllers
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/test/app/Consts"
 	"github.com/dengpju/higo-gin/test/app/Entity"
+	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,7 +34,7 @@ func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
 	fmt.Println("控制器 Conn", this)
 	fmt.Println("控制器 Conn", ctx.Request.URL.Path)
 	//测试异常抛出
-	//exception.Throw(exception.Message("111"), exception.Code(1), exception.Data("hhh"))
+	exception.Throw(exception.Message("111"), exception.Code(Consts.CodeError), exception.Data("hhh"))
 	loginEntity := Entity.NewLoginEntity()
 	err := ctx.ShouldBind(loginEntity)
 	if err != nil {
