@@ -24,7 +24,7 @@ var (
 func init() {
 	wsRecoverOnce.Do(func() {
 		WsRecoverHandle = func(r interface{}) (respMsg string) {
-			if msg, ok := r.(*code.Code); ok {
+			if msg, ok := r.(*code.CodeMessage); ok {
 				respMsg = utils.Array().
 					Put("code", msg.Code).
 					Put("message", msg.Message).

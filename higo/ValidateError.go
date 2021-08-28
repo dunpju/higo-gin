@@ -14,6 +14,6 @@ func (this ValidateError) Error() string {
 	return this.error.Message()
 }
 
-func (this ValidateError) Get() code.ICode {
-	return this.error
+func (this ValidateError) Get() *code.CodeMessage {
+	return code.New(this.error)
 }
