@@ -4,6 +4,7 @@ const (
 	controller  = "Controller"
 	model       = "Model"
 	enum        = "Enum"
+	code        = "Code"
 	attributes  = "attributes"
 	NewFuncDecl = "func_decl"
 )
