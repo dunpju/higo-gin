@@ -31,6 +31,7 @@ type Enum struct {
 	File      string
 	Doc       string
 	RealName  string
+	LenMap    int
 	EnumMap   []*EnumMap
 	Enums     []*Enum
 }
@@ -70,7 +71,7 @@ func newEnum(pkg string, name string, file string) *Enum {
 	name = strings.Trim(name, "\n")
 	name = strings.Trim(name, "\r")
 	name = strings.Trim(name, "")
-	e := &Enum{}
+	E := &Enum{}
 	if fs := reg.FindString(name); fs != "" {
 		name = strings.Trim(fs, "")
 		name = strings.Trim(name, "-e=")
@@ -81,27 +82,28 @@ func newEnum(pkg string, name string, file string) *Enum {
 		name = strings.Trim(names[0], "")
 		docs := strings.Split(names[1], ":")
 		doc := strings.Trim(docs[0], "")
-		e.Doc = doc
+		E.Doc = doc
 		es := strings.Split(docs[1], ",")
 		for _, v := range es {
 			em := strings.Split(v, "-")
-			e.EnumMap = append(e.EnumMap,
+			E.EnumMap = append(E.EnumMap,
 				NewEnumMap(strings.Trim(em[0], ""),
 					strings.Trim(em[1], ""),
 					strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), "")))
 		}
+		E.LenMap = len(E.EnumMap) - 1
 		name = utils.Ucfirst(utils.CaseToCamel(name))
-		e.Name = enum + name
-		e.RealName = name
-		e.OutDir = file + utils.PathSeparator() + enum + e.RealName
-		e.OutStruct = e.OutDir + utils.PathSeparator() + enum + strings.Trim(name, enum)
-		e.File = e.OutDir + utils.PathSeparator() + "enum.go"
-		e.Package = enum + name
-		return e
+		E.Name = enum + name
+		E.RealName = name
+		E.OutDir = file + utils.PathSeparator() + enum + E.RealName
+		E.OutStruct = E.OutDir + utils.PathSeparator() + enum + strings.Trim(name, enum)
+		E.File = E.OutDir + utils.PathSeparator() + "enum.go"
+		E.Package = enum + name
+		return E
 	} else {
 		log.Fatalln(`name format error: ` + name)
 	}
-	return e
+	return E
 }
 
 func (this *Enum) Template(tplfile string) string {
@@ -128,7 +130,11 @@ func (this *Enum) generate() {
 	utils.Dir(this.OutDir).Create()
 	utils.FileFlag = os.O_WRONLY | os.O_TRUNC | os.O_CREATE
 	utils.SetModePerm(0755)
-	utils.NewFile(this.File)
+	outfile := utils.File{Name: this.File}
+	if outfile.Exist() {
+		log.Println(this.File + " already existed")
+		return
+	}
 	outFile := utils.NewFile(this.File)
 	defer outFile.Close()
 	tpl := this.Template("enum.tpl")

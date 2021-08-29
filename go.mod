@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/dengpju/higo-annotation v1.0.4
 	github.com/dengpju/higo-config v1.0.8
-	github.com/dengpju/higo-enum v1.0.3
+	github.com/dengpju/higo-enum v1.0.4
 	github.com/dengpju/higo-ioc v1.0.2
 	github.com/dengpju/higo-logger v1.0.7
 	github.com/dengpju/higo-redis v1.0.5

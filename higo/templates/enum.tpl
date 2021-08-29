@@ -5,14 +5,17 @@ import "github.com/dengpju/higo-enum/enum"
 //{{.Doc}}
 type {{.Name}} int
 
-func (this {{.Name}}) Code() int64 {
-	return enum.New(this).Code
+func (this {{.Name}}) Name() string {
+	return "{{.Name}}"
+}
+
+func (this {{.Name}}) Inspect(value interface{}) error {
+	return enum.Inspect(this, value)
 }
 
 func (this {{.Name}}) Message() string {
-	return enum.New(this).Doc
+	return enum.String(this)
 }
-
 
 const (
 	{{- range $i,$v := .EnumMap}}
@@ -20,12 +23,13 @@ const (
     {{- end}}
 )
 
-func (this {{.Name}}) String() string {
-	switch this {
-	{{- range $v := .EnumMap}}
-	case {{$v.Key}}:
-    	return "{{$v.Doc}}"
-    {{- end}}
-	}
-	return "未定义"
+func (this {{$.Name}}) Register() enum.Message {
+	return make(enum.Message).
+	{{- range $i,$v := .EnumMap}}
+	    {{- if ne $i $.LenMap}}
+	    Put({{$v.Key}}, "{{$v.Doc}}").
+	    {{- else}}
+	    Put({{$v.Key}}, "{{$v.Doc}}")
+        {{- end}}
+	{{- end}}
 }
