@@ -31,6 +31,7 @@ type Enum struct {
 	File      string
 	Doc       string
 	RealName  string
+	EnumType  string
 	LenMap    int
 	EnumMap   []*EnumMap
 	Enums     []*Enum
@@ -83,13 +84,22 @@ func newEnum(pkg string, name string, file string) *Enum {
 		docs := strings.Split(names[1], ":")
 		doc := strings.Trim(docs[0], "")
 		E.Doc = doc
+		characterReg := regexp.MustCompile(`([a-zA-Z_]).*`)
+		if characterReg == nil {
+			log.Fatalln("character regexp err")
+		}
 		es := strings.Split(docs[1], ",")
 		for _, v := range es {
 			em := strings.Split(v, "-")
-			E.EnumMap = append(E.EnumMap,
-				NewEnumMap(strings.Trim(em[0], ""),
-					strings.Trim(em[1], ""),
-					strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), "")))
+			k := strings.Trim(em[0], "")
+			v := strings.Trim(em[1], "")
+			d := strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), "")
+			E.EnumMap = append(E.EnumMap, NewEnumMap(k, v, d))
+			if valueMatch := characterReg.FindString(v); valueMatch != "" {
+				E.EnumType = "string"
+			} else {
+				E.EnumType = "int"
+			}
 		}
 		E.LenMap = len(E.EnumMap) - 1
 		name = utils.Ucfirst(utils.CaseToCamel(name))

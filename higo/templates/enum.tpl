@@ -2,8 +2,14 @@ package {{.Package}}
 
 import "github.com/dengpju/higo-enum/enum"
 
+var {{.RealName}} {{.Name}}
+
+func Inspect(value {{.EnumType}}) error {
+	return {{.RealName}}.Inspect(value)
+}
+
 //{{.Doc}}
-type {{.Name}} int
+type {{.Name}} {{.EnumType}}
 
 func (this {{.Name}}) Name() string {
 	return "{{.Name}}"
