@@ -28,8 +28,8 @@ func NewTool() *Tool {
 
 func (this *Tool) Cmd() {
 	if len(os.Args) >= 2 {
-		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller or Model or Enum
-	--option[controller | model | enum]
+		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller or Model or Enum or Code or Dao or Entity
+	--option[controller | model | enum | code | dao | entity]
 	eg:-gen=controller`)
 		flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
 	eg:-name=Test`)
@@ -94,8 +94,8 @@ eg: -out=test\app\Models`)
 			}
 		} else {
 			log.Fatalln(`gen Arguments Error! 
-Explain: Generate Controller or Model or Enum
-	--option[controller | model | enum] 
+Explain: Generate Controller or Model or Enum or Code or Dao or Entity
+	--option[controller | model | enum | code | dao | entity] 
 	eg:-gen=controller`)
 		}
 		os.Exit(1)

@@ -93,7 +93,7 @@ func newDao(pkg string, name string, file string) *Dao {
 		for _, v := range es {
 			em := strings.Split(v, "-")
 			k := strings.Trim(em[0], "")
-			v := strings.Trim(C.Iota, "")
+			v := strings.Trim(D.Iota, "")
 			d := strings.Trim(strings.Trim(strings.Trim(em[1], "\n"), "\r"), "")
 			D.DaoMap = append(D.DaoMap, NewDaoMap(k, v, d))
 		}
