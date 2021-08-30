@@ -103,7 +103,7 @@ func newCode(pkg string, name string, file string) *Code {
 		C.OutDir = file
 		C.OutStruct = C.OutDir + utils.PathSeparator() + code + strings.Trim(name, code)
 		C.File = C.OutDir + utils.PathSeparator() + C.RealName + ".go"
-		C.Package = code + name
+		C.Package = pkg
 		return C
 	} else {
 		log.Fatalln(`name format error: ` + name)
