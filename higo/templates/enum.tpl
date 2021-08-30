@@ -29,7 +29,7 @@ const (
     {{- end}}
 )
 
-func (this {{$.Name}}) Register() enum.Message {
+func (this {{.Name}}) Register() enum.Message {
 	return make(enum.Message).
 	{{- range $i,$v := .EnumMap}}
 	    {{- if ne $i $.LenMap}}

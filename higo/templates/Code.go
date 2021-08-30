@@ -31,20 +31,22 @@ type Code struct {
 	File      string
 	Doc       string
 	RealName  string
-	CodeType  string
+	Iota      string
 	LenMap    int
 	CodeMap   []*CodeMap
 	Codes     []*Code
 }
 
+var codeRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
+
 func NewCode(pkg string, name string, file string) *Code {
-	reg := regexp.MustCompile(`(-e=[a-zA-Z_]+\s*-f=).*`)
+	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
-	e := &Code{}
+	C := &Code{}
 	if fs := reg.FindString(name); fs != "" {
-		e.Codes = append(e.Codes, newCode(pkg, name, file))
+		C.Codes = append(C.Codes, newCode(pkg, name, file))
 	} else {
 		outfile := utils.NewFile(name)
 		if !outfile.Exist() {
@@ -56,15 +58,15 @@ func NewCode(pkg string, name string, file string) *Code {
 			s = strings.Trim(s, "\r")
 			s = strings.Trim(s, "")
 			if "" != s {
-				e.Codes = append(e.Codes, newCode(pkg, s, file))
+				C.Codes = append(C.Codes, newCode(pkg, s, file))
 			}
 		})
 	}
-	return e
+	return C
 }
 
 func newCode(pkg string, name string, file string) *Code {
-	reg := regexp.MustCompile(`(-e=[a-zA-Z_]+\s*-f=).*`)
+	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
@@ -72,54 +74,48 @@ func newCode(pkg string, name string, file string) *Code {
 	name = strings.Trim(name, "\n")
 	name = strings.Trim(name, "\r")
 	name = strings.Trim(name, "")
-	E := &Code{}
+	C := &Code{}
 	if fs := reg.FindString(name); fs != "" {
 		name = strings.Trim(fs, "")
-		name = strings.Trim(name, "-e=")
-		names := strings.Split(name, "-f=")
-		if len(names) != 2 {
+		name = strings.Trim(name, "-c=")
+		codeName := strings.Split(name, "-i=")
+		structName := codeName[0]
+		flags := strings.Split(codeName[1], "-f=")
+		if len(flags) != 2 {
 			log.Fatalln("name err")
 		}
-		name = strings.Trim(names[0], "")
-		docs := strings.Split(names[1], ":")
+		C.Iota = strings.Trim(flags[0], "")
+		docs := strings.Split(flags[1], ":")
 		doc := strings.Trim(docs[0], "")
-		E.Doc = doc
-		characterReg := regexp.MustCompile(`([a-zA-Z_]).*`)
-		if characterReg == nil {
-			log.Fatalln("character regexp err")
-		}
+		C.Doc = doc
 		es := strings.Split(docs[1], ",")
 		for _, v := range es {
 			em := strings.Split(v, "-")
 			k := strings.Trim(em[0], "")
-			v := strings.Trim(em[1], "")
-			d := strings.Trim(strings.Trim(strings.Trim(em[2], "\n"), "\r"), "")
-			E.CodeMap = append(E.CodeMap, NewCodeMap(k, v, d))
-			if valueMatch := characterReg.FindString(v); valueMatch != "" {
-				E.CodeType = "string"
-			} else {
-				E.CodeType = "int"
-			}
+			v := strings.Trim(C.Iota, "")
+			d := strings.Trim(strings.Trim(strings.Trim(em[1], "\n"), "\r"), "")
+			C.CodeMap = append(C.CodeMap, NewCodeMap(k, v, d))
 		}
-		E.LenMap = len(E.CodeMap) - 1
-		name = utils.Ucfirst(utils.CaseToCamel(name))
-		E.Name = code + name
-		E.RealName = name
-		E.OutDir = file + utils.PathSeparator() + code + E.RealName
-		E.OutStruct = E.OutDir + utils.PathSeparator() + code + strings.Trim(name, code)
-		E.File = E.OutDir + utils.PathSeparator() + "code.go"//TODO
-		E.Package = code + name
-		return E
+		C.LenMap = len(C.CodeMap) - 1
+		name = utils.Ucfirst(utils.CaseToCamel(structName))
+		C.Name = code + name
+		C.RealName = name
+		C.OutDir = file
+		C.OutStruct = C.OutDir + utils.PathSeparator() + code + strings.Trim(name, code)
+		C.File = C.OutDir + utils.PathSeparator() + C.RealName + ".go"
+		C.Package = code + name
+		return C
 	} else {
 		log.Fatalln(`name format error: ` + name)
 	}
-	return E
+	return C
 }
 
 func (this *Code) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
 	file = path.Dir(file) + utils.PathSeparator() + tplfile
 	f, err := os.Open(file)
+	defer f.Close()
 	if err != nil {
 		panic(err)
 	}

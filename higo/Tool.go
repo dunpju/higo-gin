@@ -12,6 +12,7 @@ const (
 	controller = "controller"
 	model      = "model"
 	enum       = "enum"
+	codes      = "code"
 )
 
 type Tool struct {
@@ -59,6 +60,19 @@ func (this *Tool) Cmd() {
 			}
 			this.Package = utils.Basename(this.Out)
 			templates.NewEnum(this.Package, this.Name, this.Out).Generate()
+		} else if codes == this.Gen {
+			if this.Name == "" {
+				log.Fatalln(`code configure file unable empty 
+	eg: -name=test\bin\code_cmd.md 
+	or format
+	eg: -name="-c=token -i=400001 -f=token码:token_empty-token为空"`)
+			}
+			if this.Out == "" {
+				log.Fatalln(`output directory unable empty 
+	eg: -out=test\app\Codes`)
+			}
+			this.Package = utils.Basename(this.Out)
+			templates.NewCode(this.Package, this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`table name unable empty 

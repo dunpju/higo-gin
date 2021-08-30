@@ -45,6 +45,7 @@ func (this *Controller) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
 	file = path.Dir(file) + utils.PathSeparator() + tplfile
 	f, err := os.Open(file)
+	defer f.Close()
 	if err != nil {
 		panic(err)
 	}
