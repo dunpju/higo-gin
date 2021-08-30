@@ -41,7 +41,7 @@ type Dao struct {
 var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
 
 func NewDao(pkg string, name string, file string) *Dao {
-	reg := regexp.MustCompile(codeRegexpStr)
+	reg := regexp.MustCompile(daoRegexpStr)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
@@ -67,7 +67,7 @@ func NewDao(pkg string, name string, file string) *Dao {
 }
 
 func newDao(pkg string, name string, file string) *Dao {
-	reg := regexp.MustCompile(codeRegexpStr)
+	reg := regexp.MustCompile(daoRegexpStr)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
