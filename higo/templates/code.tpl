@@ -20,7 +20,7 @@ const (
 )
 
 func (this {{$.Name}}) Register() code.Message {
-	return make(code.Message).
+	return code.Container().
 	{{- range $i,$v := .CodeMap}}
 	    {{- if ne $i $.LenMap}}
 	    Put({{$v.Key}}, "{{$v.Doc}}").
