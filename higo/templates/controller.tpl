@@ -22,14 +22,14 @@ func (this *{{.Name}}) Route(hg *higo.Higo) {
     /**
     //TODO::example
 	//route example
-	hg.Get("/relative1", this.Example1, hg.Flag("this.Example1"), hg.Desc("Example1"))
-	hg.Get("/relative2", this.Example2, hg.Flag("this.Example2"), hg.Desc("Example2"))
-	hg.Get("/relative3", this.Example3, hg.Flag("this.Example3"), hg.Desc("Example3"))
-	hg.Get("/relative4", this.Example4, hg.Flag("this.Example4"), hg.Desc("Example4"))
-	hg.Get("/relative5", this.Example5, hg.Flag("this.Example5"), hg.Desc("Example5"))
+	hg.Get("/relative1", this.Example1, hg.Flag("{{.Name}}.Example1"), hg.Desc("Example1"))
+	hg.Get("/relative2", this.Example2, hg.Flag("{{.Name}}.Example2"), hg.Desc("Example2"))
+	hg.Get("/relative3", this.Example3, hg.Flag("{{.Name}}.Example3"), hg.Desc("Example3"))
+	hg.Get("/relative4", this.Example4, hg.Flag("{{.Name}}.Example4"), hg.Desc("Example4"))
+	hg.Get("/relative5", this.Example5, hg.Flag("{{.Name}}.Example5"), hg.Desc("Example5"))
     //route group example
     hg.AddGroup("/group_prefix", func() {
-    	hg.Get("/relative6", this.Example6, hg.Flag("this.Example6"), hg.Desc("Example6"))
+    	hg.Get("/relative6", this.Example6, hg.Flag("{{.Name}}.Example6"), hg.Desc("Example6"))
     })
     */
 }
