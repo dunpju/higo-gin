@@ -51,8 +51,8 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 //func (this *ModelImpl) RegisterValidator() {
 //	higo.RegisterValid(this).
 //		Tag("custom_tag_name",
-//			higo.Rule("required", code.Message("20000@custom_message")),
-//			higo.Rule("min=5", code.Message("20000@custom_message")))
+//			higo.Rule("required", Codes.Success),
+//			higo.Rule("min=5", Codes.Success))
 //}
 func (this *ModelImpl) RegisterValidator() {
 

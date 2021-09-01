@@ -12,9 +12,9 @@ func (this {{.Name}}) Message() string {
 const (
 	{{- range $i,$v := .CodeMap}}
 	{{- if eq $i 0}}
-	{{$v.Key}} {{$.Name}} = iota + {{$.Iota}} //{{$v.Doc}}
+	{{$v.Key}} {{$.Name}} = iota + {{$.Iota}}  //{{$v.Doc}}
 	{{- else}}
-	{{$v.Key}}
+	{{$v.Key}}  //{{$v.Doc}}
 	{{- end}}
     {{- end}}
 )

@@ -49,7 +49,7 @@ func NewDao(pkg string, name string, file string) *Dao {
 	if fs := reg.FindString(name); fs != "" {
 		D.Daos = append(D.Daos, newDao(pkg, name, file))
 	} else {
-		outfile := utils.NewFile(name)
+		outfile := utils.ReadFile(name)
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
@@ -135,14 +135,11 @@ func (this *Dao) Generate() {
 
 func (this *Dao) generate() {
 	utils.Dir(this.OutDir).Create()
-	utils.FileFlag = os.O_WRONLY | os.O_TRUNC | os.O_CREATE
-	utils.SetModePerm(0755)
-	outfile := utils.File{Name: this.File}
-	if outfile.Exist() {
+	if utils.FileExist(this.File) {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.File)
+	outFile := utils.NewFile(this.File, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0755)
 	defer outFile.Close()
 	tpl := this.Template("dao.tpl")
 	tmpl, err := template.New("dao.tpl").Parse(tpl)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Consts"
+	"github.com/dengpju/higo-gin/test/app/Codes"
 	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
 	"log"
@@ -48,11 +48,11 @@ func (this *UserModelImpl) RegisterValidator() *UserModelImpl {
 	// example
 	higo.RegisterValid(this).
 		Tag("UserName",
-			higo.Rule("required", Consts.CodeError),
-			higo.Rule("min=5", Consts.CodeError)).
+			higo.Rule("required", Codes.Success),
+			higo.Rule("min=5", Codes.Success)).
 		Tag("Utel",
-			higo.Rule("required", Consts.CodeError),
-			higo.Rule("min=4", Consts.CodeError))
+			higo.Rule("required", Codes.Success),
+			higo.Rule("min=4", Codes.Success))
 	return this
 }
 
