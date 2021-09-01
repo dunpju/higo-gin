@@ -36,7 +36,7 @@ type FuncDecl struct {
 func NewController(pkg string, name string, file string) *Controller {
 	name = utils.Ucfirst(name)
 	name = name + controller
-	outStruct := file + utils.PathSeparator() + strings.Trim(name, controller) + controller
+	outStruct := file + utils.PathSeparator() + strings.Replace(name, controller, "", -1) + controller
 	file = outStruct + ".go"
 	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, File: file}
 }
@@ -57,8 +57,7 @@ func (this *Controller) Template(tplfile string) string {
 }
 
 func (this *Controller) Generate() {
-	outfile := utils.File{Name: this.File}
-	if outfile.Exist() {
+	if utils.FileExist(this.File) {
 		log.Fatalln(this.File + " already existed")
 	}
 	outFile, err := os.OpenFile(this.File, os.O_RDWR|os.O_CREATE, 0755)
