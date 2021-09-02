@@ -10,11 +10,14 @@ import (
 	"strings"
 )
 
-var valid *validator.Validate
-var ValidContainer map[string]Valid
+var (
+	valid          *validator.Validate
+	ValidContainer map[string]Valid
+)
 
 func init() {
 	ValidContainer = make(map[string]Valid)
+	//初始化校验引擎
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		valid = v
 	} else {
@@ -22,12 +25,14 @@ func init() {
 	}
 }
 
+//校验接口
 type IValidate interface {
 	RegisterValidator()
 }
 
 type Valid map[string]*ValidRules
 
+//自定义tag
 func (this Valid) Tag(tag string, rules ...*ValidRule) Valid {
 	if tag != "" && len(rules) > 0 {
 		this[tag] = NewValidRules(rules...)
@@ -35,6 +40,7 @@ func (this Valid) Tag(tag string, rules ...*ValidRule) Valid {
 	return this
 }
 
+//注册校验规则
 func RegisterValid(class IClass) Valid {
 	v := reflect.ValueOf(class)
 	valid := make(Valid, 0)
@@ -63,6 +69,7 @@ func NewValidRules(rules ...*ValidRule) *ValidRules {
 	return vr
 }
 
+//设置规则
 func (this *ValidRules) setRule() *ValidRules {
 	for _, vrs := range this.Rules {
 		this.rule += vrs.Rule + ","
@@ -83,8 +90,7 @@ func (this *ValidRules) Rule() string {
 
 func (this *ValidRules) ToFunc() validator.Func {
 	return func(fl validator.FieldLevel) bool {
-		v, ok := fl.Field().Interface().(string)
-		if ok {
+		if v, ok := fl.Field().Interface().(string); ok {
 			this.Throw(v)
 			return true
 		}
@@ -92,6 +98,7 @@ func (this *ValidRules) ToFunc() validator.Func {
 	}
 }
 
+//抛异常
 func (this *ValidRules) Throw(v interface{}) {
 	if err := valid.Var(v, this.rule); err != nil {
 		estring := strings.Split(err.Error(), "failed on the '")
@@ -103,6 +110,7 @@ func (this *ValidRules) Throw(v interface{}) {
 	}
 }
 
+//注册自定义校验规则
 func RegisterValidation(tag string, fn validator.Func) {
 	err := valid.RegisterValidation(tag, fn)
 	if err != nil {
