@@ -27,7 +27,7 @@ func init() {
 
 //校验接口
 type IValidate interface {
-	RegisterValidator()
+	RegisterValidator() Valid
 }
 
 type Valid map[string]*ValidRules
@@ -41,11 +41,23 @@ func (this Valid) Tag(tag string, rules ...*ValidRule) Valid {
 }
 
 //注册校验规则
-func RegisterValid(class IClass) Valid {
-	v := reflect.ValueOf(class)
+func RegisterValid(verifier IValidate) Valid {
+	v := reflect.ValueOf(verifier)
 	valid := make(Valid, 0)
 	ValidContainer[v.Type().String()] = valid
 	return valid
+}
+
+//校验者
+func Verifier() Valid {
+	return make(Valid, 0)
+}
+
+//手动调用注册校验
+func Validate(verifier IValidate) {
+	for tag, va := range verifier.RegisterValidator() {
+		RegisterValidation(tag, va.ToFunc())
+	}
 }
 
 type ValidRule struct {

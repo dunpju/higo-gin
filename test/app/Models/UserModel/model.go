@@ -42,11 +42,11 @@ func (this *UserModelImpl) Mutate(attrs ...higo.Property) higo.Model {
 	return this
 }
 
-func (this *UserModelImpl) RegisterValidator() {
+func (this *UserModelImpl) RegisterValidator() higo.Valid {
 	//The custom tag
 	//require import "gitee.com/dengpju/higo-code/code"
 	// example
-	higo.RegisterValid(this).
+	return higo.RegisterValid(this).
 		Tag("UserName",
 			higo.Rule("required", Codes.Success),
 			higo.Rule("min=5", Codes.Success)).

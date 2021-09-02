@@ -48,14 +48,16 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 //require import "gitee.com/dengpju/higo-code/code"
 //
 //example code:
-//func (this *ModelImpl) RegisterValidator() {
-//	higo.RegisterValid(this).
+//func (this *ModelImpl) RegisterValidator() higo.Valid {
+//	return higo.RegisterValid(this).
 //		Tag("custom_tag_name",
 //			higo.Rule("required", Codes.Success),
 //			higo.Rule("min=5", Codes.Success))
+//  Or
+//  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
-func (this *ModelImpl) RegisterValidator() {
-
+func (this *ModelImpl) RegisterValidator() higo.Valid {
+    return higo.RegisterValid(this)
 }
 
 func (this *ModelImpl) GetByID(ID {{.PriType}}, columns ...string) {
