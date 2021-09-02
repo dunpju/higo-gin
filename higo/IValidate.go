@@ -59,10 +59,12 @@ func Verifier() Valid {
 }
 
 //手动调用注册校验
-func Validate(verifier IValidate) {
-	for tag, va := range verifier.RegisterValidator() {
+func Validate(verifier IValidate) Valid {
+	valid := verifier.RegisterValidator()
+	for tag, va := range valid {
 		RegisterValidation(tag, va.ToFunc())
 	}
+	return valid
 }
 
 type ValidRule struct {
