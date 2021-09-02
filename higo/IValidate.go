@@ -40,6 +40,11 @@ func (this Valid) Tag(tag string, rules ...*ValidRule) Valid {
 	return this
 }
 
+//接收数据
+func (this Valid) Receiver(values ...interface{}) *ErrorResult {
+	return Receiver(values...)
+}
+
 //注册校验规则
 func RegisterValid(verifier IValidate) Valid {
 	v := reflect.ValueOf(verifier)
