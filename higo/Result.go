@@ -99,3 +99,8 @@ func Error(ctx *gin.Context, v interface{}) {
 	ctx.JSON(http.StatusBadRequest, v)
 	panic(nil)
 }
+
+//结果接收者
+func Receiver(values ...interface{}) *ErrorResult {
+	return Result(values...)
+}
