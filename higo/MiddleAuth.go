@@ -34,19 +34,21 @@ func NewAuth() *Auth {
 
 func (this *Auth) Middle(hg *Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
-		MiddleAuthFunc(cxt)
+		MiddleAuthFunc(hg)(cxt)
 		cxt.Next()
 	}
 }
 
-func middleAuthFunc(cxt *gin.Context) {
-	if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
-		if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
-			if "" == cxt.GetHeader("X-Token") {
-				exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken)))
+func middleAuthFunc(hg *Higo) gin.HandlerFunc {
+	return func(cxt *gin.Context) {
+		if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
+			if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
+				if "" == cxt.GetHeader("X-Token") {
+					exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken)))
+				}
 			}
+		} else {
+			exception.Throw(exception.Message(Consts.InvalidApi.Message()), exception.Code(int(Consts.InvalidApi)))
 		}
-	} else {
-		exception.Throw(exception.Message(Consts.InvalidApi.Message()), exception.Code(int(Consts.InvalidApi)))
 	}
 }

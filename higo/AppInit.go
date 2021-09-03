@@ -33,8 +33,8 @@ var (
 	pathSeparator    string
 	AppConfigDir     *utils.SliceString
 	root             *utils.SliceString
-	MiddleCorsFunc   func(cxt *gin.Context)
-	MiddleAuthFunc   func(cxt *gin.Context)
+	MiddleCorsFunc   func(hg *Higo) gin.HandlerFunc
+	MiddleAuthFunc   func(hg *Higo) gin.HandlerFunc
 	Upgrader         websocket.Upgrader
 	WsPingHandle     WebsocketPingFunc
 	WsContainer      *WebsocketClient
