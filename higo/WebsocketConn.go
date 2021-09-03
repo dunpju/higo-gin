@@ -160,3 +160,12 @@ func websocketConnFunc(ctx *gin.Context) string {
 	WsContainer.Store(route, client)
 	return client.RemoteAddr().String()
 }
+
+func wsPingFunc(websocketConn *WebsocketConn, waittime time.Duration) {
+	time.Sleep(waittime)
+	err := websocketConn.conn.WriteMessage(websocket.TextMessage, []byte("ping"))
+	if err != nil {
+		WsContainer.Remove(websocketConn.conn)
+		return
+	}
+}

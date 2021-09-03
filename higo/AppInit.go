@@ -2,9 +2,7 @@ package higo
 
 import (
 	"github.com/dengpju/higo-config/config"
-	"github.com/dengpju/higo-gin/test/app/Consts"
 	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -88,42 +86,4 @@ func init() {
 
 func Root() *utils.SliceString {
 	return root
-}
-
-func wsPingFunc(websocketConn *WebsocketConn, waittime time.Duration) {
-	time.Sleep(waittime)
-	err := websocketConn.conn.WriteMessage(websocket.TextMessage, []byte("ping"))
-	if err != nil {
-		WsContainer.Remove(websocketConn.conn)
-		return
-	}
-}
-
-func middleCorsFunc(cxt *gin.Context) {
-	method := cxt.Request.Method
-	origin := cxt.Request.Header.Get("Origin") //请求头部
-	if origin != "" {
-		cxt.Header("Access-Control-Allow-Origin", "*") // 可将将 * 替换为指定的域名
-		cxt.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		cxt.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
-		cxt.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
-		cxt.Header("Access-Control-Allow-Credentials", "true")
-	}
-
-	//允许类型校验
-	if method == "OPTIONS" {
-		cxt.AbortWithStatus(http.StatusNoContent)
-	}
-}
-
-func middleAuthFunc(cxt *gin.Context) {
-	if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
-		if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
-			if "" == cxt.GetHeader("X-Token") {
-				exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken)))
-			}
-		}
-	} else {
-		exception.Throw(exception.Message(Consts.InvalidApi.Message()), exception.Code(int(Consts.InvalidApi)))
-	}
 }
