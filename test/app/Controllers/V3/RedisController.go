@@ -37,8 +37,8 @@ func (this *RedisController) Route(hg *higo.Higo) {
 
 func (this *RedisController) Test(ctx *gin.Context) string {
 	ctx.Set("db_result", rand.Intn(1000))
-	this.Redis.Set("name", rand.Intn(1000))
-	v := this.Redis.Get("name")
+	higo.Redis.Set("name", rand.Intn(1000))
+	v := higo.Redis.Get("name")
 	return v
 }
 
