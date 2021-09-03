@@ -2,10 +2,10 @@ package {{.Package}}
 
 import "github.com/dengpju/higo-enum/enum"
 
-var {{.RealName}} {{.Name}}
+var e {{.Name}}
 
 func Inspect(value {{.EnumType}}) error {
-	return {{.RealName}}.Inspect(value)
+	return e.Inspect(value)
 }
 
 //{{.Doc}}

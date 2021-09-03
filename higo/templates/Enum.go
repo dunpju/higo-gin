@@ -103,10 +103,10 @@ func newEnum(pkg string, name string, file string) *Enum {
 		}
 		E.LenMap = len(E.EnumMap) - 1
 		name = utils.Ucfirst(utils.CaseToCamel(name))
-		E.Name = enum + name
+		E.Name = name
 		E.RealName = name
 		E.OutDir = file + utils.PathSeparator() + enum + E.RealName
-		E.OutStruct = E.OutDir + utils.PathSeparator() + enum + strings.Trim(name, enum)
+		E.OutStruct = E.OutDir + utils.PathSeparator() + enum + strings.Replace(name, enum, "", -1)
 		E.File = E.OutDir + utils.PathSeparator() + "enum.go"
 		E.Package = enum + name
 		return E
@@ -143,7 +143,7 @@ func (this *Enum) generate() {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.File, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0755)
+	outFile := utils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	defer outFile.Close()
 	tpl := this.Template("enum.tpl")
 	tmpl, err := template.New("enum.tpl").Parse(tpl)
