@@ -198,6 +198,19 @@ func (this *Higo) Middleware(middlewares ...IMiddleware) *Higo {
 	return this
 }
 
+//设置鉴权中间件
+func (this *Higo) AuthHandlerFunc(middle IMiddleware) *Higo {
+	MiddleAuthFunc = middle.Middle
+	return this
+}
+
+//设置跨域中间件
+func (this *Higo) CorsHandlerFunc(middle IMiddleware) *Higo {
+	MiddleCorsFunc = middle.Middle
+	return this
+}
+
+//设置服务名称
 func (this *Higo) SetName(serve string) *Higo {
 	this.serve = serve
 	return this
