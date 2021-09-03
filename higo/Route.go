@@ -3,6 +3,7 @@ package higo
 import (
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -10,6 +11,7 @@ import (
 	"strings"
 )
 
+//路由容器
 var RouterContainer RouterCollect
 
 type RouterCollect map[string]*router.Route
@@ -34,6 +36,7 @@ func (this RouterCollect) Get(relativePath string) *router.Route {
 	return route
 }
 
+//添加路由
 func (this *Higo) AddRoute(httpMethod string, relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
 	funcForPC := strings.Split(runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name(), "/")
 	endFuncForPC := funcForPC[len(funcForPC)-1:]
@@ -62,11 +65,13 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 	return this
 }
 
+//添加路由组
 func (this *Higo) AddGroup(prefix string, callable interface{}, attributes ...*router.RouteAttribute) *Higo {
 	router.AddGroup(prefix, callable, attributes...)
 	return this
 }
 
+//websocket路由
 func (this *Higo) Ws(relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
 	this.AddRoute(router.WEBSOCKET, relativePath, handler, attributes...)
 	return this
@@ -114,15 +119,18 @@ func (this *Higo) IsStatic(value bool) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.ROUTE_IS_STATIC, value)
 }
 
+//描述
 func (this *Higo) Desc(value string) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.ROUTE_DESC, value)
 }
 
-func (this *Higo) Middle(value interface{}) *router.RouteAttribute {
+//单路由中间件
+func (this *Higo) Middle(value gin.HandlerFunc) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.ROUTE_MIDDLEWARE, value)
 }
 
-func (this *Higo) GroupMiddle(value interface{}) *router.RouteAttribute {
+//组中间件
+func (this *Higo) GroupMiddle(value gin.HandlerFunc) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.ROUTE_GROUP_MIDDLE, value)
 }
 

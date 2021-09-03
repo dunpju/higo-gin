@@ -449,6 +449,7 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 	return this
 }
 
+//中间件顺序倒序包裹，越往后添加的中间件越贴近需要执行的逻辑
 func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc {
 	handles := handleSlice(route)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
@@ -459,6 +460,7 @@ func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc
 	return handles
 }
 
+//handle切片
 func handleSlice(route *router.Route) []gin.HandlerFunc {
 	handles := make([]gin.HandlerFunc, 0)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
