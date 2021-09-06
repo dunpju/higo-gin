@@ -64,9 +64,9 @@ type Orm struct {
 	cvs            []*columnValue
 	table          string
 	currentOpState operationState
-	insertBuilder  squirrel.InsertBuilder
-	updateBuilder  squirrel.UpdateBuilder
-	deleteBuilder  squirrel.DeleteBuilder
+	insertBuilder  *squirrel.InsertBuilder
+	updateBuilder  *squirrel.UpdateBuilder
+	deleteBuilder  *squirrel.DeleteBuilder
 }
 
 func GetDbConfig() *Dbconfig {
@@ -151,16 +151,16 @@ func sqlReplace(scope *gorm.Scope) {
 
 func newOrm() *Orm {
 	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0),
-		insertBuilder: squirrel.InsertBuilder{},
-		updateBuilder: squirrel.UpdateBuilder{},
-		deleteBuilder: squirrel.DeleteBuilder{}}
+		insertBuilder: &squirrel.InsertBuilder{},
+		updateBuilder: &squirrel.UpdateBuilder{},
+		deleteBuilder: &squirrel.DeleteBuilder{}}
 }
 
 func mapperOrm() *Orm {
 	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0),
-		insertBuilder: squirrel.InsertBuilder{},
-		updateBuilder: squirrel.UpdateBuilder{},
-		deleteBuilder: squirrel.DeleteBuilder{}}
+		insertBuilder: &squirrel.InsertBuilder{},
+		updateBuilder: &squirrel.UpdateBuilder{},
+		deleteBuilder: &squirrel.DeleteBuilder{}}
 }
 
 func NewOrm() *Orm {
@@ -406,11 +406,11 @@ func (this *Orm) ToSql() (string, []interface{}, error) {
 
 func (this *Orm) Build(builder interface{}) *Orm {
 	if b, ok := builder.(squirrel.InsertBuilder); ok {
-		this.insertBuilder = b
+		this.insertBuilder = &b
 	} else if b, ok := builder.(squirrel.UpdateBuilder); ok {
-		this.updateBuilder = b
+		this.updateBuilder = &b
 	} else if b, ok := builder.(squirrel.DeleteBuilder); ok {
-		this.deleteBuilder = b
+		this.deleteBuilder = &b
 	}
 	return this
 }
