@@ -55,6 +55,10 @@ func (this *UserModelImpl) RegisterValidator() higo.Valid {
 			higo.Rule("min=4", Codes.Success))
 }
 
+func (this *UserModelImpl) Exist() bool {
+	return this.Id > 0
+}
+
 func (this *UserModelImpl) UserById(id int, columns ...string) {
 	fmt.Println(55, this.TableName())
 	this.Mapper(squirrel.

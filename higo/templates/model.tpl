@@ -13,9 +13,9 @@ import (
 )
 
 type {{.ModelImpl}} struct {
-	*higo.Orm `inject:"Bean.NewOrm()"`
+	*higo.Orm    `inject:"Bean.NewOrm()"`
 	{{- range .TplFields}}
-	{{.Field}}        {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}" comment:"{{.Comment}}"`
+	{{.Field}}    {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}" comment:"{{.Comment}}"`
     {{- end}}
 }
 
@@ -60,12 +60,16 @@ func (this *ModelImpl) RegisterValidator() higo.Valid {
     return higo.RegisterValid(this)
 }
 
-func (this *ModelImpl) GetByID(ID {{.PriType}}, columns ...string) {
-	this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` = ?", ID).ToSql()).Query().Scan(&this)
+func (this *ModelImpl) Exist() bool {
+	return this.{{.HumpPRI}} > 0
 }
 
-func (this *ModelImpl) GetByIDS(IDS []string, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` IN(?)", strings.Join(IDS, ",")).ToSql()).Query()
+func (this *ModelImpl) GetBy{{.HumpPRI}}({{.HumpPRI}} {{.PriType}}, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` = ?", {{.HumpPRI}}).ToSql()).Query()
+}
+
+func (this *ModelImpl) GetBy{{.HumpPRI}}s({{.HumpPRI}}s []string, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` IN(?)", strings.Join({{.HumpPRI}}s, ",")).ToSql()).Query()
 }
 
 func (this *ModelImpl) Paginate(perPage, page uint64) *higo.Pager {

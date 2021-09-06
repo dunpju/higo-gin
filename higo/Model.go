@@ -7,6 +7,7 @@ import (
 type Model interface {
 	New() IClass
 	Mutate(attrs ...Property) Model
+	Exist() bool
 }
 
 type Models string

@@ -25,6 +25,7 @@ type Model struct {
 	Package   string
 	Dir       string
 	ModelImpl string
+	HumpPRI   string
 	PRI       string
 	PriType   string
 	Fields    []Field
@@ -67,7 +68,8 @@ func (this *Model) Generate() {
 		if f.Key == "PRI" {
 			this.PRI = tField.DbField
 			this.PriType = tField.Type
-			tField.Field = "ID"
+			this.HumpPRI = generator.CamelCase(this.PRI)
+			tField.Field = this.HumpPRI
 		}
 		if tField.Type == "time.Time" {
 			if _, ok := this.Imports[tField.Type]; !ok {
