@@ -82,6 +82,11 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 		Values(uname, tel, score).
 		ToSql())
 	fmt.Println("update")
+	fmt.Println(this.Build(this.Update(this.TableName()).
+		Set("uname", "张三").
+		Set("score", 5).
+		Where("id = ?", 3)).
+		ToSql())
 	fmt.Println(this.Update(this.TableName()).
 		Set("uname", "张三").
 		Set("score", 5).
@@ -119,7 +124,7 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 	//log.Fatalln("wanc")
 	u1 := this.New()
 	u := this.AddUser(uname, tel, score)
-	return
+
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
 	user := this.New()

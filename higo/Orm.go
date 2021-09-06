@@ -64,6 +64,8 @@ type Orm struct {
 	cvs            []*columnValue
 	table          string
 	currentOpState operationState
+	updateBuilder  squirrel.UpdateBuilder
+	deleteBuilder  squirrel.DeleteBuilder
 }
 
 func GetDbConfig() *Dbconfig {
@@ -147,11 +149,11 @@ func sqlReplace(scope *gorm.Scope) {
 }
 
 func newOrm() *Orm {
-	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0)}
+	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0), updateBuilder: squirrel.UpdateBuilder{}, deleteBuilder: squirrel.DeleteBuilder{}}
 }
 
 func mapperOrm() *Orm {
-	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0)}
+	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0), updateBuilder: squirrel.UpdateBuilder{}, deleteBuilder: squirrel.DeleteBuilder{}}
 }
 
 func NewOrm() *Orm {
@@ -383,6 +385,19 @@ func (this *Orm) ToSql() (string, []interface{}, error) {
 			values = append(values, cv.value)
 		}
 		return sqlOp.Columns(columns...).Values(values...).ToSql()
+	} else if opUpdate == this.currentOpState {
+		return this.updateBuilder.ToSql()
+	} else if opDelete == this.currentOpState {
+		return this.deleteBuilder.ToSql()
 	}
 	return "", nil, fmt.Errorf("An unsupported operation")
+}
+
+func (this *Orm) Build(builder interface{}) *Orm {
+	if b, ok := builder.(squirrel.UpdateBuilder); ok {
+		this.updateBuilder = b
+	} else if b, ok := builder.(squirrel.DeleteBuilder); ok {
+		this.deleteBuilder = b
+	}
+	return this
 }
