@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/sql"
 	"github.com/dengpju/higo-gin/test/app/Codes"
 	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
@@ -71,7 +72,29 @@ func (this *UserModelImpl) UserById(id int, columns ...string) {
 }
 
 func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Orm {
-	return this.Mapper(squirrel.Insert(this.TableName()).
+	fmt.Println("tttt")
+	fmt.Println(this.Insert(this.TableName()).
+		Set("uname", uname).
+		Set("u_tel", tel).
+		Set("score", score).ToSql())
+	fmt.Println(sql.Insert(this.TableName()).
+		Columns("uname", "u_tel", "score").
+		Values(uname, tel, score).
+		ToSql())
+	fmt.Println("update")
+	fmt.Println(this.Update(this.TableName()).
+		Set("uname", "张三").
+		Set("score", 5).
+		Where("id = ?", 2).
+		ToSql())
+	fmt.Println(sql.Update(this.TableName()).
+		Set("uname", "张三").
+		Set("score", 5).
+		Where("id = ?", 1).
+		ToSql())
+
+	log.Fatalln("ggggg")
+	return this.Mapper(sql.Insert(this.TableName()).
 		Columns("uname", "u_tel", "score").
 		Values(uname, tel, score).
 		ToSql())
@@ -93,9 +116,10 @@ func (this *UserModelImpl) Paginate(perPage, page uint64) *higo.Pager {
 func (this *UserModelImpl) Add(uname string, tel string, score int) {
 	//higo.Result(this.AddUser(uname, tel, score).Exec().Error).Unwrap()
 	this.Paginate(2, 1)
-	log.Fatalln("wanc")
+	//log.Fatalln("wanc")
 	u1 := this.New()
 	u := this.AddUser(uname, tel, score)
+	return
 	coinModel := CoinModel.New()
 	coin := CoinModel.New().AddCoin(uname, score)
 	user := this.New()

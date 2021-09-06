@@ -41,7 +41,7 @@ func (this *Http) http(hg *higo.Higo) {
 			hg.Post("/login", V3.NewDemoController().Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		})
 		hg.Get("/test_throw", V3.NewDemoController().HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常"))
-		hg.Get("/test_get", V3.NewDemoController().HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
+		hg.Get("/test_get", V3.NewDemoController().HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET111"))
 		hg.Post("/test_post", V3.NewDemoController().HttpsTestPost, hg.Flag("TestPost"), hg.Desc("V3 测试POST"))
 		hg.Get("/test_get_redis", V3.NewRedisController().Test, hg.Flag("test_get_redis"), hg.Desc("V3 测试redis"))
 

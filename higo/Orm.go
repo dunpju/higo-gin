@@ -2,7 +2,9 @@ package higo
 
 import (
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-config/config"
+	"github.com/dengpju/higo-gin/higo/sql"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/go-sql-driver/mysql"
@@ -37,12 +39,31 @@ type Dbconfig struct {
 	Prefix   string
 }
 
+type columnValue struct {
+	column string
+	value  interface{}
+}
+
+func ColumnValue(column string, value interface{}) *columnValue {
+	return &columnValue{column: column, value: value}
+}
+
+type operationState int
+
+const (
+	opInsert operationState = iota + 1
+	opUpdate
+	opDelete
+)
+
 type Orm struct {
 	*gorm.DB
-	sql   string
-	args  []interface{}
-	orms  []*Orm
-	table string
+	sql            string
+	args           []interface{}
+	orms           []*Orm
+	cvs            []*columnValue
+	table          string
+	currentOpState operationState
 }
 
 func GetDbConfig() *Dbconfig {
@@ -126,11 +147,11 @@ func sqlReplace(scope *gorm.Scope) {
 }
 
 func newOrm() *Orm {
-	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0)}
+	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0)}
 }
 
 func mapperOrm() *Orm {
-	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0)}
+	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0)}
 }
 
 func NewOrm() *Orm {
@@ -238,6 +259,7 @@ func (this *Orm) Paginate(pager *Pager, items interface{}) {
 
 func (this *Orm) Table(name string) *Orm {
 	this.DB = this.DB.Table(name)
+	this.table = name
 	return this
 }
 
@@ -324,4 +346,43 @@ func (this *Orm) Pluck(column string, value interface{}) *Orm {
 func (this *Orm) Count(value interface{}) *Orm {
 	this.DB = this.DB.Count(value)
 	return this
+}
+
+func (this *Orm) Insert(name string) *Orm {
+	this.currentOpState = opInsert
+	this.table = name
+	return this
+}
+
+func (this *Orm) Update(name string) squirrel.UpdateBuilder {
+	this.currentOpState = opUpdate
+	this.table = name
+	return sql.Update(name)
+}
+
+func (this *Orm) Delete(name string) squirrel.DeleteBuilder {
+	this.currentOpState = opDelete
+	this.table = name
+	return sql.Delete(name)
+}
+
+func (this *Orm) Set(column string, value interface{}) *Orm {
+	this.cvs = append(this.cvs, ColumnValue(column, value))
+	return this
+}
+
+func (this *Orm) ToSql() (string, []interface{}, error) {
+	var (
+		columns []string
+		values  []interface{}
+	)
+	if opInsert == this.currentOpState {
+		sqlOp := sql.Insert(this.table)
+		for _, cv := range this.cvs {
+			columns = append(columns, cv.column)
+			values = append(values, cv.value)
+		}
+		return sqlOp.Columns(columns...).Values(values...).ToSql()
+	}
+	return "", nil, fmt.Errorf("An unsupported operation")
 }
