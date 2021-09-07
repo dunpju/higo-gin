@@ -40,10 +40,11 @@ type Dbconfig struct {
 
 type Orm struct {
 	*gorm.DB
-	sql   string
-	args  []interface{}
-	orms  []*Orm
-	table string
+	sql       string
+	args      []interface{}
+	orms      []*Orm
+	table     string
+	statement *sql.Statement
 }
 
 func GetDbConfig() *Dbconfig {
@@ -331,20 +332,28 @@ func (this *Orm) Count(value interface{}) *Orm {
 }
 
 func (this *Orm) Builder() *sql.Statement {
-	return sql.Query()
+	this.statement = sql.Query()
+	return this.statement
 }
 
 func (this *Orm) Insert(name string) *sql.Statement {
 	this.table = name
-	return sql.Update(name)
+	this.statement = sql.Insert(name)
+	return this.statement
 }
 
 func (this *Orm) Update(name string) *sql.Statement {
 	this.table = name
-	return sql.Update(name)
+	this.statement = sql.Update(name)
+	return this.statement
 }
 
 func (this *Orm) Delete(name string) *sql.Statement {
 	this.table = name
-	return sql.Delete(name)
+	this.statement = sql.Delete(name)
+	return this.statement
+}
+
+func (this *Orm) ToSql() (string, []interface{}, error) {
+	return this.statement.ToSql()
 }

@@ -68,6 +68,9 @@ func (this *Statement) ToSql() (string, []interface{}, error) {
 		values  []interface{}
 	)
 	if opSelect == this.currentOpState {
+		fmt.Println("tosql")
+		fmt.Println(this.Builder.(squirrel.SelectBuilder).ToSql())
+		fmt.Println("tosql_end")
 		return this.Builder.(squirrel.SelectBuilder).ToSql()
 	} else if opInsert == this.currentOpState {
 		for _, clause := range this.setClauses {
