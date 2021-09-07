@@ -17,14 +17,15 @@ import (
 )
 
 var (
-	orm          *Orm
-	onceGorm     sync.Once
-	dbConfigOnce sync.Once
-	confDefault  *config.Configure
-	dbConfig     *Dbconfig
-	logMode      bool
-	maxIdle      int
-	maxOpen      int
+	orm                     *Orm
+	onceGorm                sync.Once
+	dbConfigOnce            sync.Once
+	confDefault             *config.Configure
+	dbConfig                *Dbconfig
+	logMode                 bool
+	maxIdle                 int
+	maxOpen                 int
+	registerCallbackCounter int
 )
 
 type Dbconfig struct {
@@ -60,7 +61,7 @@ func (this *Orm) Sql() string {
 	return this.sql
 }
 
-func newGorm(mapper bool) *gorm.DB {
+func newGorm() *gorm.DB {
 	dbConfigOnce.Do(func() {
 		confDefault = config.Db("DB.DEFAULT").(*config.Configure)
 		dbConfig = &Dbconfig{Username: confDefault.Get("USERNAME").(string),
@@ -92,7 +93,7 @@ func newGorm(mapper bool) *gorm.DB {
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(maxIdle)
 	db.DB().SetMaxOpenConns(maxOpen)
-	if mapper == false {
+	if registerCallbackCounter == 1 {
 		if db.Callback().Query().Get("gorm:Query") == nil {
 			db.Callback().Query().Before("gorm:Query").Register("Query", sqlReplace)
 		}
@@ -108,6 +109,8 @@ func newGorm(mapper bool) *gorm.DB {
 		if db.Callback().Delete().Get("gorm:Delete") == nil {
 			db.Callback().Delete().Before("gorm:Delete").Register("Delete", sqlReplace)
 		}
+		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", dbConfig.Host,
+			dbConfig.Port))
 	}
 	return db
 }
@@ -128,36 +131,29 @@ func sqlReplace(scope *gorm.Scope) {
 	}
 }
 
-func newOrm() *Orm {
-	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0),
-		builder: newBuilder(),
-	}
-}
-
-func mapperOrm() *Orm {
-	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0),
-		builder: newBuilder(),
-	}
-}
-
-func NewOrm() *Orm {
+func SingleOrm() *Orm {
 	onceGorm.Do(func() {
 		orm = newOrm()
-		logger.Logrus.Infoln(fmt.Sprintf("DB %s:%s Connection success!", dbConfig.Host,
-			dbConfig.Port))
 	})
 	return orm
 }
 
-func MultiOrm() *Orm {
-	return mapperOrm()
+func NewOrm() *Orm {
+	return newOrm()
+}
+
+func newOrm() *Orm {
+	registerCallbackCounter++
+	return &Orm{DB: newGorm(), orms: make([]*Orm, 0),
+		builder: newBuilder(),
+	}
 }
 
 func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
 	if err != nil {
 		panic(err.Error())
 	}
-	clone := mapperOrm()
+	clone := newOrm()
 	clone.DB = orm.DB
 	clone.sql = sql
 	clone.args = args

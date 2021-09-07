@@ -5,7 +5,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/sql"
-	"github.com/dengpju/higo-gin/test/app/Codes"
+	"github.com/dengpju/higo-gin/test/app/Consts"
 	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"github.com/dengpju/higo-ioc/injector"
 	"log"
@@ -49,11 +49,11 @@ func (this *UserModelImpl) RegisterValidator() higo.Valid {
 	// example
 	return higo.RegisterValid(this).
 		Tag("UserName",
-			higo.Rule("required", Codes.Success),
-			higo.Rule("min=5", Codes.Success)).
+			higo.Rule("required", Consts.Success),
+			higo.Rule("min=5", Consts.Success)).
 		Tag("Utel",
-			higo.Rule("required", Codes.Success),
-			higo.Rule("min=4", Codes.Success))
+			higo.Rule("required", Consts.Success),
+			higo.Rule("min=4", Consts.Success))
 }
 
 func (this *UserModelImpl) Exist() bool {

@@ -18,7 +18,7 @@ func Mapper(sql string, args []interface{}, err error) *SqlMapper {
 		panic(err.Error())
 	}
 	sqlMapper := &SqlMapper{}
-	sqlMapper.Orm = MultiOrm()
+	sqlMapper.Orm = newOrm()
 	sqlMapper.Orm.sql = sql
 	sqlMapper.Orm.args = args
 	return sqlMapper
@@ -41,5 +41,5 @@ func (this *SqlMapper) Transaction(fn func() error) {
 }
 
 func Begin(orms ...*Orm) *SqlMapper {
-	return NewSqlMapper(MultiOrm(), orms)
+	return NewSqlMapper(newOrm(), orms)
 }

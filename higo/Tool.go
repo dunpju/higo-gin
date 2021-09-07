@@ -82,7 +82,7 @@ eg: -name=ts_user`)
 				log.Fatalln(`output directory unable empty 
 eg: -out=test\app\Models`)
 			}
-			db := mapperOrm().DB
+			db := newOrm().DB
 			if this.Name == "all" {
 				newModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 				tables := newModel.GetTables()
