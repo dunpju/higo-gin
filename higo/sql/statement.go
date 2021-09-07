@@ -20,7 +20,7 @@ type setClause struct {
 }
 
 type setWhere struct {
-	pred  string
+	column  string
 	value interface{}
 }
 
@@ -41,8 +41,8 @@ func (this *Statement) Set(column string, value interface{}) *Statement {
 	return this
 }
 
-func (this *Statement) Where(pred string, value interface{}) *Statement {
-	this.setWheres = append(this.setWheres, setWhere{pred: pred, value: value})
+func (this *Statement) Where(column string, value interface{}) *Statement {
+	this.setWheres = append(this.setWheres, setWhere{column: column, value: value})
 	return this
 }
 
@@ -68,9 +68,6 @@ func (this *Statement) ToSql() (string, []interface{}, error) {
 		values  []interface{}
 	)
 	if opSelect == this.currentOpState {
-		fmt.Println("tosql")
-		fmt.Println(this.Builder.(squirrel.SelectBuilder).ToSql())
-		fmt.Println("tosql_end")
 		return this.Builder.(squirrel.SelectBuilder).ToSql()
 	} else if opInsert == this.currentOpState {
 		for _, clause := range this.setClauses {
@@ -85,13 +82,13 @@ func (this *Statement) ToSql() (string, []interface{}, error) {
 		}
 		whereMap := make(map[string]interface{}, 0)
 		for _, where := range this.setWheres {
-			whereMap[where.pred] = where.value
+			whereMap[where.column] = where.value
 		}
 		return this.Builder.(squirrel.UpdateBuilder).SetMap(setMap).Where(whereMap).ToSql()
 	} else if opDelete == this.currentOpState {
 		whereMap := make(map[string]interface{}, 0)
 		for _, where := range this.setWheres {
-			whereMap[where.pred] = where.value
+			whereMap[where.column] = where.value
 		}
 		return this.Builder.(squirrel.DeleteBuilder).Where(whereMap).ToSql()
 	}
