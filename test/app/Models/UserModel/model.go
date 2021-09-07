@@ -73,20 +73,25 @@ func (this *UserModelImpl) UserById(id int, columns ...string) {
 
 func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Orm {
 	fmt.Println("tttt")
+	fmt.Println(this.Builder().Select("uname", "u_tel").From("user_table").Where("id = ?", 9).ToSql())
 	fmt.Println(this.Insert(this.TableName()).
 		Set("uname", uname).
 		Set("u_tel", tel).
 		Set("score", score).ToSql())
-	fmt.Println(sql.Insert(this.TableName()).
+	fmt.Println(sql.Insert(this.TableName()).InsertBuilder().
 		Columns("uname", "u_tel", "score").
 		Values(uname, tel, score).
 		ToSql())
 	fmt.Println("update")
-	fmt.Println(this.Build(this.Update(this.TableName()).
+	b := this.Update(this.TableName())
+	b.Set("uname", "张三")
+	b.Set("score", 5)
+	b.Where("id = ?", 4)
+	fmt.Println(b.ToSql())
+	fmt.Println(this.Update(this.TableName()).
 		Set("uname", "张三").
 		Set("score", 5).
-		Where("id = ?", 3)).
-		ToSql())
+		Where("id = ?", 3).ToSql())
 	fmt.Println(this.Update(this.TableName()).
 		Set("uname", "张三").
 		Set("score", 5).
@@ -99,7 +104,7 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 		ToSql())
 
 	log.Fatalln("ggggg")
-	return this.Mapper(sql.Insert(this.TableName()).
+	return this.Mapper(sql.Insert(this.TableName()).InsertBuilder().
 		Columns("uname", "u_tel", "score").
 		Values(uname, tel, score).
 		ToSql())

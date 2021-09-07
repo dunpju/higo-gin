@@ -2,7 +2,6 @@ package higo
 
 import (
 	"fmt"
-	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-gin/higo/sql"
 	"github.com/dengpju/higo-logger/logger"
@@ -39,34 +38,12 @@ type Dbconfig struct {
 	Prefix   string
 }
 
-type columnValue struct {
-	column string
-	value  interface{}
-}
-
-func ColumnValue(column string, value interface{}) *columnValue {
-	return &columnValue{column: column, value: value}
-}
-
-type operationState int
-
-const (
-	opInsert operationState = iota + 1
-	opUpdate
-	opDelete
-)
-
 type Orm struct {
 	*gorm.DB
-	sql            string
-	args           []interface{}
-	orms           []*Orm
-	cvs            []*columnValue
-	table          string
-	currentOpState operationState
-	insertBuilder  *squirrel.InsertBuilder
-	updateBuilder  *squirrel.UpdateBuilder
-	deleteBuilder  *squirrel.DeleteBuilder
+	sql   string
+	args  []interface{}
+	orms  []*Orm
+	table string
 }
 
 func GetDbConfig() *Dbconfig {
@@ -150,17 +127,13 @@ func sqlReplace(scope *gorm.Scope) {
 }
 
 func newOrm() *Orm {
-	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0),
-		insertBuilder: &squirrel.InsertBuilder{},
-		updateBuilder: &squirrel.UpdateBuilder{},
-		deleteBuilder: &squirrel.DeleteBuilder{}}
+	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0),
+	}
 }
 
 func mapperOrm() *Orm {
-	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0), cvs: make([]*columnValue, 0),
-		insertBuilder: &squirrel.InsertBuilder{},
-		updateBuilder: &squirrel.UpdateBuilder{},
-		deleteBuilder: &squirrel.DeleteBuilder{}}
+	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0),
+	}
 }
 
 func NewOrm() *Orm {
@@ -357,60 +330,21 @@ func (this *Orm) Count(value interface{}) *Orm {
 	return this
 }
 
-func (this *Orm) Insert(name string) *Orm {
-	this.currentOpState = opInsert
-	this.table = name
-	return this
+func (this *Orm) Builder() *sql.Statement {
+	return sql.Query()
 }
 
-func (this *Orm) Update(name string) squirrel.UpdateBuilder {
-	this.currentOpState = opUpdate
+func (this *Orm) Insert(name string) *sql.Statement {
 	this.table = name
 	return sql.Update(name)
 }
 
-func (this *Orm) Delete(name string) squirrel.DeleteBuilder {
-	this.currentOpState = opDelete
+func (this *Orm) Update(name string) *sql.Statement {
+	this.table = name
+	return sql.Update(name)
+}
+
+func (this *Orm) Delete(name string) *sql.Statement {
 	this.table = name
 	return sql.Delete(name)
-}
-
-func (this *Orm) Set(column string, value interface{}) *Orm {
-	this.cvs = append(this.cvs, ColumnValue(column, value))
-	return this
-}
-
-func (this *Orm) ToSql() (string, []interface{}, error) {
-	var (
-		columns []string
-		values  []interface{}
-	)
-	if opInsert == this.currentOpState {
-		if len(this.cvs) == 0 {
-			return this.insertBuilder.ToSql()
-		} else {
-			sqlOp := sql.Insert(this.table)
-			for _, cv := range this.cvs {
-				columns = append(columns, cv.column)
-				values = append(values, cv.value)
-			}
-			return sqlOp.Columns(columns...).Values(values...).ToSql()
-		}
-	} else if opUpdate == this.currentOpState {
-		return this.updateBuilder.ToSql()
-	} else if opDelete == this.currentOpState {
-		return this.deleteBuilder.ToSql()
-	}
-	return "", nil, fmt.Errorf("An unsupported operation")
-}
-
-func (this *Orm) Build(builder interface{}) *Orm {
-	if b, ok := builder.(squirrel.InsertBuilder); ok {
-		this.insertBuilder = &b
-	} else if b, ok := builder.(squirrel.UpdateBuilder); ok {
-		this.updateBuilder = &b
-	} else if b, ok := builder.(squirrel.DeleteBuilder); ok {
-		this.deleteBuilder = &b
-	}
-	return this
 }
