@@ -45,6 +45,7 @@ type Orm struct {
 	orms      []*Orm
 	table     string
 	statement *sql.Statement
+	builder   *Builder
 }
 
 func GetDbConfig() *Dbconfig {
@@ -129,11 +130,13 @@ func sqlReplace(scope *gorm.Scope) {
 
 func newOrm() *Orm {
 	return &Orm{DB: newGorm(false), orms: make([]*Orm, 0),
+		builder: newBuilder(),
 	}
 }
 
 func mapperOrm() *Orm {
 	return &Orm{DB: newGorm(true), orms: make([]*Orm, 0),
+		builder: newBuilder(),
 	}
 }
 
@@ -356,4 +359,26 @@ func (this *Orm) Delete(name string) *sql.Statement {
 
 func (this *Orm) ToSql() (string, []interface{}, error) {
 	return this.statement.ToSql()
+}
+
+func (this *Orm) setBuilder(sql string, args []interface{}, err error) {
+	this.builder.sql, this.builder.args, this.builder.err = sql, args, err
+}
+
+func (this *Orm) GetBuilder() (string, []interface{}, error) {
+	return this.builder.sql, this.builder.args, this.builder.err
+}
+
+func (this *Orm) Build() {
+	this.setBuilder(this.ToSql())
+}
+
+type Builder struct {
+	sql  string
+	args []interface{}
+	err  error
+}
+
+func newBuilder() *Builder {
+	return &Builder{}
 }
