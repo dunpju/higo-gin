@@ -151,6 +151,7 @@ func (this *UserModelImpl) Add(uname string, tel string, score int) {
 		higo.Result(u.Last(u1).Error).Unwrap()
 		fmt.Println(coinModel)
 		fmt.Println(u1)
+		panic(fmt.Errorf("test"))
 		return nil
 	})
 

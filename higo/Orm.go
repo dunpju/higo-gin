@@ -153,10 +153,9 @@ func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
 	if err != nil {
 		panic(err.Error())
 	}
-	clone := newOrm()
-	clone.sql = sql
-	clone.args = args
-	return clone
+	this.sql = sql
+	this.args = args
+	return this
 }
 
 func (this *Orm) setDB(db *gorm.DB) {
