@@ -74,6 +74,8 @@ func (this *UserModelImpl) UserById(id int, columns ...string) {
 func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Orm {
 	fmt.Println("tttt")
 	fmt.Println(this.Builder().Select("uname", "u_tel").From("user_table").Where("id = ?", 9).ToSql())
+	fmt.Println(this.Builder().Select("uname", "u_tel").From("user_table").Where("id = ?", 10).ToSql())
+	fmt.Println(this.Builder().Select("uname", "u_tel").From("user_table").Where("id = ?", 11).ToSql())
 	fmt.Println(this.Insert(this.TableName()).
 		Set("uname", uname).
 		Set("u_tel", tel).

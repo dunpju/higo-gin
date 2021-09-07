@@ -103,7 +103,7 @@ func Query() *Statement {
 }
 
 func (this *Statement) Select(columns ...string) squirrel.SelectBuilder {
-	return statement(Select(columns...), opSelect, "").SelectBuilder()
+	return statement(squirrel.Select(columns...), opSelect, "").SelectBuilder()
 }
 
 func Select(columns ...string) squirrel.SelectBuilder {
