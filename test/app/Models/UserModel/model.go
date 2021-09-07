@@ -105,7 +105,7 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 		Where("id", 1).
 		ToSql())
 
-	log.Fatalln("ggggg")
+	log.Println("ggggg")
 	return this.Mapper(sql.Insert(this.TableName()).InsertBuilder().
 		Columns("uname", "u_tel", "score").
 		Values(uname, tel, score).

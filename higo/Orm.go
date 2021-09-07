@@ -154,7 +154,6 @@ func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
 		panic(err.Error())
 	}
 	clone := newOrm()
-	clone.DB = orm.DB
 	clone.sql = sql
 	clone.args = args
 	return clone
