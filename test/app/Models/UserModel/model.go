@@ -115,7 +115,7 @@ func (this *UserModelImpl) AddUser(uname string, tel string, score int) *higo.Or
 func (this *UserModelImpl) Paginate(perPage, page uint64) *higo.Pager {
 	models := make([]*UserModelImpl, 0)
 	pager := higo.NewPager(perPage, page)
-	this.Table(this.TableName()).Where("uname like ?", "%werwerwer%").Paginate(pager, &models)
+	this.Table(this.TableName()).Where("uname like ?", "%werwerwer%").Paginate(pager).Find(&models)
 	pager.Items = models
 	fmt.Println(pager)
 	fmt.Println(pager.Items)

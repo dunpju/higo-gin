@@ -240,22 +240,21 @@ func NewPager(perPage, page uint64) *Pager {
 	return &Pager{CurrentPage: page, PerPage: perPage}
 }
 
-func (this *Orm) Paginate(pager *Pager, items interface{}) {
+func (this *Orm) Paginate(pager *Pager) *gorm.DB {
 	if pager.CurrentPage <= 0 {
 		panic("Current Page: Can't be less than or equal to 0")
 	}
 	if pager.PerPage <= 0 {
 		panic("Per Page: Can't be less than or equal to 0")
 	}
-	this.DB.
-		Count(&pager.Total).
+	this.DB.Count(&pager.Total).
 		Limit(pager.PerPage).
-		Offset((pager.CurrentPage - 1) * pager.PerPage).
-		Find(items)
+		Offset((pager.CurrentPage - 1) * pager.PerPage)
 	if this.DB.Error != nil {
 		panic(this.DB.Error)
 	}
 	pager.LastPage = uint64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
+	return this.DB
 }
 
 func (this *Orm) Table(name string) *Orm {
