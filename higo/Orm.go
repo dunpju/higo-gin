@@ -353,7 +353,7 @@ func (this *Orm) Builder() *higosql.Statement {
 	return this.statement
 }
 
-func (this *Orm) Insert(name string) *sql.Statement {
+func (this *Orm) Insert(name string) *higosql.Statement {
 	this.table = name
 	this.statement = higosql.Insert(name)
 	return this.statement
