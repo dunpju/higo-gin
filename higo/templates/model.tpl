@@ -75,7 +75,7 @@ func (this *ModelImpl) GetBy{{.HumpPRI}}s({{.HumpPRI}}s []string, columns ...str
 func (this *ModelImpl) Paginate(perPage, page uint64) *higo.Pager {
 	models := make([]*ModelImpl, 0)
 	pager := higo.NewPager(perPage, page)
-	this.Table(this.TableName()). /**Where().*/ Paginate(pager, &models)
+	this.Table(this.TableName()). /**Where().*/ Paginate(pager).Find(&models)
 	pager.Items = models
 	return pager
 }
