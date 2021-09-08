@@ -176,10 +176,8 @@ func (this *Orm) Exec() *gorm.DB {
 }
 
 func (this *Orm) InsertGetId() *Orm {
+	sqlReplace(this.NewScope(this))
 	this.result, this.DB.Error = this.DB.CommonDB().Exec(this.sql, this.args...)
-	if logMode {
-		logger.Logrus.Debugln(this.sql)
-	}
 	return this
 }
 
