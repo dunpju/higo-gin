@@ -229,11 +229,11 @@ func (this *Orm) Transaction(fn func() error) {
 }
 
 type Pager struct {
-	Total,
-	CurrentPage,
-	PerPage,
-	LastPage uint64
-	Items interface{}
+	Total       uint64      `json:"total"`
+	CurrentPage uint64      `json:"current_page"`
+	PerPage     uint64      `json:"per_page"`
+	LastPage    uint64      `json:"last_page"`
+	Items       interface{} `json:"items"`
 }
 
 func NewPager(perPage, page uint64) *Pager {
