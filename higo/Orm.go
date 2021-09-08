@@ -1,9 +1,10 @@
 package higo
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/dengpju/higo-config/config"
-	"github.com/dengpju/higo-gin/higo/sql"
+	higosql "github.com/dengpju/higo-gin/higo/sql"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/go-sql-driver/mysql"
@@ -41,12 +42,14 @@ type Dbconfig struct {
 
 type Orm struct {
 	*gorm.DB
-	sql       string
-	args      []interface{}
-	orms      []*Orm
-	table     string
-	statement *sql.Statement
-	builder   *Builder
+	sql          string
+	args         []interface{}
+	orms         []*Orm
+	table        string
+	statement    *higosql.Statement
+	builder      *Builder
+	result       sql.Result
+	lastInsertId int64
 }
 
 func GetDbConfig() *Dbconfig {
@@ -170,6 +173,23 @@ func (this *Orm) Query() *gorm.DB {
 func (this *Orm) Exec() *gorm.DB {
 	sqlReplace(this.NewScope(this))
 	return this.DB.Exec(this.sql, this.args...)
+}
+
+func (this *Orm) Save() *Orm {
+	this.result, this.DB.Error = this.DB.CommonDB().Exec(this.sql, this.args...)
+	return this
+}
+
+func (this *Orm) LastInsertId() int64 {
+	id, err := this.result.LastInsertId()
+	if nil != err {
+		panic(err)
+	}
+	return id
+}
+
+func (this *Orm) Result() sql.Result {
+	return this.result
 }
 
 func (this *Orm) Begin(orms ...*Orm) *Orm {
@@ -328,26 +348,26 @@ func (this *Orm) Count(value interface{}) *Orm {
 	return this
 }
 
-func (this *Orm) Builder() *sql.Statement {
-	this.statement = sql.Query()
+func (this *Orm) Builder() *higosql.Statement {
+	this.statement = higosql.Query()
 	return this.statement
 }
 
 func (this *Orm) Insert(name string) *sql.Statement {
 	this.table = name
-	this.statement = sql.Insert(name)
+	this.statement = higosql.Insert(name)
 	return this.statement
 }
 
-func (this *Orm) Update(name string) *sql.Statement {
+func (this *Orm) Update(name string) *higosql.Statement {
 	this.table = name
-	this.statement = sql.Update(name)
+	this.statement = higosql.Update(name)
 	return this.statement
 }
 
-func (this *Orm) Delete(name string) *sql.Statement {
+func (this *Orm) Delete(name string) *higosql.Statement {
 	this.table = name
-	this.statement = sql.Delete(name)
+	this.statement = higosql.Delete(name)
 	return this.statement
 }
 
