@@ -175,8 +175,11 @@ func (this *Orm) Exec() *gorm.DB {
 	return this.DB.Exec(this.sql, this.args...)
 }
 
-func (this *Orm) Save() *Orm {
+func (this *Orm) InsertGetId() *Orm {
 	this.result, this.DB.Error = this.DB.CommonDB().Exec(this.sql, this.args...)
+	if logMode {
+		logger.Logrus.Debugln(this.sql)
+	}
 	return this
 }
 
