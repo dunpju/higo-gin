@@ -1,4 +1,4 @@
-package {{.Package}}
+package {{.PackageName}}
 
 import (
 	//"gitee.com/dengpju/higo-code/code"
@@ -14,8 +14,8 @@ import (
 
 type {{.StructName}} struct {
 	*higo.Orm    `inject:"Bean.NewOrm()"`
-	{{- range .TplFields}}
-	{{.Field}}    {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}" comment:"{{.Comment}}"`
+	{{- range .StructFields}}
+	{{.FieldName}}    {{.FieldType}}    `gorm:"column:{{.TableFieldName}}" json:"{{.TableFieldName}}" comment:"{{.TableFieldComment}}"`
     {{- end}}
 }
 
@@ -61,15 +61,15 @@ func (this *{{.StructName}}) RegisterValidator() higo.Valid {
 }
 
 func (this *{{.StructName}}) Exist() bool {
-	return this.{{.HumpPRI}} > 0
+	return this.{{.PrimaryId}} > 0
 }
 
-func (this *{{.StructName}}) GetBy{{.HumpPRI}}({{.HumpPRI}} {{.PriType}}, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` = ?", {{.HumpPRI}}).ToSql()).Query()
+func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.PrimaryId}} {{.PrimaryIdType}}, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.TablePrimaryId}}` = ?", {{.PrimaryId}}).ToSql()).Query()
 }
 
-func (this *{{.StructName}}) GetBy{{.HumpPRI}}s({{.HumpPRI}}s []string, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` IN(?)", strings.Join({{.HumpPRI}}s, ",")).ToSql()).Query()
+func (this *{{.StructName}}) GetBy{{.PrimaryId}}s({{.PrimaryId}}s []string, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.TablePrimaryId}}` IN(?)", strings.Join({{.PrimaryId}}s, ",")).ToSql()).Query()
 }
 
 func (this *{{.StructName}}) Paginate(perPage, page uint64) *higo.Pager {

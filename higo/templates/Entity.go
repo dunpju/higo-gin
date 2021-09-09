@@ -7,9 +7,8 @@ type Entity struct {
 	StructFields  []StructField
 	HasCreateTime bool
 	HasUpdateTime bool
-	OutStruct     string
 	OutDir        string
-	File          string
+	FileName      string
 }
 
 type StructField struct {
@@ -17,4 +16,8 @@ type StructField struct {
 	FieldType         string
 	TableFieldName    string
 	TableFieldComment string
+}
+
+func NewEntity() *Entity {
+	return &Entity{}
 }

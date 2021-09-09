@@ -18,25 +18,25 @@ import (
 )
 
 type Model struct {
-	DB         *gorm.DB
-	database   string
-	prefix     string
-	TableName  string
-	Package    string
-	Dir        string
-	StructName string
-	HumpPRI    string
-	PRI        string
-	PriType    string
-	Fields     []Field
-	TplFields  []TplField
-	Imports    map[string]string
+	PackageName    string
+	Imports        map[string]string
+	StructName     string
+	DB             *gorm.DB
+	Database       string
+	Prefix         string
+	TableName      string
+	PrimaryId      string
+	PrimaryIdType  string
+	TablePrimaryId string
+	TableFields    []TableField
+	StructFields   []StructField
+	Dir            string
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
 	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + "Model"
-	return &Model{DB: DB, TableName: name, Package: pkg, StructName: "Impl",
-		Dir: dir + utils.PathSeparator() + pkg, database: db, prefix: pre,
+	return &Model{DB: DB, TableName: name, PackageName: pkg, StructName: "Impl",
+		Dir: dir + utils.PathSeparator() + pkg, Database: db, Prefix: pre,
 		Imports: make(map[string]string),
 	}
 }
@@ -57,26 +57,26 @@ func (this *Model) Template(tplfile string) string {
 }
 
 func (this *Model) Generate() {
-	this.Fields = this.GetFields(this.TableName)
-	for _, f := range this.Fields {
-		tField := TplField{
-			Field:   generator.CamelCase(f.Field),
-			Type:    getFiledType(f),
-			DbField: f.Field,
-			Comment: f.Comment,
+	this.TableFields = this.GetTableFields(this.TableName)
+	for _, f := range this.TableFields {
+		tField := StructField{
+			FieldName:         generator.CamelCase(f.Field),
+			FieldType:         getFiledType(f),
+			TableFieldName:    f.Field,
+			TableFieldComment: f.Comment,
 		}
 		if f.Key == "PRI" {
-			this.PRI = tField.DbField
-			this.PriType = tField.Type
-			this.HumpPRI = generator.CamelCase(this.PRI)
-			tField.Field = this.HumpPRI
+			this.TablePrimaryId = tField.TableFieldName
+			this.PrimaryIdType = tField.FieldType
+			this.PrimaryId = generator.CamelCase(this.TablePrimaryId)
+			tField.FieldName = this.PrimaryId
 		}
-		if tField.Type == "time.Time" {
-			if _, ok := this.Imports[tField.Type]; !ok {
-				this.Imports[tField.Type] = `"time"`
+		if tField.FieldType == "time.Time" {
+			if _, ok := this.Imports[tField.FieldType]; !ok {
+				this.Imports[tField.FieldType] = `"time"`
 			}
 		}
-		this.TplFields = append(this.TplFields, tField)
+		this.StructFields = append(this.StructFields, tField)
 	}
 	if _, err := os.Stat(this.Dir); os.IsNotExist(err) {
 		if err = os.Mkdir(this.Dir, os.ModePerm); err != nil {
@@ -214,10 +214,10 @@ func GetTables(db *gorm.DB, database string, tableNames ...string) []Table {
 	return tables
 }
 
-//获取所有字段信息
-func (this *Model) GetFields(tableName string) []Field {
+//获取表所有字段信息
+func (this *Model) GetTableFields(tableName string) []TableField {
 	db := this.DB
-	var fields []Field
+	var fields []TableField
 	d := db.Raw("show FULL COLUMNS from " + tableName + ";").Find(&fields)
 	if d.Error != nil {
 		panic(d.Error.Error())
@@ -237,7 +237,7 @@ type TplField struct {
 	Comment string
 }
 
-type Field struct {
+type TableField struct {
 	Field      string `gorm:"column:Field"`
 	Type       string `gorm:"column:Type"`
 	Null       string `gorm:"column:Null"` //非空 YES/NO
@@ -249,7 +249,7 @@ type Field struct {
 }
 
 //获取字段类型
-func getFiledType(field Field) string {
+func getFiledType(field TableField) string {
 	if field.Null == "YES" {
 		return "interface{}"
 	}

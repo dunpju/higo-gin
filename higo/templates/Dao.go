@@ -34,7 +34,7 @@ type Dao struct {
 	PrimaryId         string
 	PrimaryIdType     string
 	TablePrimaryId    string
-	TableFields       []Field
+	TableFields       []TableField
 	ModelFields       []TplField
 	HasDeleteTime     bool
 	OutStruct         string

@@ -1,4 +1,4 @@
-package {{.Package}}
+package {{.PackageName}}
 
 import (
 	"github.com/dengpju/higo-gin/higo"
@@ -7,10 +7,10 @@ import (
     {{- end}}
 )
 
-{{- range .TplFields}}
-func With{{.Field}}(v {{.Type}}) higo.Property {
+{{range .StructFields}}
+func With{{.FieldName}}(v {{.FieldType}}) higo.Property {
 	return func(class higo.IClass) {
-		class.(*{{$.StructName}}).{{.Field}} = v
+		class.(*{{$.StructName}}).{{.FieldName}} = v
 	}
 }
 {{end}}
