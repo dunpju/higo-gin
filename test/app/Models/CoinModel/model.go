@@ -24,8 +24,21 @@ func (this *Impl) New() higo.IClass {
 	return New()
 }
 
+func (this *Impl) Mutate(attrs ...higo.Property) higo.Model {
+	higo.Propertys(attrs).Apply(this)
+	return this
+}
+
 func (this *Impl) TableName() string {
 	return "ts_coin"
+}
+
+func (this *Impl) RegisterValidator() higo.Valid {
+	return higo.RegisterValid(this)
+}
+
+func (this *Impl) Exist() bool {
+	return this.Id > 0
 }
 
 func (this *Impl) AddCoin(uname string, coin int) *higo.Orm {

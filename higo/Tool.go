@@ -111,10 +111,11 @@ eg: -out=test\app\Models`)
 				for _, table := range tables {
 					genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 					genModel.Generate()
-					genModel.
 				}
 			} else {
-				templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
+				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+				genModel.Generate()
+				log.Fatalln(genModel)
 			}
 		} else {
 			log.Fatalln(`gen Arguments Error! 

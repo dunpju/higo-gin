@@ -1,6 +1,5 @@
 package templates
 
-import "C"
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
@@ -33,45 +32,21 @@ type Dao struct {
 	EntityPackageName string
 	EntityName        string
 	PrimaryId         string
+	PrimaryIdType     string
+	TablePrimaryId    string
 	TableFields       []Field
 	ModelFields       []TplField
+	HasDeleteTime     bool
 	OutStruct         string
 	OutDir            string
 	File              string
-	Doc               string
-	RealName          string
-	Iota              string
-	LenMap            int
-	DaoMap            []*DaoMap
-	Daos              []*Dao
 }
 
 var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
 
 func NewDao(pkg string, name string, file string) *Dao {
-	reg := regexp.MustCompile(daoRegexpStr)
-	if reg == nil {
-		log.Fatalln("regexp err")
-	}
-	D := &Dao{}
-	if fs := reg.FindString(name); fs != "" {
-		D.Daos = append(D.Daos, newDao(pkg, name, file))
-	} else {
-		outfile := utils.ReadFile(name)
-		if !outfile.Exist() {
-			log.Fatalln(name + " configure file non-exist")
-		}
-		outfile.ForEach(func(line int, s string) {
-			s = strings.Replace(s, "\\", "", -1)
-			s = strings.Trim(s, "\n")
-			s = strings.Trim(s, "\r")
-			s = strings.Trim(s, "")
-			if "" != s {
-				D.Daos = append(D.Daos, newDao(pkg, s, file))
-			}
-		})
-	}
-	return D
+
+	return &Dao{}
 }
 
 func newDao(pkg string, name string, file string) *Dao {
@@ -85,35 +60,7 @@ func newDao(pkg string, name string, file string) *Dao {
 	name = strings.Trim(name, "")
 	D := &Dao{}
 	if fs := reg.FindString(name); fs != "" {
-		name = strings.Trim(fs, "")
-		name = strings.Trim(name, "-c=")
-		codeName := strings.Split(name, "-i=")
-		structName := codeName[0]
-		flags := strings.Split(codeName[1], "-f=")
-		if len(flags) != 2 {
-			log.Fatalln("name err")
-		}
-		D.Iota = strings.Trim(flags[0], "")
-		docs := strings.Split(flags[1], ":")
-		doc := strings.Trim(docs[0], "")
-		D.Doc = doc
-		es := strings.Split(docs[1], ",")
-		for _, v := range es {
-			em := strings.Split(v, "-")
-			k := strings.Trim(em[0], "")
-			v := strings.Trim(D.Iota, "")
-			d := strings.Trim(strings.Trim(strings.Trim(em[1], "\n"), "\r"), "")
-			D.DaoMap = append(D.DaoMap, NewDaoMap(k, v, d))
-		}
-		D.LenMap = len(D.DaoMap) - 1
-		name = utils.Ucfirst(utils.CaseToCamel(structName))
-		D.StructName = dao + name
-		D.RealName = name
-		D.OutDir = file
-		D.OutStruct = D.OutDir + utils.PathSeparator() + dao + strings.Trim(name, dao)
-		D.File = D.OutDir + utils.PathSeparator() + D.RealName + ".go"
-		D.PackageName = pkg
-		return D
+
 	} else {
 		log.Fatalln(`name format error: ` + name)
 	}
@@ -136,9 +83,7 @@ func (this *Dao) Template(tplfile string) string {
 }
 
 func (this *Dao) Generate() {
-	for _, e := range this.Daos {
-		e.generate()
-	}
+	this.generate()
 }
 
 func (this *Dao) generate() {
