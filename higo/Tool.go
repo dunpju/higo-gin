@@ -2,6 +2,7 @@ package higo
 
 import (
 	"flag"
+	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates"
 	"github.com/dengpju/higo-utils/utils"
 	"log"
@@ -82,6 +83,28 @@ eg: -name=ts_user`)
 				log.Fatalln(`output directory unable empty 
 eg: -out=test\app\Models`)
 			}
+		loopDao:
+			fmt.Print("Whether to generate Dao [yes|no] (default:yes):")
+			isGenerateDao := "yes"
+			isGenerateEntity := "yes"
+			n, err := fmt.Scanln(&isGenerateDao)
+			if nil != err && n > 0 {
+				panic(err)
+			}
+			if ("yes" != isGenerateDao || "no" != isGenerateDao) && n > 0 {
+				goto loopDao
+			}
+			fmt.Printf("Your Choice Generate Dao: %s\n", isGenerateDao)
+		loopEntity:
+			fmt.Print("Whether to generate Entity [yes|no] (default:yes):")
+			n, err = fmt.Scanln(&isGenerateEntity)
+			if nil != err && n > 0 {
+				panic(err)
+			}
+			if ("yes" != isGenerateEntity || "no" != isGenerateEntity) && n > 0 {
+				goto loopEntity
+			}
+			fmt.Printf("Your Choice Generate Entity: %s\n", isGenerateEntity)
 			db := newOrm().DB
 			if this.Name == "all" {
 				newModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)

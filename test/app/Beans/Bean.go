@@ -4,7 +4,6 @@ import (
 	"github.com/dengpju/higo-gin/higo"
 	a "github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
-	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gomodule/redigo/redis"
 )
@@ -41,10 +40,6 @@ func (this *MyBean) NewDemoController() *V3.DemoController {
 
 func (this *MyBean) NewEventController() *a.EventController {
 	return a.NewEventController()
-}
-
-func (this *MyBean) NewUserModel() *UserModel.UserModelImpl {
-	return UserModel.New()
 }
 
 func (this *MyBean) New_gen_github8com_dengpju_higo9gin_test_app_Controllers_TestController() *a.TestController {

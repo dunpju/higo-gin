@@ -1,21 +1,29 @@
 package UserModel
 
-import "github.com/dengpju/higo-gin/higo"
-
-func WithId(id int) higo.Property {
+import (
+	"github.com/dengpju/higo-gin/higo"
+)
+func WithId(v int) higo.Property {
 	return func(class higo.IClass) {
-		class.(*UserModelImpl).Id = id
+		class.(*Impl).Id = v
 	}
 }
 
-func WithUname(name string) higo.Property {
+func WithUname(v string) higo.Property {
 	return func(class higo.IClass) {
-		class.(*UserModelImpl).Uname = name
+		class.(*Impl).Uname = v
 	}
 }
 
-func WithUtel(tel string) higo.Property {
+func WithUTel(v string) higo.Property {
 	return func(class higo.IClass) {
-		class.(*UserModelImpl).Utel = tel
+		class.(*Impl).UTel = v
 	}
 }
+
+func WithScore(v int) higo.Property {
+	return func(class higo.IClass) {
+		class.(*Impl).Score = v
+	}
+}
+

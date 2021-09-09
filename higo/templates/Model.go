@@ -18,24 +18,26 @@ import (
 )
 
 type Model struct {
-	DB        *gorm.DB
-	database  string
-	prefix    string
-	TableName string
-	Package   string
-	Dir       string
-	ModelImpl string
-	HumpPRI   string
-	PRI       string
-	PriType   string
-	Fields    []Field
-	TplFields []TplField
-	Imports   map[string]string
+	DB               *gorm.DB
+	database         string
+	prefix           string
+	TableName        string
+	Package          string
+	Dir              string
+	StructName       string
+	HumpPRI          string
+	PRI              string
+	PriType          string
+	Fields           []Field
+	TplFields        []TplField
+	Imports          map[string]string
+	isGenerateDao    string
+	isGenerateEntity string
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
 	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + "Model"
-	return &Model{DB: DB, TableName: name, Package: pkg, ModelImpl: "ModelImpl",
+	return &Model{DB: DB, TableName: name, Package: pkg, StructName: "Impl",
 		Dir: dir + utils.PathSeparator() + pkg, database: db, prefix: pre,
 		Imports: make(map[string]string),
 	}
@@ -89,34 +91,39 @@ func (this *Model) Generate() {
 	}
 	outfile := utils.File{Name: this.Dir + utils.PathSeparator() + "model.go"}
 	if outfile.Exist() {
-		newbuf := new(bytes.Buffer)
-		err = tmpl.Execute(newbuf, this)
-		newFset := token.NewFileSet()
-		newfd, err := parser.ParseFile(newFset, "", newbuf.String(), 0)
+		//生成最新ast buffer
+		bufferbuf := new(bytes.Buffer)
+		err = tmpl.Execute(bufferbuf, this)
+		bufferfset := token.NewFileSet()
+		bufferfd, err := parser.ParseFile(bufferfset, outfile.Name, bufferbuf.String(), 0)
 		if err != nil {
 			panic(err)
 		}
-		var newNode *ast.TypeSpec
-		ast.Inspect(newfd, func(n ast.Node) bool {
+		var bufferNode *ast.TypeSpec
+		ast.Inspect(bufferfd, func(n ast.Node) bool {
 			switch x := n.(type) {
 			case *ast.TypeSpec:
-				newNode = x
+				if x.Name.Name == this.StructName {
+					bufferNode = x //找到struct node
+				}
 			}
 			return true
 		})
-		oldFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+		//读取原文件
+		oldfile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
 		if err != nil {
 			panic(err)
 		}
-		oldsrc, err := ioutil.ReadAll(oldFile)
+		oldsrc, err := ioutil.ReadAll(oldfile)
 		if err != nil {
 			panic(err)
 		}
-		oldFset := token.NewFileSet()
-		oldfd, err := parser.ParseFile(oldFset, "", oldsrc, parser.ParseComments)
+		oldfset := token.NewFileSet()
+		oldfd, err := parser.ParseFile(oldfset, outfile.Name, oldsrc, parser.ParseComments)
 		if err != nil {
 			panic(err)
 		}
+		//生成新文件
 		newFileBuf := bytes.NewBufferString("")
 		ast.Inspect(oldfd, func(n ast.Node) bool {
 			switch oldNode := n.(type) {
@@ -125,8 +132,8 @@ func (this *Model) Generate() {
 			case *ast.GenDecl:
 				if oldNode.Tok == token.TYPE {
 					for i, oldn := range oldNode.Specs {
-						if oldn.(*ast.TypeSpec).Name.Name == "ModelImpl" {
-							oldNode.Specs[i] = newNode
+						if oldn.(*ast.TypeSpec).Name.Name == this.StructName {
+							oldNode.Specs[i] = bufferNode//将Buffer中的Node替换原Node
 						}
 					}
 				}
@@ -151,7 +158,7 @@ func (this *Model) Generate() {
 			}
 			return true
 		})
-		//ast.Print(oldFset, oldfd)
+		//ast.Print(oldfset, oldfd)
 		//fmt.Println(newFileBuf)
 		newFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 		if err != nil {

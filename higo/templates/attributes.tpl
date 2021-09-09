@@ -7,10 +7,10 @@ import (
     {{- end}}
 )
 
-{{range .TplFields}}
+{{- range .TplFields}}
 func With{{.Field}}(v {{.Type}}) higo.Property {
 	return func(class higo.IClass) {
-		class.(*{{$.ModelImpl}}).{{.Field}} = v
+		class.(*{{$.StructName}}).{{.Field}} = v
 	}
 }
 {{end}}

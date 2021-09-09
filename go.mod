@@ -23,6 +23,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/nsf/termbox-go v1.1.1
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/stretchr/testify v1.7.0 // indirect
