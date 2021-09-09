@@ -21,15 +21,15 @@ type Model struct {
 	PackageName    string
 	Imports        map[string]string
 	StructName     string
-	DB             *gorm.DB
-	Database       string
-	Prefix         string
 	TableName      string
 	PrimaryId      string
 	PrimaryIdType  string
 	TablePrimaryId string
 	TableFields    []TableField
 	StructFields   []StructField
+	DB             *gorm.DB
+	Database       string
+	Prefix         string
 	Dir            string
 }
 
@@ -58,14 +58,14 @@ func (this *Model) Template(tplfile string) string {
 
 func (this *Model) Generate() {
 	this.TableFields = this.GetTableFields(this.TableName)
-	for _, f := range this.TableFields {
+	for _, tableField := range this.TableFields {
 		tField := StructField{
-			FieldName:         generator.CamelCase(f.Field),
-			FieldType:         getFiledType(f),
-			TableFieldName:    f.Field,
-			TableFieldComment: f.Comment,
+			FieldName:         generator.CamelCase(tableField.Field),
+			FieldType:         getFiledType(tableField),
+			TableFieldName:    tableField.Field,
+			TableFieldComment: tableField.Comment,
 		}
-		if f.Key == "PRI" {
+		if tableField.Key == "PRI" {
 			this.TablePrimaryId = tField.TableFieldName
 			this.PrimaryIdType = tField.FieldType
 			this.PrimaryId = generator.CamelCase(this.TablePrimaryId)
@@ -230,11 +230,11 @@ type Table struct {
 	Comment string `gorm:"column:Comment"`
 }
 
-type TplField struct {
-	Field   string
-	Type    string
-	DbField string
-	Comment string
+type StructField struct {
+	FieldName         string
+	FieldType         string
+	TableFieldName    string
+	TableFieldComment string
 }
 
 type TableField struct {

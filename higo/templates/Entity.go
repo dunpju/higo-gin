@@ -11,12 +11,7 @@ type Entity struct {
 	FileName      string
 }
 
-type StructField struct {
-	FieldName         string
-	FieldType         string
-	TableFieldName    string
-	TableFieldComment string
-}
+
 
 func NewEntity() *Entity {
 	return &Entity{}
