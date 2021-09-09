@@ -18,21 +18,19 @@ import (
 )
 
 type Model struct {
-	DB               *gorm.DB
-	database         string
-	prefix           string
-	TableName        string
-	Package          string
-	Dir              string
-	StructName       string
-	HumpPRI          string
-	PRI              string
-	PriType          string
-	Fields           []Field
-	TplFields        []TplField
-	Imports          map[string]string
-	isGenerateDao    string
-	isGenerateEntity string
+	DB         *gorm.DB
+	database   string
+	prefix     string
+	TableName  string
+	Package    string
+	Dir        string
+	StructName string
+	HumpPRI    string
+	PRI        string
+	PriType    string
+	Fields     []Field
+	TplFields  []TplField
+	Imports    map[string]string
 }
 
 func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
@@ -75,13 +73,14 @@ func (this *Model) Generate() {
 		}
 		if tField.Type == "time.Time" {
 			if _, ok := this.Imports[tField.Type]; !ok {
-				this.Imports[tField.Type] = "\"time\""
+				this.Imports[tField.Type] = `"time"`
 			}
 		}
 		this.TplFields = append(this.TplFields, tField)
 	}
 	if _, err := os.Stat(this.Dir); os.IsNotExist(err) {
-		if os.Mkdir(this.Dir, os.ModePerm) != nil {
+		if err = os.Mkdir(this.Dir, os.ModePerm); err != nil {
+			panic(err)
 		}
 	}
 	tpl := this.Template("model.tpl")
@@ -133,7 +132,7 @@ func (this *Model) Generate() {
 				if oldNode.Tok == token.TYPE {
 					for i, oldn := range oldNode.Specs {
 						if oldn.(*ast.TypeSpec).Name.Name == this.StructName {
-							oldNode.Specs[i] = bufferNode//将Buffer中的Node替换原Node
+							oldNode.Specs[i] = bufferNode //将Buffer中的Node替换原Node
 						}
 					}
 				}
@@ -199,16 +198,15 @@ func (this *Model) Generate() {
 	fmt.Println("model: " + this.Dir + " generate success!")
 }
 
-func (this *Model) GetTables(tableNames ...string) []Table {
-	db := this.DB
+func GetTables(db *gorm.DB, database string, tableNames ...string) []Table {
 	var (
 		tables []Table
 		d      *gorm.DB
 	)
 	if len(tableNames) == 0 {
-		d = db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE table_schema='" + this.database + "';").Find(&tables)
+		d = db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE table_schema='" + database + "';").Find(&tables)
 	} else {
-		d = db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE TABLE_NAME IN (" + strings.Join(tableNames, ",") + ") AND table_schema='" + this.database + "';").Find(&tables)
+		d = db.Raw("SELECT TABLE_NAME as Name,TABLE_COMMENT as Comment FROM information_schema.TABLES WHERE TABLE_NAME IN (" + strings.Join(tableNames, ",") + ") AND table_schema='" + database + "';").Find(&tables)
 	}
 	if d.Error != nil {
 		panic(d.Error.Error())

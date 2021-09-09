@@ -25,17 +25,25 @@ func NewDaoMap(key string, value interface{}, doc string) *DaoMap {
 }
 
 type Dao struct {
-	Package   string
-	Name      string
-	OutStruct string
-	OutDir    string
-	File      string
-	Doc       string
-	RealName  string
-	Iota      string
-	LenMap    int
-	DaoMap    []*DaoMap
-	Daos      []*Dao
+	PackageName       string
+	Imports           map[string]string
+	StructName        string
+	ModelPackageName  string
+	ModelName         string
+	EntityPackageName string
+	EntityName        string
+	PrimaryId         string
+	TableFields       []Field
+	ModelFields       []TplField
+	OutStruct         string
+	OutDir            string
+	File              string
+	Doc               string
+	RealName          string
+	Iota              string
+	LenMap            int
+	DaoMap            []*DaoMap
+	Daos              []*Dao
 }
 
 var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
@@ -99,12 +107,12 @@ func newDao(pkg string, name string, file string) *Dao {
 		}
 		D.LenMap = len(D.DaoMap) - 1
 		name = utils.Ucfirst(utils.CaseToCamel(structName))
-		D.Name = dao + name
+		D.StructName = dao + name
 		D.RealName = name
 		D.OutDir = file
 		D.OutStruct = D.OutDir + utils.PathSeparator() + dao + strings.Trim(name, dao)
 		D.File = D.OutDir + utils.PathSeparator() + D.RealName + ".go"
-		D.Package = pkg
+		D.PackageName = pkg
 		return D
 	} else {
 		log.Fatalln(`name format error: ` + name)
@@ -139,7 +147,7 @@ func (this *Dao) generate() {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.File, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0755)
+	outFile := utils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	defer outFile.Close()
 	tpl := this.Template("dao.tpl")
 	tmpl, err := template.New("dao.tpl").Parse(tpl)

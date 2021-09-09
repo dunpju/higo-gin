@@ -3,8 +3,6 @@ package CoinModel
 import (
 	"github.com/dengpju/higo-gin/higo"
 )
-
-
 func WithId(v int) higo.Property {
 	return func(class higo.IClass) {
 		class.(*Impl).Id = v

@@ -8,9 +8,9 @@ import (
 
 type Impl struct {
 	*higo.Orm `inject:"Bean.NewOrm()"`
-	Id        int    `gorm:"column:id"`
-	Uname     string `gorm:"column:uname"`
-	Coin      int    `gorm:"column:coin"`
+	Id        int    `gorm:"column:id" json:"id" comment:""`
+	Uname     string `gorm:"column:uname" json:"uname" comment:""`
+	Coin      int    `gorm:"column:coin" json:"coin" comment:""`
 }
 
 func New(attrs ...higo.Property) *Impl {

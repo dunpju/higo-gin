@@ -107,10 +107,11 @@ eg: -out=test\app\Models`)
 			fmt.Printf("Your Choice Generate Entity: %s\n", isGenerateEntity)
 			db := newOrm().DB
 			if this.Name == "all" {
-				newModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
-				tables := newModel.GetTables()
+				tables := templates.GetTables(db, GetDbConfig().Database)
 				for _, table := range tables {
-					templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
+					genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+					genModel.Generate()
+					genModel.
 				}
 			} else {
 				templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix).Generate()
