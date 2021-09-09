@@ -1,46 +1,51 @@
-package AdminEntity
+package {{.PackageName}}
 
 import (
 	"github.com/dengpju/higo-gin/higo"
 	"time"
 )
 
-type Impl struct {
+type {{.StructName}} struct {
 	isEdit      bool
 	currentFlag higo.Flag
-	AdminId     int64       `json:"admin_id"`
-	AdminName   string      `json:"admin_name"`
-	UserId      int64       `json:"user_id"`
-	State       int         `json:"state"`
-	IsSuper     int         `json:"is_super"`
-	Password    string      `json:"password"`
-	CreateTime  time.Time   `json:"create_time" comment:"创建时间"`
-	UpdateTime  time.Time   `json:"update_time" comment:"更新时间"`
-	DeleteTime  interface{} `json:"delete_time" comment:"删除时间"`
+	{{- range .StructFields}}
+	{{.FieldName}}    {{.FieldType}}    `gorm:"column:{{.TableFieldName}}" json:"{{.TableFieldName}}" comment:"{{.TableFieldComment}}"`
+    {{- end}}
 }
 
-func New() *Impl {
+func New() *{{.StructName}} {
+	{{- if .HasCreateTime and .HasUpdateTime}}
 	t := time.Now()
-	return &Impl{CreateTime: t, UpdateTime: t}
+    return &{{.StructName}}{CreateTime: t, UpdateTime: t}
+    {{- else if .HasCreateTime}}
+	t := time.Now()
+    return &{{.StructName}}{CreateTime: t}
+    {{- else if .HasUpdateTime}}
+	t := time.Now()
+    return &{{.StructName}}{UpdateTime: t}
+	{{- else}}
+	return &{{.StructName}}{}
+    {{- end}}
+
 }
 
-func (this *Impl) IsEdit() bool {
+func (this *{{.StructName}}) IsEdit() bool {
 	return this.isEdit
 }
 
-func (this *Impl) SetIsEdit(isEdit bool) {
+func (this *{{.StructName}}) SetIsEdit(isEdit bool) {
 	this.isEdit = isEdit
 }
 
-func (this *Impl) SetFlag(flag higo.Flag) {
+func (this *{{.StructName}}) SetFlag(flag higo.Flag) {
 	this.currentFlag = flag
 	this.isEdit = true
 }
 
-func (this *Impl) Flag() higo.Flag {
+func (this *{{.StructName}}) Flag() higo.Flag {
 	return this.currentFlag
 }
 
-func (this *Impl) PriEmpty() bool {
-	return this.AdminId == 0
+func (this *{{.StructName}}) PriEmpty() bool {
+	return this.{{.PrimaryId}} == 0
 }
