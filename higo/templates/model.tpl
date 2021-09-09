@@ -12,7 +12,7 @@ import (
     {{- end}}
 )
 
-type {{.ModelImpl}} struct {
+type {{.Impl}} struct {
 	*higo.Orm    `inject:"Bean.NewOrm()"`
 	{{- range .TplFields}}
 	{{.Field}}    {{.Type}}    `gorm:"column:{{.DbField}}" json:"{{.DbField}}" comment:"{{.Comment}}"`
@@ -24,22 +24,22 @@ func init() {
 	New().RegisterValidator()
 }
 
-func New(attrs ...higo.Property) *{{.ModelImpl}} {
-	impl := &{{.ModelImpl}}{}
+func New(attrs ...higo.Property) *{{.Impl}} {
+	impl := &{{.Impl}}{}
 	higo.Propertys(attrs).Apply(impl)
 	injector.BeanFactory.Apply(impl)
 	return impl
 }
 
-func (this *{{.ModelImpl}}) New() higo.IClass {
+func (this *{{.Impl}}) New() higo.IClass {
 	return New()
 }
 
-func (this *{{.ModelImpl}}) TableName() string {
+func (this *{{.Impl}}) TableName() string {
 	return "{{.TableName}}"
 }
 
-func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
+func (this *{{.Impl}}) Mutate(attrs ...higo.Property) higo.Model {
 	higo.Propertys(attrs).Apply(this)
 	return this
 }
@@ -48,7 +48,7 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 //require import "gitee.com/dengpju/higo-code/code"
 //
 //example code:
-//func (this *ModelImpl) RegisterValidator() higo.Valid {
+//func (this *Impl) RegisterValidator() higo.Valid {
 //	return higo.RegisterValid(this).
 //		Tag("custom_tag_name",
 //			higo.Rule("required", Codes.Success),
@@ -56,24 +56,24 @@ func (this *{{.ModelImpl}}) Mutate(attrs ...higo.Property) higo.Model {
 //  Or
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
-func (this *ModelImpl) RegisterValidator() higo.Valid {
+func (this *Impl) RegisterValidator() higo.Valid {
     return higo.RegisterValid(this)
 }
 
-func (this *ModelImpl) Exist() bool {
+func (this *Impl) Exist() bool {
 	return this.{{.HumpPRI}} > 0
 }
 
-func (this *ModelImpl) GetBy{{.HumpPRI}}({{.HumpPRI}} {{.PriType}}, columns ...string) *gorm.DB {
+func (this *Impl) GetBy{{.HumpPRI}}({{.HumpPRI}} {{.PriType}}, columns ...string) *gorm.DB {
 	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` = ?", {{.HumpPRI}}).ToSql()).Query()
 }
 
-func (this *ModelImpl) GetBy{{.HumpPRI}}s({{.HumpPRI}}s []string, columns ...string) *gorm.DB {
+func (this *Impl) GetBy{{.HumpPRI}}s({{.HumpPRI}}s []string, columns ...string) *gorm.DB {
 	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.PRI}}` IN(?)", strings.Join({{.HumpPRI}}s, ",")).ToSql()).Query()
 }
 
-func (this *ModelImpl) Paginate(perPage, page uint64) *higo.Pager {
-	models := make([]*ModelImpl, 0)
+func (this *Impl) Paginate(perPage, page uint64) *higo.Pager {
+	models := make([]*Impl, 0)
 	pager := higo.NewPager(perPage, page)
 	this.Table(this.TableName()). /**Where().*/ Paginate(pager).Find(&models)
 	pager.Items = models
