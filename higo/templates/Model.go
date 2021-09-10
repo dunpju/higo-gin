@@ -70,6 +70,7 @@ type Model struct {
 	HasUpdateTime      bool
 	HasDeleteTime      bool
 	UpdateTimeField    string
+	DeleteTimeField    string
 }
 
 func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
@@ -121,6 +122,7 @@ func (this *Model) Generate() {
 		}
 		if tableField.Field == "delete_time" {
 			this.HasDeleteTime = true
+			this.DeleteTimeField = structField.FieldName
 		}
 		if tableField.Key == "PRI" {
 			this.TablePrimaryId = structField.TableFieldName

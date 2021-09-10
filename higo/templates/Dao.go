@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"runtime"
@@ -41,6 +40,7 @@ type Dao struct {
 	HasUpdateTime         bool
 	HasDeleteTime         bool
 	EntityUpdateTimeField string
+	EntityDeleteTimeField string
 	OutDir                string
 	FileName              string
 }
@@ -80,6 +80,7 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 		HasUpdateTime:         model.HasUpdateTime,
 		HasDeleteTime:         model.HasDeleteTime,
 		EntityUpdateTimeField: entity.UpdateTimeField,
+		EntityDeleteTimeField: entity.DeleteTimeField,
 		OutDir:                modelTool.OutDaoDir + utils.PathSeparator() + packageName,
 		FileName:              DaoFileName,
 	}
@@ -108,7 +109,7 @@ func (this *Dao) generate() {
 	utils.Dir(this.OutDir).Create()
 	fileName := this.OutDir + utils.PathSeparator() + this.FileName + ".go"
 	if utils.FileExist(fileName) {
-		log.Println(fileName + " already existed")
+		fmt.Println("dao: " + fileName + " already existed")
 		return
 	}
 	outFile := utils.NewFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)

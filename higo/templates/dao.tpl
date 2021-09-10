@@ -44,7 +44,7 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 		{{- if .HasUpdateTime}}
 		builder := this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
 		{{- else}}
-		_ := this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
+		_ = this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
 		{{- end}}
 		if {{.EntityPackageName}}.FlagDelete == entity.Flag() {
 
@@ -52,7 +52,7 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 
 		}
 		{{- if .HasUpdateTime}}
-		builder.Set({{.ModelPackageName}}.{{EntityUpdateTimeField}}, entity.{{.EntityUpdateTimeField}})
+		builder.Set({{.ModelPackageName}}.{{.EntityUpdateTimeField}}, entity.{{.EntityUpdateTimeField}})
 		{{- end}}
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
@@ -87,9 +87,9 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.Prim
 	model := this.Model()
 	model.Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where("`{{.TablePrimaryId}}` = ?", {{.SmallHumpPrimaryId}}).
+		Where({{.ModelPackageName}}.{{.PrimaryId}}+" = ?", {{.SmallHumpPrimaryId}}).
 		{{- if .HasDeleteTime}}
-        Where("isnull(`delete_time`)").
+        Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
         {{- end}}
 		ToSql()).Query().Scan(&model)
 	return model
@@ -103,9 +103,9 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []interface{}, fi
 	models := this.Models()
 	this.Model().Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where("`{{.TablePrimaryId}}` IN (?)", strings.Join(utils.ConvStrSlice({{.SmallHumpPrimaryId}}s), ",")).
+		Where({{.ModelPackageName}}.{{.PrimaryId}}+" IN (?)", strings.Join(utils.ConvStrSlice({{.SmallHumpPrimaryId}}s), ",")).
 		{{- if .HasDeleteTime}}
-		Where("isnull(`delete_time`)").
+		Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
 		{{- end}}
 		ToSql()).Query().Scan(&models)
 	return models
@@ -115,7 +115,7 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []interface{}, fi
 func (this *Dao) DeleteByAdminId({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
 	higo.Result(this.model.Mapper(sql.Delete(this.model.TableName()).
 		DeleteBuilder().
-		Where("{{.TablePrimaryId}} = ?", {{.SmallHumpPrimaryId}}).
+		Where({{.ModelPackageName}}.{{.PrimaryId}}+" = ?", {{.SmallHumpPrimaryId}}).
 		ToSql()).Exec().Error).Unwrap()
 }
 

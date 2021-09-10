@@ -19,6 +19,7 @@ type Entity struct {
 	HasCreateTime   bool
 	HasUpdateTime   bool
 	UpdateTimeField string
+	DeleteTimeField string
 	OutDir          string
 	FileName        string
 }
@@ -45,6 +46,7 @@ func NewEntity(modelTool ModelTool, model Model) *Entity {
 		HasCreateTime:   model.HasCreateTime,
 		HasUpdateTime:   model.HasUpdateTime,
 		UpdateTimeField: model.UpdateTimeField,
+		DeleteTimeField: model.DeleteTimeField,
 		OutDir:          modelTool.OutEntityDir + utils.PathSeparator() + packageName,
 		FileName:        EntityFileName,
 	}
@@ -87,21 +89,23 @@ func (this *Entity) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile = utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
-	flagFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-	if err != nil {
-		panic(err)
-	}
-	defer flagFile.Close()
-	tpl = this.Template(EntityFileName + "_" + EntityFlagFileName + ".tpl")
-	tmpl, err = template.New(attributes).Parse(tpl)
-	if err != nil {
-		panic(err)
-	}
-	//生成flag.go
-	err = tmpl.Execute(flagFile, this)
-	if err != nil {
-		panic(err)
+	outFlagFile := utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
+	if !utils.FileExist(outFlagFile.Name) { // flag.go 不存在则生成
+		flagFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		if err != nil {
+			panic(err)
+		}
+		defer flagFile.Close()
+		tpl = this.Template(EntityFileName + "_" + EntityFlagFileName + ".tpl")
+		tmpl, err = template.New(attributes).Parse(tpl)
+		if err != nil {
+			panic(err)
+		}
+		//生成flag.go
+		err = tmpl.Execute(flagFile, this)
+		if err != nil {
+			panic(err)
+		}
 	}
 	fmt.Println("entity: " + this.OutDir + " generate success!")
 }
