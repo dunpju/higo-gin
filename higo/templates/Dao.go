@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strings"
 	"text/template"
 )
 
@@ -35,6 +36,9 @@ type Dao struct {
 	TablePrimaryId     string
 	TableFields        []TableField
 	ModelFields        []StructField
+	LenModelFields     int
+	HasCreateTime      bool
+	HasUpdateTime      bool
 	HasDeleteTime      bool
 	OutDir             string
 	FileName           string
@@ -49,23 +53,30 @@ const (
 func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 	packageName := model.HumpUnpreTableName + DaoDirSuffix
 	modName := GetModName() + utils.PathSeparator()
+	modelImport := `"` + modName + model.OutDir + `"`
+	modelImport = strings.ReplaceAll(modelImport, utils.PathSeparator(), "/")
+	entityImport := `"` + modName + entity.OutDir + `"`
+	entityImport = strings.ReplaceAll(entityImport, utils.PathSeparator(), "/")
 	return &Dao{
 		PackageName: packageName,
 		Imports: map[string]string{
-			"modelImport":  `"` + modName + model.OutDir + `"`,
-			"entityImport": `"` + modName + modelTool.OutEntityDir + utils.PathSeparator() + `"`,
+			"modelImport":  modelImport,
+			"entityImport": entityImport,
 		},
 		StructName:         DaoStructName,
 		ModelPackageName:   model.PackageName,
 		ModelName:          model.StructName,
-		EntityPackageName:  model.StructName,
-		EntityName:         model.StructName,
+		EntityPackageName:  entity.PackageName,
+		EntityName:         entity.StructName,
 		PrimaryId:          model.PrimaryId,
 		SmallHumpPrimaryId: model.SmallHumpPrimaryId,
 		PrimaryIdType:      model.PrimaryIdType,
 		TablePrimaryId:     model.TablePrimaryId,
 		TableFields:        model.TableFields,
 		ModelFields:        model.StructFields,
+		LenModelFields:     len(model.StructFields) - 1,
+		HasCreateTime:      model.HasCreateTime,
+		HasUpdateTime:      model.HasUpdateTime,
 		HasDeleteTime:      model.HasDeleteTime,
 		OutDir:             modelTool.OutDaoDir + utils.PathSeparator() + packageName,
 		FileName:           DaoFileName,
@@ -93,21 +104,22 @@ func (this *Dao) Generate() {
 
 func (this *Dao) generate() {
 	utils.Dir(this.OutDir).Create()
-	if utils.FileExist(this.FileName) {
-		log.Println(this.FileName + " already existed")
+	fileName := this.OutDir + utils.PathSeparator() + this.FileName + ".go"
+	if utils.FileExist(fileName) {
+		log.Println(fileName + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.FileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := utils.NewFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	defer outFile.Close()
-	tpl := this.Template("dao.tpl")
-	tmpl, err := template.New("dao.tpl").Parse(tpl)
+	tpl := this.Template(DaoFileName + ".tpl")
+	tmpl, err := template.New(DaoFileName + ".tpl").Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
-	//生成enum
+	//生成dao.go
 	err = tmpl.Execute(outFile.File(), this)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("dao: " + this.StructName + " generate success!")
+	fmt.Println("dao: " + this.OutDir + " generate success!")
 }

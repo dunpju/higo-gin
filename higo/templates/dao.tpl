@@ -5,8 +5,6 @@ import (
 	"github.com/dengpju/higo-gin/higo/errcodg"
 	"github.com/dengpju/higo-gin/higo/exceptions/DaoException"
 	"github.com/dengpju/higo-gin/higo/sql"
-	"github.com/dengpju/higo-gin/test/app/Entity/AdminEntity"
-	"github.com/dengpju/higo-gin/test/app/Models/AdminModel"
 	"github.com/dengpju/higo-utils/utils"
 	"strings"
 	{{- range $impo := .Imports}}
@@ -31,7 +29,7 @@ func (this *{{.StructName}}) Model() *{{.ModelPackageName}}.{{.ModelName}} {
 }
 
 func (this *{{.StructName}}) Models() []*{{.ModelPackageName}}.{{.ModelName}} {
-	return make([]*{{.ModelPackageName}}.{{.ModelName}}``, 0)
+	return make([]*{{.ModelPackageName}}.{{.ModelName}}, 0)
 }
 
 func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityName}}) {
@@ -42,20 +40,24 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 		if !this.GetBy{{.PrimaryId}}(entity.{{.PrimaryId}}).Exist() {
 			DaoException.Throw(errcodg.NotExistError.Message(), int(errcodg.NotExistError))
 		}
-		builder := this.model.Update(this.model.TableName()).Where("{{.TablePrimaryId}}", entity.{{.PrimaryId}})
+		builder := this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
 		if {{.EntityPackageName}}.FlagDelete == entity.Flag() {
 
 		} else {
 
 		}
-		builder.Set("update_time", entity.UpdateTime)
+		{{- if .HasUpdateTime}}
+		builder.Set({{.ModelPackageName}}.UpdateTime, entity.UpdateTime)
+		{{- end}}
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
-		    Set(string(AdminModel.AdminName), entity.AdminName).
-			Set("admin_name", entity.AdminName).
-			Set("user_id", entity.UserId).
-			Set("create_time", entity.CreateTime).
-			Set("update_time", entity.UpdateTime)
+		{{- range $i,$v := .ModelFields}}
+		    {{- if ne $i $.LenModelFields}}
+            Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}}).  //{{$v.TableFieldComment}}
+            {{- else}}
+            Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}})  //{{$v.TableFieldComment}}
+            {{- end}}
+        {{- end}}
 	}
 	this.model.Build()
 }
