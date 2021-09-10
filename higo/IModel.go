@@ -19,5 +19,3 @@ func MakeModels(v interface{}) Models {
 	}
 	return Models(b)
 }
-
-type DbFieldName string

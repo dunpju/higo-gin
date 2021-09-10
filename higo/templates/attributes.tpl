@@ -9,7 +9,7 @@ import (
 
 const (
     {{- range .StructFields}}
-    {{.FieldName}}   higo.DbFieldName = "{{.TableFieldName}}"  //{{.TableFieldComment}}
+    {{.FieldName}} = "{{.TableFieldName}}"  //{{.TableFieldComment}}
     {{- end}}
 )
 
