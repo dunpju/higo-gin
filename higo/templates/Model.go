@@ -34,6 +34,32 @@ type Model struct {
 	HasDeleteTime  bool
 }
 
+type YesNo string
+
+func (this YesNo) Bool() bool {
+	lower := strings.ToLower(string(this))
+	if lower == "yes" {
+		return true
+	} else if lower == "no" {
+		return false
+	}
+	panic(fmt.Errorf("Undefined Constant"))
+}
+
+type ModelTool struct {
+	Name                 string
+	Out                  string
+	ConfirmBeginGenerate YesNo
+	IsGenerateDao        YesNo
+	IsGenerateEntity     YesNo
+	OutDaoDir            string
+	OutEntityDir         string
+}
+
+func NewModelTool() *ModelTool {
+	return &ModelTool{ConfirmBeginGenerate: "yes", IsGenerateDao: "yes", IsGenerateEntity: "yes"}
+}
+
 const ModelStructName = "Impl"
 
 func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {

@@ -51,6 +51,7 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 		builder.Set("update_time", entity.UpdateTime)
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
+		    Set(string(AdminModel.AdminName), entity.AdminName).
 			Set("admin_name", entity.AdminName).
 			Set("user_id", entity.UserId).
 			Set("create_time", entity.CreateTime).

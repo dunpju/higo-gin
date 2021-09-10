@@ -7,7 +7,13 @@ import (
     {{- end}}
 )
 
-{{range .StructFields}}
+const (
+    {{- range .StructFields}}
+    {{.FieldName}}   higo.DbFieldName = "{{.TableFieldName}}"  //{{.TableFieldComment}}
+    {{- end}}
+)
+
+{{- range .StructFields}}
 func With{{.FieldName}}(v {{.FieldType}}) higo.Property {
 	return func(class higo.IClass) {
 		class.(*{{$.StructName}}).{{.FieldName}} = v

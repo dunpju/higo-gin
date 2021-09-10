@@ -8,29 +8,16 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 )
 
 const (
-	controller       = "controller"
-	model            = "model"
-	enum             = "enum"
-	codes            = "code"
-	yes        YesNo = "yes"
-	no         YesNo = "no"
+	controller                 = "controller"
+	model                      = "model"
+	enum                       = "enum"
+	codes                      = "code"
+	yes        templates.YesNo = "yes"
+	no         templates.YesNo = "no"
 )
-
-type YesNo string
-
-func (this YesNo) Bool() bool {
-	lower := strings.ToLower(string(this))
-	if lower == "yes" {
-		return true
-	} else if lower == "no" {
-		return false
-	}
-	panic(fmt.Errorf("Undefined Constant"))
-}
 
 type Tool struct {
 	Gen     string
@@ -41,20 +28,6 @@ type Tool struct {
 
 func NewTool() *Tool {
 	return &Tool{}
-}
-
-type ModelTool struct {
-	Name                 string
-	Out                  string
-	ConfirmBeginGenerate YesNo
-	IsGenerateDao        YesNo
-	IsGenerateEntity     YesNo
-	OutDaoDir            string
-	OutEntityDir         string
-}
-
-func NewModelTool() *ModelTool {
-	return &ModelTool{ConfirmBeginGenerate: "yes", IsGenerateDao: "yes", IsGenerateEntity: "yes"}
 }
 
 func (this *Tool) Cmd() {
@@ -116,7 +89,7 @@ eg: -out=test\app\Models`)
 		loopDao:
 			capitalBeganReg := regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 			isMatchCapitalBegan := ""
-			modelTool := NewModelTool()
+			modelTool := templates.NewModelTool()
 			modelTool.Name = this.Name
 			modelTool.Out = this.Out
 			fmt.Print("Whether To Generate Dao [yes|no] (default:yes):")
@@ -160,7 +133,7 @@ eg: -out=test\app\Models`)
 			}
 		loopChoiceGenerateEntity:
 			fmt.Printf("Your Choice Generate Entity: %s\n", modelTool.IsGenerateEntity)
-			if modelTool.IsGenerateEntity.Bool() {//确认构建entity
+			if modelTool.IsGenerateEntity.Bool() { //确认构建entity
 				entityDir := "entity"
 				isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
 				if isMatchCapitalBegan != "" {
@@ -198,6 +171,9 @@ eg: -out=test\app\Models`)
 			} else {
 				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 				genModel.Generate()
+				if modelTool.IsGenerateDao.Bool() {
+
+				}
 				if modelTool.IsGenerateEntity.Bool() {
 
 				}

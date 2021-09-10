@@ -44,9 +44,8 @@ type Dao struct {
 
 var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
 
-func NewDao(pkg string, name string, file string) *Dao {
-
-	return &Dao{}
+func NewDao(modelTool ModelTool, model Model) *Dao {
+	return &Dao{OutDir: modelTool.OutDaoDir}
 }
 
 func newDao(pkg string, name string, file string) *Dao {
