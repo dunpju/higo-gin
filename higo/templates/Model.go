@@ -30,13 +30,16 @@ type Model struct {
 	DB             *gorm.DB
 	Database       string
 	Prefix         string
-	Dir            string
+	OutDir         string
+	HasDeleteTime  bool
 }
 
-func NewModel(DB *gorm.DB, name, dir, db, pre string) *Model {
+const ModelStructName = "Impl"
+
+func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
 	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + "Model"
-	return &Model{DB: DB, TableName: name, PackageName: pkg, StructName: "Impl",
-		Dir: dir + utils.PathSeparator() + pkg, Database: db, Prefix: pre,
+	return &Model{DB: DB, TableName: name, PackageName: pkg, StructName: ModelStructName,
+		OutDir: outDir + utils.PathSeparator() + pkg, Database: db, Prefix: pre,
 		Imports: make(map[string]string),
 	}
 }
@@ -65,6 +68,9 @@ func (this *Model) Generate() {
 			TableFieldName:    tableField.Field,
 			TableFieldComment: tableField.Comment,
 		}
+		if tableField.Field == "delete_time" {
+			this.HasDeleteTime = true
+		}
 		if tableField.Key == "PRI" {
 			this.TablePrimaryId = tField.TableFieldName
 			this.PrimaryIdType = tField.FieldType
@@ -78,8 +84,8 @@ func (this *Model) Generate() {
 		}
 		this.StructFields = append(this.StructFields, tField)
 	}
-	if _, err := os.Stat(this.Dir); os.IsNotExist(err) {
-		if err = os.Mkdir(this.Dir, os.ModePerm); err != nil {
+	if _, err := os.Stat(this.OutDir); os.IsNotExist(err) {
+		if err = os.Mkdir(this.OutDir, os.ModePerm); err != nil {
 			panic(err)
 		}
 	}
@@ -88,7 +94,7 @@ func (this *Model) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := utils.File{Name: this.Dir + utils.PathSeparator() + "model.go"}
+	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + "model.go"}
 	if outfile.Exist() {
 		//生成最新ast buffer
 		bufferbuf := new(bytes.Buffer)
@@ -179,7 +185,7 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	}
-	outfile = utils.File{Name: this.Dir + utils.PathSeparator() + "attributes.go"}
+	outfile = utils.File{Name: this.OutDir + utils.PathSeparator() + "attributes.go"}
 	attributesFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
@@ -195,7 +201,7 @@ func (this *Model) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("model: " + this.Dir + " generate success!")
+	fmt.Println("model: " + this.OutDir + " generate success!")
 }
 
 func GetTables(db *gorm.DB, database string, tableNames ...string) []Table {

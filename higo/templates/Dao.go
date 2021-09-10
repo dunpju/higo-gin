@@ -39,7 +39,7 @@ type Dao struct {
 	HasDeleteTime     bool
 	OutStruct         string
 	OutDir            string
-	File              string
+	FileName          string
 }
 
 var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
@@ -88,11 +88,11 @@ func (this *Dao) Generate() {
 
 func (this *Dao) generate() {
 	utils.Dir(this.OutDir).Create()
-	if utils.FileExist(this.File) {
-		log.Println(this.File + " already existed")
+	if utils.FileExist(this.FileName) {
+		log.Println(this.FileName + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := utils.NewFile(this.FileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	defer outFile.Close()
 	tpl := this.Template("dao.tpl")
 	tmpl, err := template.New("dao.tpl").Parse(tpl)

@@ -8,14 +8,29 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strings"
 )
 
 const (
-	controller = "controller"
-	model      = "model"
-	enum       = "enum"
-	codes      = "code"
+	controller       = "controller"
+	model            = "model"
+	enum             = "enum"
+	codes            = "code"
+	yes        YesNo = "yes"
+	no         YesNo = "no"
 )
+
+type YesNo string
+
+func (this YesNo) Bool() bool {
+	lower := strings.ToLower(string(this))
+	if lower == "yes" {
+		return true
+	} else if lower == "no" {
+		return false
+	}
+	panic(fmt.Errorf("Undefined Constant"))
+}
 
 type Tool struct {
 	Gen     string
@@ -31,9 +46,9 @@ func NewTool() *Tool {
 type ModelTool struct {
 	Name                 string
 	Out                  string
-	ConfirmBeginGenerate string
-	IsGenerateDao        string
-	IsGenerateEntity     string
+	ConfirmBeginGenerate YesNo
+	IsGenerateDao        YesNo
+	IsGenerateEntity     YesNo
 	OutDaoDir            string
 	OutEntityDir         string
 }
@@ -99,6 +114,8 @@ eg: -name=ts_user`)
 eg: -out=test\app\Models`)
 			}
 		loopDao:
+			capitalBeganReg := regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
+			isMatchCapitalBegan := ""
 			modelTool := NewModelTool()
 			modelTool.Name = this.Name
 			modelTool.Out = this.Out
@@ -107,58 +124,65 @@ eg: -out=test\app\Models`)
 			if nil != err && n > 0 {
 				panic(err)
 			}
-			if ("yes" != modelTool.IsGenerateDao && "no" != modelTool.IsGenerateDao) && n > 0 {
+			if (yes != modelTool.IsGenerateDao && no != modelTool.IsGenerateDao) && n > 0 {
 				goto loopDao
 			}
 			fmt.Printf("Your Choice Generate Dao: %s\n", modelTool.IsGenerateDao)
-			capitalBeganReg := regexp.MustCompile(`^[A-Z].*`)
-			if capitalBeganReg == nil {
-				log.Fatalln("regexp err")
+			if modelTool.IsGenerateDao.Bool() { //确认构建dao
+				if capitalBeganReg == nil {
+					log.Fatalln("regexp err")
+				}
+				daoDir := "dao"
+				isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
+				if isMatchCapitalBegan != "" {
+					daoDir = utils.Ucfirst(daoDir)
+				}
+				outDaoDir := utils.Dirname(this.Out) + `\` + daoDir
+				fmt.Printf("Whether To Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", outDaoDir)
+				modelTool.OutDaoDir = outDaoDir
+				n, err = fmt.Scanln(&modelTool.OutDaoDir)
+				if nil != err && n > 0 {
+					panic(err)
+				}
+				fmt.Printf("You Confirmed Output Directory Of Dao: %s\n", modelTool.OutDaoDir)
+				//确认构建dao，默认必须构建entity
+				modelTool.IsGenerateEntity = yes
+				goto loopChoiceGenerateEntity
 			}
-			daoDir := "dao"
-			isMatchCapitalBegan := capitalBeganReg.FindString(utils.Basename(this.Out))
-			if isMatchCapitalBegan != "" {
-				daoDir = utils.Ucfirst(daoDir)
-			}
-			outDaoDir := utils.Dirname(this.Out) + `\` + daoDir
-			fmt.Printf("Whether To Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", outDaoDir)
-			modelTool.OutDaoDir = outDaoDir
-			n, err = fmt.Scanln(&modelTool.OutDaoDir)
-			if nil != err && n > 0 {
-				panic(err)
-			}
-			fmt.Printf("You Confirmed Output Directory Of Dao: %s\n", modelTool.OutDaoDir)
 		loopEntity:
 			fmt.Print("Whether To Generate Entity [yes|no] (default:yes):")
 			n, err = fmt.Scanln(&modelTool.IsGenerateEntity)
 			if nil != err && n > 0 {
 				panic(err)
 			}
-			if ("yes" != modelTool.IsGenerateEntity && "no" != modelTool.IsGenerateEntity) && n > 0 {
+			if (yes != modelTool.IsGenerateEntity && no != modelTool.IsGenerateEntity) && n > 0 {
 				goto loopEntity
 			}
+		loopChoiceGenerateEntity:
 			fmt.Printf("Your Choice Generate Entity: %s\n", modelTool.IsGenerateEntity)
-			entityDir := "entity"
-			isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
-			if isMatchCapitalBegan != "" {
-				entityDir = utils.Ucfirst(entityDir)
+			if modelTool.IsGenerateEntity.Bool() {//确认构建entity
+				entityDir := "entity"
+				isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
+				if isMatchCapitalBegan != "" {
+					entityDir = utils.Ucfirst(entityDir)
+				}
+				outEntityDir := utils.Dirname(this.Out) + `\` + entityDir
+				fmt.Printf("Whether To Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", outEntityDir)
+				modelTool.OutEntityDir = outEntityDir
+				n, err = fmt.Scanln(&modelTool.OutEntityDir)
+				if nil != err && n > 0 {
+					panic(err)
+				}
+				fmt.Printf("You Confirmed Output Directory Of Entity: %s\n", modelTool.OutEntityDir)
 			}
-			outEntityDir := utils.Dirname(this.Out) + `\` + entityDir
-			fmt.Printf("Whether To Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", outEntityDir)
-			modelTool.OutEntityDir = outEntityDir
-			n, err = fmt.Scanln(&modelTool.OutEntityDir)
-			if nil != err && n > 0 {
-				panic(err)
-			}
-			fmt.Printf("You Confirmed Output Directory Of Entity: %s\n", modelTool.OutEntityDir)
 			//确认开始构建
 		loopConfirmBeginGenerate:
 			fmt.Print("Confirm To Start Generate [yes|no] (default:yes):")
 			n, err = fmt.Scanln(&modelTool.ConfirmBeginGenerate)
-			if ("yes" != modelTool.ConfirmBeginGenerate && "no" != modelTool.ConfirmBeginGenerate) && n > 0 {
+			if (yes != modelTool.ConfirmBeginGenerate && no != modelTool.ConfirmBeginGenerate) && n > 0 {
 				goto loopConfirmBeginGenerate
 			}
-			if ("yes" != modelTool.ConfirmBeginGenerate) && n > 0 {
+			if (yes != modelTool.ConfirmBeginGenerate) && n > 0 {
 				goto loopDao
 			}
 			fmt.Println(modelTool)
@@ -174,6 +198,9 @@ eg: -out=test\app\Models`)
 			} else {
 				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 				genModel.Generate()
+				if modelTool.IsGenerateEntity.Bool() {
+
+				}
 				log.Fatalln(genModel)
 			}
 		} else {
