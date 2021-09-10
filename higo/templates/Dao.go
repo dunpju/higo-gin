@@ -3,13 +3,11 @@ package templates
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
-	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"runtime"
-	"strings"
 	"text/template"
 )
 
@@ -48,11 +46,15 @@ const (
 	DaoFileName   = "dao"
 )
 
-func NewDao(modelTool ModelTool, model Model) *Dao {
-	packageName := generator.CamelCase(strings.Replace(model.TableName, model.Prefix, "", 1)) + DaoDirSuffix
+func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
+	packageName := model.HumpUnpreTableName + DaoDirSuffix
+	modName := GetModName() + utils.PathSeparator()
 	return &Dao{
 		PackageName: packageName,
-		Imports:            make(map[string]string),
+		Imports: map[string]string{
+			"modelImport":  `"` + modName + model.OutDir + `"`,
+			"entityImport": `"` + modName + modelTool.OutEntityDir + utils.PathSeparator() + `"`,
+		},
 		StructName:         DaoStructName,
 		ModelPackageName:   model.PackageName,
 		ModelName:          model.StructName,

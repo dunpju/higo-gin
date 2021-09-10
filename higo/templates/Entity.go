@@ -11,8 +11,22 @@ type Entity struct {
 	FileName      string
 }
 
+const (
+	EntityStructName = "Impl"
+	EntityDirSuffix  = "Entity"
+	EntityFileName   = "entity"
+)
 
-
-func NewEntity() *Entity {
-	return &Entity{}
+func NewEntity(modelTool ModelTool, model Model) *Entity {
+	packageName := model.HumpUnpreTableName + EntityDirSuffix
+	return &Entity{
+		PackageName:   packageName,
+		StructName:    EntityStructName,
+		PrimaryId:     model.PrimaryId,
+		StructFields:  model.StructFields,
+		HasCreateTime: model.HasCreateTime,
+		HasUpdateTime: model.HasUpdateTime,
+		OutDir:        modelTool.OutEntityDir,
+		FileName:      EntityFileName,
+	}
 }

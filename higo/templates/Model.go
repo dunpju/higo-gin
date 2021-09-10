@@ -53,6 +53,7 @@ type Model struct {
 	Imports            map[string]string
 	StructName         string
 	TableName          string
+	HumpUnpreTableName string //驼峰无前缀表名
 	PrimaryId          string //大驼峰
 	SmallHumpPrimaryId string //小驼峰
 	PrimaryIdType      string
@@ -63,14 +64,24 @@ type Model struct {
 	Database           string
 	Prefix             string
 	OutDir             string
+	HasCreateTime      bool
+	HasUpdateTime      bool
 	HasDeleteTime      bool
 }
 
 func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
-	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + ModelDirSuffix
-	return &Model{DB: DB, TableName: name, PackageName: pkg, StructName: ModelStructName,
-		OutDir: outDir + utils.PathSeparator() + pkg, Database: db, Prefix: pre,
-		Imports: make(map[string]string),
+	humpUnpreTableName := generator.CamelCase(strings.Replace(name, pre, "", 1))
+	packageName := humpUnpreTableName + ModelDirSuffix
+	return &Model{
+		DB:                 DB,
+		TableName:          name,
+		HumpUnpreTableName: humpUnpreTableName,
+		PackageName:        packageName,
+		StructName:         ModelStructName,
+		OutDir:             outDir + utils.PathSeparator() + packageName,
+		Database:           db,
+		Prefix:             pre,
+		Imports:            make(map[string]string),
 	}
 }
 
@@ -92,28 +103,34 @@ func (this *Model) Template(tplfile string) string {
 func (this *Model) Generate() {
 	this.TableFields = this.GetTableFields(this.TableName)
 	for _, tableField := range this.TableFields {
-		tField := StructField{
+		structField := StructField{
 			FieldName:         generator.CamelCase(tableField.Field),
 			FieldType:         getFiledType(tableField),
 			TableFieldName:    tableField.Field,
 			TableFieldComment: tableField.Comment,
 		}
+		if tableField.Field == "create_time" {
+			this.HasCreateTime = true
+		}
+		if tableField.Field == "update_time" {
+			this.HasUpdateTime = true
+		}
 		if tableField.Field == "delete_time" {
 			this.HasDeleteTime = true
 		}
 		if tableField.Key == "PRI" {
-			this.TablePrimaryId = tField.TableFieldName
-			this.PrimaryIdType = tField.FieldType
+			this.TablePrimaryId = structField.TableFieldName
+			this.PrimaryIdType = structField.FieldType
 			this.PrimaryId = generator.CamelCase(this.TablePrimaryId)
 			this.SmallHumpPrimaryId = utils.Lcfirst(this.PrimaryId)
-			tField.FieldName = this.PrimaryId
+			structField.FieldName = this.PrimaryId
 		}
-		if tField.FieldType == "time.Time" {
-			if _, ok := this.Imports[tField.FieldType]; !ok {
-				this.Imports[tField.FieldType] = `"time"`
+		if structField.FieldType == "time.Time" {
+			if _, ok := this.Imports[structField.FieldType]; !ok {
+				this.Imports[structField.FieldType] = `"time"`
 			}
 		}
-		this.StructFields = append(this.StructFields, tField)
+		this.StructFields = append(this.StructFields, structField)
 	}
 	if _, err := os.Stat(this.OutDir); os.IsNotExist(err) {
 		if err = os.Mkdir(this.OutDir, os.ModePerm); err != nil {

@@ -43,6 +43,7 @@ func init() {
 	})
 }
 
+//获取模块名称
 func GetModName() string {
 	return moduleName
 }
