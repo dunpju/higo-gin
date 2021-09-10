@@ -167,18 +167,12 @@ eg: -out=test\app\Models`)
 				for _, table := range tables {
 					genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 					genModel.Generate()
+					daoEntity(*modelTool, *genModel)
 				}
 			} else {
 				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 				genModel.Generate()
-				if modelTool.IsGenerateDao.Bool() {
-					entity := templates.NewEntity(*modelTool, *genModel)
-					entity.Generate()
-					templates.NewDao(*modelTool, *genModel, *entity).Generate()
-				} else if modelTool.IsGenerateEntity.Bool() {
-					templates.NewEntity(*modelTool, *genModel).Generate()
-				}
-				log.Fatalln(genModel)
+				daoEntity(*modelTool, *genModel)
 			}
 		} else {
 			log.Fatalln(`gen Arguments Error! 
@@ -187,5 +181,15 @@ Explain: Generate Controller or Model or Enum or Code or Dao or Entity
 	eg:-gen=controller`)
 		}
 		os.Exit(1)
+	}
+}
+
+func daoEntity(modelTool templates.ModelTool, genModel templates.Model) {
+	if modelTool.IsGenerateDao.Bool() {
+		entity := templates.NewEntity(modelTool, genModel)
+		entity.Generate()
+		templates.NewDao(modelTool, genModel, *entity).Generate()
+	} else if modelTool.IsGenerateEntity.Bool() {
+		templates.NewEntity(modelTool, genModel).Generate()
 	}
 }

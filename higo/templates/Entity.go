@@ -11,15 +11,16 @@ import (
 )
 
 type Entity struct {
-	PackageName   string
-	Imports       map[string]string
-	StructName    string
-	PrimaryId     string
-	StructFields  []StructField
-	HasCreateTime bool
-	HasUpdateTime bool
-	OutDir        string
-	FileName      string
+	PackageName     string
+	Imports         map[string]string
+	StructName      string
+	PrimaryId       string
+	StructFields    []StructField
+	HasCreateTime   bool
+	HasUpdateTime   bool
+	UpdateTimeField string
+	OutDir          string
+	FileName        string
 }
 
 const (
@@ -36,15 +37,16 @@ func NewEntity(modelTool ModelTool, model Model) *Entity {
 		imports["time"] = `"time"`
 	}
 	return &Entity{
-		PackageName:   packageName,
-		Imports:       imports,
-		StructName:    EntityStructName,
-		PrimaryId:     model.PrimaryId,
-		StructFields:  model.StructFields,
-		HasCreateTime: model.HasCreateTime,
-		HasUpdateTime: model.HasUpdateTime,
-		OutDir:        modelTool.OutEntityDir + utils.PathSeparator() + packageName,
-		FileName:      EntityFileName,
+		PackageName:     packageName,
+		Imports:         imports,
+		StructName:      EntityStructName,
+		PrimaryId:       model.PrimaryId,
+		StructFields:    model.StructFields,
+		HasCreateTime:   model.HasCreateTime,
+		HasUpdateTime:   model.HasUpdateTime,
+		UpdateTimeField: model.UpdateTimeField,
+		OutDir:          modelTool.OutEntityDir + utils.PathSeparator() + packageName,
+		FileName:        EntityFileName,
 	}
 }
 

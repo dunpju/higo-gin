@@ -40,14 +40,19 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 		if !this.GetBy{{.PrimaryId}}(entity.{{.PrimaryId}}).Exist() {
 			DaoException.Throw(errcodg.NotExistError.Message(), int(errcodg.NotExistError))
 		}
+
+		{{- if .HasUpdateTime}}
 		builder := this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
+		{{- else}}
+		_ := this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
+		{{- end}}
 		if {{.EntityPackageName}}.FlagDelete == entity.Flag() {
 
 		} else {
 
 		}
 		{{- if .HasUpdateTime}}
-		builder.Set({{.ModelPackageName}}.UpdateTime, entity.UpdateTime)
+		builder.Set({{.ModelPackageName}}.{{EntityUpdateTimeField}}, entity.{{.EntityUpdateTimeField}})
 		{{- end}}
 	} else { //新增
 		this.model.Insert(this.model.TableName()).

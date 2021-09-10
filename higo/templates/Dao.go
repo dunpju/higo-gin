@@ -23,25 +23,26 @@ func NewDaoMap(key string, value interface{}, doc string) *DaoMap {
 }
 
 type Dao struct {
-	PackageName        string
-	Imports            map[string]string
-	StructName         string
-	ModelPackageName   string
-	ModelName          string
-	EntityPackageName  string
-	EntityName         string
-	PrimaryId          string //大驼峰
-	SmallHumpPrimaryId string //小驼峰
-	PrimaryIdType      string
-	TablePrimaryId     string
-	TableFields        []TableField
-	ModelFields        []StructField
-	LenModelFields     int
-	HasCreateTime      bool
-	HasUpdateTime      bool
-	HasDeleteTime      bool
-	OutDir             string
-	FileName           string
+	PackageName           string
+	Imports               map[string]string
+	StructName            string
+	ModelPackageName      string
+	ModelName             string
+	EntityPackageName     string
+	EntityName            string
+	PrimaryId             string //大驼峰
+	SmallHumpPrimaryId    string //小驼峰
+	PrimaryIdType         string
+	TablePrimaryId        string
+	TableFields           []TableField
+	ModelFields           []StructField
+	LenModelFields        int
+	HasCreateTime         bool
+	HasUpdateTime         bool
+	HasDeleteTime         bool
+	EntityUpdateTimeField string
+	OutDir                string
+	FileName              string
 }
 
 const (
@@ -63,23 +64,24 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 			"modelImport":  modelImport,
 			"entityImport": entityImport,
 		},
-		StructName:         DaoStructName,
-		ModelPackageName:   model.PackageName,
-		ModelName:          model.StructName,
-		EntityPackageName:  entity.PackageName,
-		EntityName:         entity.StructName,
-		PrimaryId:          model.PrimaryId,
-		SmallHumpPrimaryId: model.SmallHumpPrimaryId,
-		PrimaryIdType:      model.PrimaryIdType,
-		TablePrimaryId:     model.TablePrimaryId,
-		TableFields:        model.TableFields,
-		ModelFields:        model.StructFields,
-		LenModelFields:     len(model.StructFields) - 1,
-		HasCreateTime:      model.HasCreateTime,
-		HasUpdateTime:      model.HasUpdateTime,
-		HasDeleteTime:      model.HasDeleteTime,
-		OutDir:             modelTool.OutDaoDir + utils.PathSeparator() + packageName,
-		FileName:           DaoFileName,
+		StructName:            DaoStructName,
+		ModelPackageName:      model.PackageName,
+		ModelName:             model.StructName,
+		EntityPackageName:     entity.PackageName,
+		EntityName:            entity.StructName,
+		PrimaryId:             model.PrimaryId,
+		SmallHumpPrimaryId:    model.SmallHumpPrimaryId,
+		PrimaryIdType:         model.PrimaryIdType,
+		TablePrimaryId:        model.TablePrimaryId,
+		TableFields:           model.TableFields,
+		ModelFields:           model.StructFields,
+		LenModelFields:        len(model.StructFields) - 1,
+		HasCreateTime:         model.HasCreateTime,
+		HasUpdateTime:         model.HasUpdateTime,
+		HasDeleteTime:         model.HasDeleteTime,
+		EntityUpdateTimeField: entity.UpdateTimeField,
+		OutDir:                modelTool.OutDaoDir + utils.PathSeparator() + packageName,
+		FileName:              DaoFileName,
 	}
 }
 
