@@ -43,7 +43,10 @@ func NewModelTool() *ModelTool {
 	return &ModelTool{ConfirmBeginGenerate: "yes", IsGenerateDao: "yes", IsGenerateEntity: "yes"}
 }
 
-const ModelStructName = "Impl"
+const (
+	ModelStructName = "Impl"
+	ModelDirSuffix  = "Model"
+)
 
 type Model struct {
 	PackageName        string
@@ -64,7 +67,7 @@ type Model struct {
 }
 
 func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
-	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + "Model"
+	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + ModelDirSuffix
 	return &Model{DB: DB, TableName: name, PackageName: pkg, StructName: ModelStructName,
 		OutDir: outDir + utils.PathSeparator() + pkg, Database: db, Prefix: pre,
 		Imports: make(map[string]string),

@@ -3,11 +3,11 @@ package templates
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"regexp"
 	"runtime"
 	"strings"
 	"text/template"
@@ -38,33 +38,36 @@ type Dao struct {
 	TableFields        []TableField
 	ModelFields        []StructField
 	HasDeleteTime      bool
-	OutStruct          string
 	OutDir             string
 	FileName           string
 }
 
-var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
+const (
+	DaoStructName = "Dao"
+	DaoDirSuffix  = "Dao"
+	DaoFileName   = "dao"
+)
 
 func NewDao(modelTool ModelTool, model Model) *Dao {
-	return &Dao{OutDir: modelTool.OutDaoDir}
-}
-
-func newDao(pkg string, name string, file string) *Dao {
-	reg := regexp.MustCompile(daoRegexpStr)
-	if reg == nil {
-		log.Fatalln("regexp err")
+	packageName := generator.CamelCase(strings.Replace(model.TableName, model.Prefix, "", 1)) + DaoDirSuffix
+	return &Dao{
+		PackageName: packageName,
+		Imports:            make(map[string]string),
+		StructName:         DaoStructName,
+		ModelPackageName:   model.PackageName,
+		ModelName:          model.StructName,
+		EntityPackageName:  model.StructName,
+		EntityName:         model.StructName,
+		PrimaryId:          model.PrimaryId,
+		SmallHumpPrimaryId: model.SmallHumpPrimaryId,
+		PrimaryIdType:      model.PrimaryIdType,
+		TablePrimaryId:     model.TablePrimaryId,
+		TableFields:        model.TableFields,
+		ModelFields:        model.StructFields,
+		HasDeleteTime:      model.HasDeleteTime,
+		OutDir:             modelTool.OutDaoDir + utils.PathSeparator() + packageName,
+		FileName:           DaoFileName,
 	}
-	name = strings.Replace(name, "\\", "", -1)
-	name = strings.Trim(name, "\n")
-	name = strings.Trim(name, "\r")
-	name = strings.Trim(name, "")
-	D := &Dao{}
-	if fs := reg.FindString(name); fs != "" {
-
-	} else {
-		log.Fatalln(`name format error: ` + name)
-	}
-	return D
 }
 
 func (this *Dao) Template(tplfile string) string {
@@ -104,5 +107,5 @@ func (this *Dao) generate() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("dao: " + this.OutStruct + " generate success!")
+	fmt.Println("dao: " + this.StructName + " generate success!")
 }
