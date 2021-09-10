@@ -13,6 +13,7 @@ const (
     {{- end}}
 )
 
+
 {{- range .StructFields}}
 func With{{.FieldName}}(v {{.FieldType}}) higo.Property {
 	return func(class higo.IClass) {

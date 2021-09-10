@@ -57,11 +57,13 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
 		{{- range $i,$v := .ModelFields}}
+		{{- if ne $v.FieldName $.EntityDeleteTimeField}}
 		    {{- if ne $i $.LenModelFields}}
             Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}}).  //{{$v.TableFieldComment}}
             {{- else}}
             Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}})  //{{$v.TableFieldComment}}
             {{- end}}
+		{{- end}}
         {{- end}}
 	}
 	this.model.Build()
