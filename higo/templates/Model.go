@@ -17,24 +17,6 @@ import (
 	"text/template"
 )
 
-type Model struct {
-	PackageName        string
-	Imports            map[string]string
-	StructName         string
-	TableName          string
-	PrimaryId          string //大驼峰
-	SmallHumpPrimaryId string //小驼峰
-	PrimaryIdType      string
-	TablePrimaryId     string
-	TableFields        []TableField
-	StructFields       []StructField
-	DB                 *gorm.DB
-	Database           string
-	Prefix             string
-	OutDir             string
-	HasDeleteTime      bool
-}
-
 type YesNo string
 
 func (this YesNo) Bool() bool {
@@ -62,6 +44,24 @@ func NewModelTool() *ModelTool {
 }
 
 const ModelStructName = "Impl"
+
+type Model struct {
+	PackageName        string
+	Imports            map[string]string
+	StructName         string
+	TableName          string
+	PrimaryId          string //大驼峰
+	SmallHumpPrimaryId string //小驼峰
+	PrimaryIdType      string
+	TablePrimaryId     string
+	TableFields        []TableField
+	StructFields       []StructField
+	DB                 *gorm.DB
+	Database           string
+	Prefix             string
+	OutDir             string
+	HasDeleteTime      bool
+}
 
 func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
 	pkg := generator.CamelCase(strings.Replace(name, pre, "", 1)) + "Model"
@@ -232,7 +232,8 @@ func (this *Model) Generate() {
 	fmt.Println("model: " + this.OutDir + " generate success!")
 }
 
-func GetTables(db *gorm.DB, database string, tableNames ...string) []Table {
+//获取数据库表
+func GetDbTables(db *gorm.DB, database string, tableNames ...string) []Table {
 	var (
 		tables []Table
 		d      *gorm.DB
@@ -260,8 +261,8 @@ func (this *Model) GetTableFields(tableName string) []TableField {
 }
 
 type Table struct {
-	Name    string `gorm:"column:Name"`
-	Comment string `gorm:"column:Comment"`
+	Name    string `gorm:"column:Name" json:"name"`
+	Comment string `gorm:"column:Comment" json:"comment"`
 }
 
 type StructField struct {

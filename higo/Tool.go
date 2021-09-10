@@ -163,7 +163,7 @@ eg: -out=test\app\Models`)
 			//连接数据库准备构建
 			db := newOrm().DB
 			if this.Name == "all" {
-				tables := templates.GetTables(db, GetDbConfig().Database)
+				tables := templates.GetDbTables(db, GetDbConfig().Database)
 				for _, table := range tables {
 					genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 					genModel.Generate()
