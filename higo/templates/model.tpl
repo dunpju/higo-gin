@@ -64,12 +64,12 @@ func (this *{{.StructName}}) Exist() bool {
 	return this.{{.PrimaryId}} > 0
 }
 
-func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.PrimaryId}} {{.PrimaryIdType}}, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.TablePrimaryId}}` = ?", {{.PrimaryId}}).ToSql()).Query()
+func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.TablePrimaryId}}` = ?", {{.SmallHumpPrimaryId}}).ToSql()).Query()
 }
 
-func (this *{{.StructName}}) GetBy{{.PrimaryId}}s({{.PrimaryId}}s []string, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.TablePrimaryId}}` IN(?)", strings.Join({{.PrimaryId}}s, ",")).ToSql()).Query()
+func (this *{{.StructName}}) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []string, columns ...string) *gorm.DB {
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where("`{{.TablePrimaryId}}` IN(?)", strings.Join({{.SmallHumpPrimaryId}}s, ",")).ToSql()).Query()
 }
 
 func (this *{{.StructName}}) Paginate(perPage, page uint64) *higo.Pager {

@@ -73,14 +73,14 @@ func (this *{{.StructName}}) Update() bool {
 }
 
 //id查询
-func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.PrimaryId}} {{.PrimaryIdType}}, fields ...string) *{{.ModelPackageName}}.{{.ModelName}} {
+func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}, fields ...string) *{{.ModelPackageName}}.{{.ModelName}} {
 	if len(fields) == 0 {
 		fields = append(fields, "*")
 	}
 	model := this.Model()
 	model.Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where("`{{.TablePrimaryId}}` = ?", {{.PrimaryId}}).
+		Where("`{{.TablePrimaryId}}` = ?", {{.SmallHumpPrimaryId}}).
 		{{- if .HasDeleteTime}}
         Where("isnull(`delete_time`)").
         {{- end}}
@@ -89,14 +89,14 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.PrimaryId}} {{.PrimaryIdType
 }
 
 //id集查询
-func (this *Dao) GetBy{{.PrimaryId}}s({{.PrimaryId}}s []interface{}, fields ...string) []*{{.ModelPackageName}}.{{.ModelName}} {
+func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []interface{}, fields ...string) []*{{.ModelPackageName}}.{{.ModelName}} {
 	if len(fields) == 0 {
 		fields = append(fields, "*")
 	}
 	models := this.Models()
 	this.Model().Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where("`{{.TablePrimaryId}}` IN (?)", strings.Join(utils.ConvStrSlice({{.PrimaryId}}s), ",")).
+		Where("`{{.TablePrimaryId}}` IN (?)", strings.Join(utils.ConvStrSlice({{.SmallHumpPrimaryId}}s), ",")).
 		{{- if .HasDeleteTime}}
 		Where("isnull(`delete_time`)").
 		{{- end}}
@@ -105,10 +105,10 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.PrimaryId}}s []interface{}, fields ...s
 }
 
 //硬删除
-func (this *Dao) DeleteByAdminId({{.PrimaryId}} {{.PrimaryIdType}}) {
+func (this *Dao) DeleteByAdminId({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
 	higo.Result(this.model.Mapper(sql.Delete(this.model.TableName()).
 		DeleteBuilder().
-		Where("{{.TablePrimaryId}} = ?", {{.PrimaryId}}).
+		Where("{{.TablePrimaryId}} = ?", {{.SmallHumpPrimaryId}}).
 		ToSql()).Exec().Error).Unwrap()
 }
 

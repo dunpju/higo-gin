@@ -18,20 +18,21 @@ import (
 )
 
 type Model struct {
-	PackageName    string
-	Imports        map[string]string
-	StructName     string
-	TableName      string
-	PrimaryId      string
-	PrimaryIdType  string
-	TablePrimaryId string
-	TableFields    []TableField
-	StructFields   []StructField
-	DB             *gorm.DB
-	Database       string
-	Prefix         string
-	OutDir         string
-	HasDeleteTime  bool
+	PackageName        string
+	Imports            map[string]string
+	StructName         string
+	TableName          string
+	PrimaryId          string //大驼峰
+	SmallHumpPrimaryId string //小驼峰
+	PrimaryIdType      string
+	TablePrimaryId     string
+	TableFields        []TableField
+	StructFields       []StructField
+	DB                 *gorm.DB
+	Database           string
+	Prefix             string
+	OutDir             string
+	HasDeleteTime      bool
 }
 
 type YesNo string
@@ -101,6 +102,7 @@ func (this *Model) Generate() {
 			this.TablePrimaryId = tField.TableFieldName
 			this.PrimaryIdType = tField.FieldType
 			this.PrimaryId = generator.CamelCase(this.TablePrimaryId)
+			this.SmallHumpPrimaryId = utils.Lcfirst(this.PrimaryId)
 			tField.FieldName = this.PrimaryId
 		}
 		if tField.FieldType == "time.Time" {

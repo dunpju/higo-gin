@@ -24,22 +24,23 @@ func NewDaoMap(key string, value interface{}, doc string) *DaoMap {
 }
 
 type Dao struct {
-	PackageName       string
-	Imports           map[string]string
-	StructName        string
-	ModelPackageName  string
-	ModelName         string
-	EntityPackageName string
-	EntityName        string
-	PrimaryId         string
-	PrimaryIdType     string
-	TablePrimaryId    string
-	TableFields       []TableField
-	ModelFields       []StructField
-	HasDeleteTime     bool
-	OutStruct         string
-	OutDir            string
-	FileName          string
+	PackageName        string
+	Imports            map[string]string
+	StructName         string
+	ModelPackageName   string
+	ModelName          string
+	EntityPackageName  string
+	EntityName         string
+	PrimaryId          string //大驼峰
+	SmallHumpPrimaryId string //小驼峰
+	PrimaryIdType      string
+	TablePrimaryId     string
+	TableFields        []TableField
+	ModelFields        []StructField
+	HasDeleteTime      bool
+	OutStruct          string
+	OutDir             string
+	FileName           string
 }
 
 var daoRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
