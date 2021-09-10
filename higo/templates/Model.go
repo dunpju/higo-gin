@@ -44,8 +44,10 @@ func NewModelTool() *ModelTool {
 }
 
 const (
-	ModelStructName = "Impl"
-	ModelDirSuffix  = "Model"
+	ModelStructName         = "Impl"
+	ModelDirSuffix          = "Model"
+	ModelFileName           = "model"
+	ModelAttributesFileName = "attributes"
 )
 
 type Model struct {
@@ -137,12 +139,12 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	}
-	tpl := this.Template("model.tpl")
-	tmpl, err := template.New("model.tpl").Parse(tpl)
+	tpl := this.Template(ModelFileName + ".tpl")
+	tmpl, err := template.New(ModelFileName + ".tpl").Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
-	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + "model.go"}
+	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + ModelFileName + ".go"}
 	if outfile.Exist() {
 		//生成最新ast buffer
 		bufferbuf := new(bytes.Buffer)
@@ -233,13 +235,13 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	}
-	outfile = utils.File{Name: this.OutDir + utils.PathSeparator() + "attributes.go"}
+	outfile = utils.File{Name: this.OutDir + utils.PathSeparator() + ModelAttributesFileName + ".go"}
 	attributesFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 	defer attributesFile.Close()
-	tpl = this.Template("attributes.tpl")
+	tpl = this.Template(ModelAttributesFileName + ".tpl")
 	tmpl, err = template.New(attributes).Parse(tpl)
 	if err != nil {
 		panic(err)
