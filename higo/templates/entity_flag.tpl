@@ -1,4 +1,4 @@
-package AdminEntity
+package {{.PackageName}}
 
 import "github.com/dengpju/higo-gin/higo"
 

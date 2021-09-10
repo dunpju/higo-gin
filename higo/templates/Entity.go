@@ -12,6 +12,7 @@ import (
 
 type Entity struct {
 	PackageName   string
+	Imports       map[string]string
 	StructName    string
 	PrimaryId     string
 	StructFields  []StructField
@@ -30,8 +31,13 @@ const (
 
 func NewEntity(modelTool ModelTool, model Model) *Entity {
 	packageName := model.HumpUnpreTableName + EntityDirSuffix
+	imports := make(map[string]string)
+	if model.HasCreateTime || model.HasUpdateTime {
+		imports["time"] = `"time"`
+	}
 	return &Entity{
 		PackageName:   packageName,
+		Imports:       imports,
 		StructName:    EntityStructName,
 		PrimaryId:     model.PrimaryId,
 		StructFields:  model.StructFields,
@@ -69,31 +75,31 @@ func (this *Entity) Generate() {
 		panic(err)
 	}
 	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFileName + ".go"}
-	modelFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
+	entityFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		panic(err)
 	}
-	defer modelFile.Close()
+	defer entityFile.Close()
 	//生成entity.go
-	err = tmpl.Execute(modelFile, this)
+	err = tmpl.Execute(entityFile, this)
 	if err != nil {
 		panic(err)
 	}
 	outfile = utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
-	attributesFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	flagFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
-	defer attributesFile.Close()
+	defer flagFile.Close()
 	tpl = this.Template(EntityFileName + "_" + EntityFlagFileName + ".tpl")
 	tmpl, err = template.New(attributes).Parse(tpl)
 	if err != nil {
 		panic(err)
 	}
 	//生成flag.go
-	err = tmpl.Execute(attributesFile, this)
+	err = tmpl.Execute(flagFile, this)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("model: " + this.OutDir + " generate success!")
+	fmt.Println("entity: " + this.OutDir + " generate success!")
 }

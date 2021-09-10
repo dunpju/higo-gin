@@ -172,7 +172,9 @@ eg: -out=test\app\Models`)
 				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 				genModel.Generate()
 				if modelTool.IsGenerateDao.Bool() {
-					entity := templates.NewEntity(*modelTool)
+					entity := templates.NewEntity(*modelTool, *genModel)
+					fmt.Println(entity)
+					entity.Generate()
 					fmt.Println(templates.NewDao(*modelTool, *genModel, *entity))
 				} else if modelTool.IsGenerateEntity.Bool() {
 

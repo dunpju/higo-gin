@@ -2,7 +2,9 @@ package {{.PackageName}}
 
 import (
 	"github.com/dengpju/higo-gin/higo"
-	"time"
+	{{- range $impo := .Imports}}
+    {{$impo}}
+    {{- end}}
 )
 
 type {{.StructName}} struct {
@@ -14,15 +16,15 @@ type {{.StructName}} struct {
 }
 
 func New() *{{.StructName}} {
-	{{- if .HasCreateTime and .HasUpdateTime}}
-	t := time.Now()
-    return &{{.StructName}}{CreateTime: t, UpdateTime: t}
+	{{- if and .HasCreateTime .HasUpdateTime}}
+	tn := time.Now()
+    return &{{.StructName}}{CreateTime: tn, UpdateTime: tn}
     {{- else if .HasCreateTime}}
 	t := time.Now()
-    return &{{.StructName}}{CreateTime: t}
+    return &{{.StructName}}{CreateTime: tn}
     {{- else if .HasUpdateTime}}
 	t := time.Now()
-    return &{{.StructName}}{UpdateTime: t}
+    return &{{.StructName}}{UpdateTime: tn}
 	{{- else}}
 	return &{{.StructName}}{}
     {{- end}}
