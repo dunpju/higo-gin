@@ -7,6 +7,7 @@ import (
 	"github.com/dengpju/higo-utils/utils"
 	"log"
 	"os"
+	"regexp"
 )
 
 const (
@@ -84,27 +85,70 @@ eg: -name=ts_user`)
 eg: -out=test\app\Models`)
 			}
 		loopDao:
-			fmt.Print("Whether to generate Dao [yes|no] (default:yes):")
+			fmt.Print("Whether To Generate Dao [yes|no] (default:yes):")
+			confirmBeginGenerate := "yes"
 			isGenerateDao := "yes"
 			isGenerateEntity := "yes"
 			n, err := fmt.Scanln(&isGenerateDao)
 			if nil != err && n > 0 {
 				panic(err)
 			}
-			if ("yes" != isGenerateDao || "no" != isGenerateDao) && n > 0 {
+			if ("yes" != isGenerateDao && "no" != isGenerateDao) && n > 0 {
 				goto loopDao
 			}
 			fmt.Printf("Your Choice Generate Dao: %s\n", isGenerateDao)
+			capitalBeganReg := regexp.MustCompile(`^[A-Z].*`)
+			if capitalBeganReg == nil {
+				log.Fatalln("regexp err")
+			}
+			daoDir := "dao"
+			isMatchCapitalBegan := capitalBeganReg.FindString(utils.Basename(this.Out))
+			if isMatchCapitalBegan != "" {
+				daoDir = utils.Ucfirst(daoDir)
+			}
+			daoDir = utils.Dirname(this.Out) + `\` + daoDir
+			fmt.Printf("Whether To Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", daoDir)
+			inputDaoDir := daoDir
+			n, err = fmt.Scanln(&inputDaoDir)
+			if nil != err && n > 0 {
+				panic(err)
+			}
+			fmt.Printf("You Confirmed Output Directory Of Dao: %s\n", inputDaoDir)
 		loopEntity:
-			fmt.Print("Whether to generate Entity [yes|no] (default:yes):")
+			fmt.Print("Whether To Generate Entity [yes|no] (default:yes):")
 			n, err = fmt.Scanln(&isGenerateEntity)
 			if nil != err && n > 0 {
 				panic(err)
 			}
-			if ("yes" != isGenerateEntity || "no" != isGenerateEntity) && n > 0 {
+			if ("yes" != isGenerateEntity && "no" != isGenerateEntity) && n > 0 {
 				goto loopEntity
 			}
 			fmt.Printf("Your Choice Generate Entity: %s\n", isGenerateEntity)
+			entityDir := "entity"
+			isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
+			if isMatchCapitalBegan != "" {
+				entityDir = utils.Ucfirst(entityDir)
+			}
+			entityDir = utils.Dirname(this.Out) + `\` + entityDir
+			fmt.Printf("Whether To Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", entityDir)
+			inputEntityDir := entityDir
+			n, err = fmt.Scanln(&inputEntityDir)
+			if nil != err && n > 0 {
+				panic(err)
+			}
+			fmt.Printf("You Confirmed Output Directory Of Entity: %s\n", inputEntityDir)
+			//确认开始构建
+		loopConfirmBeginGenerate:
+			fmt.Print("Confirm To Start Generate [yes|no] (default:yes):")
+			n, err = fmt.Scanln(&confirmBeginGenerate)
+			if ("yes" != confirmBeginGenerate && "no" != confirmBeginGenerate) && n > 0 {
+				goto loopConfirmBeginGenerate
+			}
+			if ("yes" != confirmBeginGenerate) && n > 0 {
+				goto loopDao
+			}
+			fmt.Print("Start Generate ......")
+			//连接数据库准备构建
 			db := newOrm().DB
 			if this.Name == "all" {
 				tables := templates.GetTables(db, GetDbConfig().Database)
