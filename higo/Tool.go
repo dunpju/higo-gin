@@ -168,6 +168,7 @@ eg: -out=test\app\Models`)
 					genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 					genModel.Generate()
 					daoEntity(*modelTool, *genModel)
+					fmt.Println("==================================================")
 				}
 			} else {
 				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)

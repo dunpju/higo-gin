@@ -91,7 +91,7 @@ func (this *Entity) Generate() {
 	}
 	outFlagFile := utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
 	if !utils.FileExist(outFlagFile.Name) { // flag.go 不存在则生成
-		flagFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		flagFile, err := os.OpenFile(outFlagFile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 		if err != nil {
 			panic(err)
 		}
