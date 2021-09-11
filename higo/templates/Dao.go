@@ -35,7 +35,7 @@ type Dao struct {
 	TablePrimaryId        string
 	TableFields           []TableField
 	ModelFields           []StructField
-	LenModelFields        int
+	ModelEndField         string
 	HasCreateTime         bool
 	HasUpdateTime         bool
 	HasDeleteTime         bool
@@ -75,7 +75,7 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 		TablePrimaryId:        model.TablePrimaryId,
 		TableFields:           model.TableFields,
 		ModelFields:           model.StructFields,
-		LenModelFields:        len(model.StructFields) - 1,
+		ModelEndField:         model.EndField,
 		HasCreateTime:         model.HasCreateTime,
 		HasUpdateTime:         model.HasUpdateTime,
 		HasDeleteTime:         model.HasDeleteTime,

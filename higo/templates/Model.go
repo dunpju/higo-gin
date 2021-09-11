@@ -50,6 +50,12 @@ const (
 	ModelAttributesFileName = "attributes"
 )
 
+var (
+	CreateTime = "create_time"
+	UpdateTime = "update_time"
+	DeleteTime = "delete_time"
+)
+
 type Model struct {
 	PackageName        string
 	Imports            map[string]string
@@ -71,6 +77,7 @@ type Model struct {
 	HasDeleteTime      bool
 	UpdateTimeField    string
 	DeleteTimeField    string
+	EndField           string
 }
 
 func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
@@ -106,21 +113,29 @@ func (this *Model) Template(tplfile string) string {
 
 func (this *Model) Generate() {
 	this.TableFields = this.GetTableFields(this.TableName)
-	for _, tableField := range this.TableFields {
+	var (
+		prevTableField    TableField
+		currentTableField TableField
+	)
+	for i, tableField := range this.TableFields {
 		structField := StructField{
 			FieldName:         generator.CamelCase(tableField.Field),
 			FieldType:         getFiledType(tableField),
 			TableFieldName:    tableField.Field,
 			TableFieldComment: tableField.Comment,
 		}
-		if tableField.Field == "create_time" {
+		currentTableField = this.TableFields[i]
+		if i > 0 {
+			prevTableField = this.TableFields[i-1]
+		}
+		if tableField.Field == CreateTime {
 			this.HasCreateTime = true
 		}
-		if tableField.Field == "update_time" {
+		if tableField.Field == UpdateTime {
 			this.HasUpdateTime = true
 			this.UpdateTimeField = structField.FieldName
 		}
-		if tableField.Field == "delete_time" {
+		if tableField.Field == DeleteTime {
 			this.HasDeleteTime = true
 			this.DeleteTimeField = structField.FieldName
 		}
@@ -137,6 +152,11 @@ func (this *Model) Generate() {
 			}
 		}
 		this.StructFields = append(this.StructFields, structField)
+	}
+	if DeleteTime != currentTableField.Field {
+		this.EndField = generator.CamelCase(currentTableField.Field)
+	} else {
+		this.EndField = generator.CamelCase(prevTableField.Field)
 	}
 	if _, err := os.Stat(this.OutDir); os.IsNotExist(err) {
 		if err = os.Mkdir(this.OutDir, os.ModePerm); err != nil {

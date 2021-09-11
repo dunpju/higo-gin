@@ -56,9 +56,9 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 		{{- end}}
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
-		{{- range $i,$v := .ModelFields}}
+		{{- range $v := .ModelFields}}
 		{{- if ne $v.FieldName $.EntityDeleteTimeField}}
-		    {{- if ne $i $.LenModelFields}}
+		    {{- if ne $v.FieldName $.ModelEndField}}
             Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}}).  //{{$v.TableFieldComment}}
             {{- else}}
             Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}})  //{{$v.TableFieldComment}}

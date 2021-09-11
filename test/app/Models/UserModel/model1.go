@@ -5,7 +5,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/sql"
-	"github.com/dengpju/higo-gin/test/app/Models/CoinModel"
 	"log"
 )
 
@@ -48,28 +47,28 @@ func (this *Impl) Paginate1(perPage, page uint64) *higo.Pager {
 }
 
 func (this *Impl) Add(uname string, tel string, score int) {
-	this.Paginate(2, 1)
-	u1 := this.New()
-	u := this.AddUser(uname, tel, score)
-	coinModel := CoinModel.New()
-	coin := CoinModel.New().AddCoin(uname, score)
-	user := this.New()
-	this.Find(user)
-	fmt.Println(user)
-	fmt.Println(this.TableName())
-	higo.Begin(u, coin).Transaction(func() error {
-		higo.Result(u.Exec().Error).Unwrap()
-		co := coin.Exec()
-		higo.Result(co.Error).Unwrap()
-		fmt.Println(1)
-		fmt.Println(co.Value)
-		coin.Last(&coinModel)
-		higo.Result(u.Last(&coinModel).Error).Unwrap()
-		fmt.Printf("%T\n", u1)
-		higo.Result(u.Last(u1).Error).Unwrap()
-		fmt.Println(coinModel)
-		fmt.Println(u1)
-		panic(fmt.Errorf("test"))
-		return nil
-	})
+	//this.Paginate(2, 1)
+	//u1 := this.New()
+	//u := this.AddUser(uname, tel, score)
+	//coinModel := CoinModel.New()
+	//coin := CoinModel.New().AddCoin(uname, score)
+	//user := this.New()
+	//this.Find(user)
+	//fmt.Println(user)
+	//fmt.Println(this.TableName())
+	//higo.Begin(u, coin).Transaction(func() error {
+	//	higo.Result(u.Exec().Error).Unwrap()
+	//	co := coin.Exec()
+	//	higo.Result(co.Error).Unwrap()
+	//	fmt.Println(1)
+	//	fmt.Println(co.Value)
+	//	coin.Last(&coinModel)
+	//	higo.Result(u.Last(&coinModel).Error).Unwrap()
+	//	fmt.Printf("%T\n", u1)
+	//	higo.Result(u.Last(u1).Error).Unwrap()
+	//	fmt.Println(coinModel)
+	//	fmt.Println(u1)
+	//	panic(fmt.Errorf("test"))
+	//	return nil
+	//})
 }
