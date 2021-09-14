@@ -47,6 +47,13 @@ func (this RouterCollect) Get(method, relativePath string) *router.Route {
 
 //添加路由
 func (this *Higo) AddRoute(httpMethod string, relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
+	//获取handler所在文件名称
+	handlerFile, _ := runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).FileLine(reflect.ValueOf(handler).Pointer())
+	handlerFileRegexp := regexp.MustCompile(`Controller.go$`)
+	if !handlerFileRegexp.MatchString(handlerFile) {
+		panic("The file name where the handler resides must end with Controller.go")
+	}
+	//获取handler函数名称
 	funcForPC := strings.Split(runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name(), "/")
 	endFuncForPC := funcForPC[len(funcForPC)-1:]
 	typeRegexp := regexp.MustCompile(`.*\.\(\*.*\)`)
