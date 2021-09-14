@@ -41,7 +41,7 @@ func (this *Auth) Middle(hg *Higo) gin.HandlerFunc {
 
 func middleAuthFunc(hg *Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
-		if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
+		if route, ok := hg.GetRoute(cxt.Request.Method, cxt.Request.URL.Path); ok {
 			if ! IsNotAuth(route.Flag()) && !route.IsStatic() {
 				if "" == cxt.GetHeader("X-Token") {
 					exception.Throw(exception.Message(Consts.InvalidToken.Message()), exception.Code(int(Consts.InvalidToken)))

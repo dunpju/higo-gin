@@ -310,7 +310,7 @@ func (this *Higo) Boot() {
 			}
 		}
 		ser.Router.Loader(hg)
-		//加载路由
+		//装载路由
 		hg.loadRoute()
 
 		serve := &http.Server{
@@ -349,8 +349,8 @@ func (this *Higo) Boot() {
 }
 
 // 获取路由
-func (this *Higo) GetRoute(relativePath string) (*router.Route, bool) {
-	return RouterContainer.Get(relativePath), true
+func (this *Higo) GetRoute(method, relativePath string) (*router.Route, bool) {
+	return RouterContainer.Get(method, relativePath), true
 }
 
 // 静态文件
@@ -367,7 +367,7 @@ func (this *Higo) loadRoute() *Higo {
 		// 判断空标记
 		IsEmptyFlag(route)
 		// 添加路由容器
-		RouterContainer.Add(route.Prefix()+route.RelativePath(), route)
+		RouterContainer.Add(route.Unique(), route)
 		if route.Prefix() != "" {
 			this.group = this.Engine.Group(route.Prefix())
 			this.GroupHandle(route)

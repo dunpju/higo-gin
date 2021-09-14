@@ -9,7 +9,7 @@ import (
 )
 
 // 运行日志
-type RunLog struct {}
+type RunLog struct{}
 
 // 构造函数
 func NewRunLog() *RunLog {
@@ -20,7 +20,7 @@ func (this *RunLog) Middle(hg *higo.Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
 		tt := cxt.Query("tt")
 		fmt.Printf("RunLog:%s\n",
-			higo.RouterContainer.Get(cxt.Request.URL.Path).Desc() + "-" +strconv.FormatUint(utils.GoroutineID(), 10) + "-" + tt)
+			higo.RouterContainer.Get(cxt.Request.Method, cxt.Request.URL.Path).Desc()+"-"+strconv.FormatUint(utils.GoroutineID(), 10)+"-"+tt)
 		cxt.Next()
 	}
 }

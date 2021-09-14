@@ -17,8 +17,8 @@ var RouterContainer RouterCollect
 type RouterCollect map[string]*router.Route
 
 // 添加路由容器
-func (this RouterCollect) Add(relativePath string, route *router.Route) *RouterCollect {
-	this[relativePath] = route
+func (this RouterCollect) Add(unique string, route *router.Route) *RouterCollect {
+	this[unique] = route
 	return &this
 }
 
@@ -27,9 +27,18 @@ func (this RouterCollect) All() RouterCollect {
 	return this
 }
 
+func Unique(method, absolutePath string) string {
+	return method + "@" + absolutePath
+}
+
+// 路由唯一标记
+func (this RouterCollect) Unique(method, absolutePath string) string {
+	return Unique(method, absolutePath)
+}
+
 // 获取路由
-func (this RouterCollect) Get(relativePath string) *router.Route {
-	route, ok := this[relativePath]
+func (this RouterCollect) Get(method, relativePath string) *router.Route {
+	route, ok := this[Unique(method, relativePath)]
 	if !ok {
 		exception.Throw(exception.Message(relativePath+" Undefined route"), exception.Code(0))
 	}
@@ -108,36 +117,36 @@ func (this *Higo) Head(relativePath string, handler interface{}, attributes ...*
 }
 
 func (this *Higo) Flag(value string) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_FLAG, value)
+	return router.NewRouteAttribute(router.RouteFlag, value)
 }
 
 func (this *Higo) FrontPath(value string) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_FRONTPATH, value)
+	return router.NewRouteAttribute(router.RouteFrontpath, value)
 }
 
 func (this *Higo) IsStatic(value bool) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_IS_STATIC, value)
+	return router.NewRouteAttribute(router.RouteIsStatic, value)
 }
 
 //描述
 func (this *Higo) Desc(value string) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_DESC, value)
+	return router.NewRouteAttribute(router.RouteDesc, value)
 }
 
 //单路由中间件
 func (this *Higo) Middle(value gin.HandlerFunc) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_MIDDLEWARE, value)
+	return router.NewRouteAttribute(router.RouteMiddleware, value)
 }
 
 //组中间件
 func (this *Higo) GroupMiddle(value gin.HandlerFunc) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_GROUP_MIDDLE, value)
+	return router.NewRouteAttribute(router.RouteGroupMiddle, value)
 }
 
 func (this *Higo) SetServe(value interface{}) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_SERVE, value)
+	return router.NewRouteAttribute(router.RouteServe, value)
 }
 
 func (this *Higo) SetHeader(value http.Header) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.ROUTE_HEADER, value)
+	return router.NewRouteAttribute(router.RouteHeader, value)
 }

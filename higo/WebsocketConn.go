@@ -128,7 +128,7 @@ func (this *WebsocketConn) dispatch(msg *WsReadMessage) WsWriteMessage {
 	handle := this.route.Handle()
 	ctx := &gin.Context{Request: &http.Request{PostForm: make(url.Values)}}
 	reader := bytes.NewReader(msg.MessageData)
-	request, _ := http.NewRequest(router.POST, this.route.FullPath(), reader)
+	request, _ := http.NewRequest(router.POST, this.route.AbsolutePath(), reader)
 	request.Header.Set("Content-Type", "application/json")
 	ctx.Request = request
 

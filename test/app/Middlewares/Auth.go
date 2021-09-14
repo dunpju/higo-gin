@@ -17,7 +17,7 @@ func NewAuth() *Auth {
 
 func (this *Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
-		if route, ok := hg.GetRoute(cxt.Request.URL.Path); ok {
+		if route, ok := hg.GetRoute(cxt.Request.Method, cxt.Request.URL.Path); ok {
 			// TODO::非静态页面需要鉴权
 			if !higo.IsNotAuth(route.Flag()) && !route.IsStatic() {
 				if "" == cxt.GetHeader("X-Token") {
