@@ -98,14 +98,14 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.Prim
 }
 
 //id集查询
-func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []interface{}, fields ...string) []*{{.ModelPackageName}}.{{.ModelName}} {
+func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdType}}, fields ...string) []*{{.ModelPackageName}}.{{.ModelName}} {
 	if len(fields) == 0 {
 		fields = append(fields, "*")
 	}
 	models := this.Models()
 	this.Model().Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where({{.ModelPackageName}}.{{.PrimaryId}}+" IN (?)", strings.Join(utils.ConvStrSlice({{.SmallHumpPrimaryId}}s), ",")).
+		Where({{.ModelPackageName}}.{{.PrimaryId}}+" IN (?)", {{.SmallHumpPrimaryId}}s).
 		{{- if .HasDeleteTime}}
 		Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
 		{{- end}}
@@ -114,7 +114,7 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []interface{}, fi
 }
 
 //硬删除
-func (this *Dao) DeleteByAdminId({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
+func (this *Dao) DeleteBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
 	higo.Result(this.model.Mapper(sql.Delete(this.model.TableName()).
 		DeleteBuilder().
 		Where({{.ModelPackageName}}.{{.PrimaryId}}+" = ?", {{.SmallHumpPrimaryId}}).
