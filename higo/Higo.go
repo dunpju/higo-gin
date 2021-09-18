@@ -361,6 +361,14 @@ func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	return this
 }
 
+// 静态目录
+func (this *Higo) Static(relativePath, root string) *Higo {
+	// 添加路由容器
+	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
+	hg.Engine.Static(relativePath, root)
+	return this
+}
+
 // 装载路由
 func (this *Higo) loadRoute() *Higo {
 	router.GetRoutes(this.serve).ForEach(func(index int, route *router.Route) {
