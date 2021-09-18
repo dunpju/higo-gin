@@ -1,19 +1,20 @@
 
 # 数据库
 DB:
-  DEFAULT:
-    DRIVER: "mysql"
-    HOST: "192.168.8.99"
-    PORT: "3306"
-    DATABASE: "test"
-    USERNAME: "root"
-    PASSWORD: "1qaz2wsx"
-    CHARSET: "utf8mb4"
-    COLLATION: "utf8mb4_unicode_ci"
-    PREFIX: ""
-    LOG_MODE: true
-    MAX_IDLE: 5
-    MAX_OPEN: 10
+  Default:
+    Driver: "mysql"
+    Host: "192.168.8.99"
+    Port: "3306"
+    Database: "test"
+    Username: "root"
+    Password: "1qaz2wsx"
+    Charset: "utf8mb4"
+    Collation: "utf8mb4_unicode_ci"
+    Prefix: "ts_"
+    LogMode: true
+    MaxIdle: 5
+    MaxOpen: 10
+    MaxLifetime: 30
 
 Redis:
   Default:

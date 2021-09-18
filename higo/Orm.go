@@ -15,6 +15,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
@@ -24,8 +25,9 @@ var (
 	confDefault             *config.Configure
 	dbConfig                *Dbconfig
 	logMode                 bool
-	maxIdle                 int
-	maxOpen                 int
+	maxIdle                 = 5
+	maxOpen                 = 5
+	maxLifetime             = 20
 	registerCallbackCounter int
 )
 
@@ -66,19 +68,20 @@ func (this *Orm) Sql() string {
 
 func newGorm() *gorm.DB {
 	dbConfigOnce.Do(func() {
-		confDefault = config.Db("DB.DEFAULT").(*config.Configure)
-		dbConfig = &Dbconfig{Username: confDefault.Get("USERNAME").(string),
-			Password: confDefault.Get("PASSWORD").(string),
-			Host:     confDefault.Get("HOST").(string),
-			Port:     confDefault.Get("PORT").(string),
-			Database: confDefault.Get("DATABASE").(string),
-			Charset:  confDefault.Get("CHARSET").(string),
-			Driver:   confDefault.Get("DRIVER").(string),
-			Prefix:   confDefault.Get("PREFIX").(string),
+		confDefault = config.Db("DB.Default").(*config.Configure)
+		dbConfig = &Dbconfig{Username: confDefault.Get("Username").(string),
+			Password: confDefault.Get("Password").(string),
+			Host:     confDefault.Get("Host").(string),
+			Port:     confDefault.Get("Port").(string),
+			Database: confDefault.Get("Database").(string),
+			Charset:  confDefault.Get("Charset").(string),
+			Driver:   confDefault.Get("Driver").(string),
+			Prefix:   confDefault.Get("Prefix").(string),
 		}
-		logMode = confDefault.Get("LOG_MODE").(bool)
-		maxIdle = confDefault.Get("MAX_IDLE").(int)
-		maxOpen = confDefault.Get("MAX_OPEN").(int)
+		logMode = confDefault.Get("LogMode").(bool)
+		maxIdle = confDefault.Get("MaxIdle").(int)
+		maxOpen = confDefault.Get("MaxOpen").(int)
+		maxLifetime = confDefault.Get("MaxLifetime").(int)
 	})
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		dbConfig.Username,
@@ -96,6 +99,7 @@ func newGorm() *gorm.DB {
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(maxIdle)
 	db.DB().SetMaxOpenConns(maxOpen)
+	db.DB().SetConnMaxLifetime(time.Duration(maxLifetime) * time.Second)
 	if registerCallbackCounter == 1 {
 		if db.Callback().Query().Get("gorm:Query") == nil {
 			db.Callback().Query().Before("gorm:Query").Register("Query", sqlReplace)
