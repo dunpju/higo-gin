@@ -251,14 +251,13 @@ func (this *Orm) Paginate(pager *Pager) *gorm.DB {
 	if pager.PerPage <= 0 {
 		panic("Per Page: Can't be less than or equal to 0")
 	}
-	this.DB.Count(&pager.Total).
-		Limit(pager.PerPage).
-		Offset((pager.CurrentPage - 1) * pager.PerPage)
+	this.DB.Count(&pager.Total)
 	if this.DB.Error != nil {
 		panic(this.DB.Error)
 	}
 	pager.LastPage = uint64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
-	return this.DB
+	return this.DB.Limit(pager.PerPage).
+		Offset((pager.CurrentPage - 1) * pager.PerPage)
 }
 
 func (this *Orm) Table(name string) *Orm {
