@@ -28,8 +28,7 @@ func Result(values ...interface{}) *ErrorResult {
 		if e, ok := values[0].(error); ok {
 			return &ErrorResult{nil, e}
 		}
-	}
-	if len(values) == 2 {
+	} else if len(values) == 2 {
 		if values[1] == nil {
 			return &ErrorResult{values[0], nil}
 		}

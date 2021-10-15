@@ -259,7 +259,7 @@ func (this *Higo) Boot() {
 	NewTool().Cmd()
 	//自动注册校验
 	for _, valid := range ValidContainer {
-		for tag, rule := range valid {
+		for tag, rule := range valid.ValidRules {
 			RegisterValidation(tag, rule.ToFunc())
 		}
 	}

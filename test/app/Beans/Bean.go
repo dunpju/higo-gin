@@ -41,7 +41,3 @@ func (this *MyBean) NewDemoController() *V3.DemoController {
 func (this *MyBean) NewEventController() *a.EventController {
 	return a.NewEventController()
 }
-
-func (this *MyBean) New_gen_github8com_dengpju_higo9gin_test_app_Controllers_TestController() *a.TestController {
-	return a.NewTestController()
-}

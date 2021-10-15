@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/test/app/Codes"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
+	"log"
 	"time"
 )
 
@@ -69,8 +71,35 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	return "v3 https_test_throw"
 }
 
+//测试验证器
+type DutyUser struct {
+	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
+	EducationClassId int64   `json:"education_class_id" binding:"password"`
+	UserIds          []int64 `json:"user_ids" `
+}
+
+func NewDutyUser() *DutyUser {
+	return &DutyUser{UserIds: make([]int64, 0)}
+}
+
+func (this *DutyUser) RegisterValidator() *higo.Valid {
+	return higo.Verifier().
+		Tag("mobile",
+			higo.Rule("required", Codes.Success)).
+		Tag("password",
+			higo.Rule("required", Codes.Success),
+			higo.Rule("min=4", Codes.Success1)).
+		Tag("user_ids",
+			higo.Rule("required", Codes.Success))
+}
+
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
+	param := NewDutyUser()
+	//校验数据
+	higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
+
+	log.Fatalln(param)
 	/**
 	fmt.Println(injector.BeanFactory.Get(this))
 	fmt.Println(this)

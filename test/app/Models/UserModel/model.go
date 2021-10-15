@@ -54,7 +54,7 @@ func (this *Impl) Mutate(attrs ...higo.Property) higo.Model {
 //  Or
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
-func (this *Impl) RegisterValidator() higo.Valid {
+func (this *Impl) RegisterValidator() *higo.Valid {
     return higo.RegisterValid(this)
 }
 
