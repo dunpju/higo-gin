@@ -48,7 +48,7 @@ func (this *{{.StructName}}) Mutate(attrs ...higo.Property) higo.Model {
 //require import "gitee.com/dengpju/higo-code/code"
 //
 //example code:
-//func (this *StructName) RegisterValidator() higo.Valid {
+//func (this *StructName) RegisterValidator() *higo.Valid {
 //	return higo.RegisterValid(this).
 //		Tag("custom_tag_name",
 //			higo.Rule("required", Codes.Success),
@@ -56,7 +56,7 @@ func (this *{{.StructName}}) Mutate(attrs ...higo.Property) higo.Model {
 //  Or
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
-func (this *{{.StructName}}) RegisterValidator() higo.Valid {
+func (this *{{.StructName}}) RegisterValidator() *higo.Valid {
     return higo.RegisterValid(this)
 }
 
