@@ -75,7 +75,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 type DutyUser struct {
 	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
 	EducationClassId int64   `json:"education_class_id" binding:"password"`
-	UserIds          []int64 `json:"user_ids" `
+	UserIds          []int64 `json:"user_ids" binding:"user_ids"`
 }
 
 func NewDutyUser() *DutyUser {
@@ -90,7 +90,7 @@ func (this *DutyUser) RegisterValidator() *higo.Valid {
 			higo.Rule("required", Codes.Success),
 			higo.Rule("min=4", Codes.Success1)).
 		Tag("user_ids",
-			higo.Rule("required", Codes.Success))
+			higo.Rule("required", Codes.Success2))
 }
 
 // 测试get请求

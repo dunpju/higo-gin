@@ -70,7 +70,7 @@ func (this *Valid) Receiver(values ...interface{}) *ErrorResult {
 			if "" != binding {
 				bindings := strings.Split(binding, ",")
 				rules := strings.Split(this.ValidRules[bindings[0]].rule, ",")
-				this.ValidRules[bindings[0]].throw(rules[0])//抛出第一规则
+				this.ValidRules[bindings[0]].throw(rules[0]) //抛出第一规则
 			}
 		}
 	}
@@ -147,10 +147,31 @@ func (this *ValidRules) ToFunc() validator.Func {
 		if v, ok := fl.Field().Interface().(string); ok {
 			this.Throw(v)
 			return true
+		} else if v, ok := fl.Field().Interface().([]string); ok {
+			this.Throw(v)
+			return true
 		} else if v, ok := fl.Field().Interface().(int64); ok {
 			this.Throw(v)
 			return true
+		} else if v, ok := fl.Field().Interface().([]int64); ok {
+			this.Throw(v)
+			return true
 		} else if v, ok := fl.Field().Interface().(int); ok {
+			this.Throw(v)
+			return true
+		} else if v, ok := fl.Field().Interface().([]int); ok {
+			this.Throw(v)
+			return true
+		} else if v, ok := fl.Field().Interface().(float32); ok {
+			this.Throw(v)
+			return true
+		} else if v, ok := fl.Field().Interface().([]float32); ok {
+			this.Throw(v)
+			return true
+		} else if v, ok := fl.Field().Interface().(float64); ok {
+			this.Throw(v)
+			return true
+		} else if v, ok := fl.Field().Interface().([]float64); ok {
 			this.Throw(v)
 			return true
 		}
