@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Codes"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
@@ -83,14 +82,15 @@ func NewDutyUser() *DutyUser {
 }
 
 func (this *DutyUser) RegisterValidator() *higo.Valid {
-	return higo.Verifier().
-		Tag("mobile",
-			higo.Rule("required", Codes.Success)).
-		Tag("password",
-			higo.Rule("required", Codes.Success),
-			higo.Rule("min=4", Codes.Success1)).
-		Tag("user_ids",
-			higo.Rule("required", Codes.Success2))
+	//return higo.Verifier().
+	//	Tag("mobile",
+	//		higo.Rule("required", Codes.Success)).
+	//	Tag("password",
+	//		higo.Rule("required", Codes.Success),
+	//		higo.Rule("min=4", Codes.Success1)).
+	//	Tag("user_ids",
+	//		higo.Rule("required", Codes.Success2))
+	return higo.Verifier()
 }
 
 // 测试get请求

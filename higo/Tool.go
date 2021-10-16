@@ -15,6 +15,7 @@ const (
 	model                      = "model"
 	enum                       = "enum"
 	codes                      = "code"
+	param                      = "param"
 	yes        templates.YesNo = "yes"
 	no         templates.YesNo = "no"
 )
@@ -33,7 +34,7 @@ func NewTool() *Tool {
 func (this *Tool) Cmd() {
 	if len(os.Args) >= 2 {
 		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller or Model or Enum or Code or Dao or Entity
-	--option[controller | model | enum | code | dao | entity]
+	--option[controller | model | enum | code | dao | entity | param]
 	eg:-gen=controller`)
 		flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
 	eg:-name=Test`)
@@ -77,6 +78,16 @@ func (this *Tool) Cmd() {
 			}
 			this.Package = utils.Basename(this.Out)
 			templates.NewCode(this.Package, this.Name, this.Out).Generate()
+		} else if param == this.Gen {
+			if this.Name == "" {
+				log.Fatalln(`param name unable empty 
+	eg: -name=list`)
+			}
+			if this.Out == "" {
+				log.Fatalln(`output directory unable empty 
+	eg: -out=test\app\Params`)
+			}
+			templates.NewParam(this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`table name unable empty 
@@ -168,7 +179,7 @@ eg: -out=test\app\Models`)
 					genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
 					genModel.Generate()
 					daoEntity(*modelTool, *genModel)
-					fmt.Println("==================================================")
+					fmt.Println("==================================================================================")
 				}
 			} else {
 				genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
@@ -178,7 +189,7 @@ eg: -out=test\app\Models`)
 		} else {
 			log.Fatalln(`gen Arguments Error! 
 Explain: Generate Controller or Model or Enum or Code or Dao or Entity
-	--option[controller | model | enum | code | dao | entity] 
+	--option[controller | model | enum | code | dao | entity | param] 
 	eg:-gen=controller`)
 		}
 		os.Exit(1)
