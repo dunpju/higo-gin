@@ -2,6 +2,7 @@ package V3
 
 import (
 	"fmt"
+	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/test/app/Exception"
@@ -70,6 +71,33 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	return "v3 https_test_throw"
 }
 
+//错误码
+type ErrorCode int64
+
+func (this ErrorCode) Message() string {
+	return code.Get(this)
+}
+
+func (this ErrorCode) Register() code.Message {
+	code400001()
+	return code.Container()
+}
+
+const (
+	TokenEmpty ErrorCode = iota +  400001  //token不存在
+	TokenError  //token错误
+	TokenSetError  //设置token失败
+	TokenExpiredError  //无效token
+)
+
+func code400001() {
+	code.Container().
+		Put(TokenEmpty, "token不存在1").
+		Put(TokenError, "token错误").
+		Put(TokenSetError, "设置token失败").
+		Put(TokenExpiredError, "无效token")
+}
+
 //测试验证器
 type DutyUser struct {
 	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
@@ -81,23 +109,25 @@ func NewDutyUser() *DutyUser {
 	return &DutyUser{UserIds: make([]int64, 0)}
 }
 
-func (this *DutyUser) RegisterValidator() *higo.Valid {
-	//return higo.Verifier().
-	//	Tag("mobile",
-	//		higo.Rule("required", Codes.Success)).
-	//	Tag("password",
-	//		higo.Rule("required", Codes.Success),
-	//		higo.Rule("min=4", Codes.Success1)).
-	//	Tag("user_ids",
-	//		higo.Rule("required", Codes.Success2))
-	return higo.Verifier()
+func (this *DutyUser) RegisterValidator() *higo.Verify {
+	return higo.Verifier().
+		Tag("mobile",
+			higo.Rule("required", TokenEmpty)).
+		Tag("password",
+			higo.Rule("required", TokenError),
+			higo.Rule("min=4", TokenSetError)).
+		Tag("user_ids",
+			higo.Rule("required", TokenExpiredError))
 }
 
 // 测试get请求
 func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	param := NewDutyUser()
+	fmt.Println(higo.VerifyContainer)
 	//校验数据
-	higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
+	//higo.Receiver(ctx.ShouldBindJSON(param)).Unwrap()
+	higo.Validate(param).Unwrap()
+	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
 
 	log.Fatalln(param)
 	/**

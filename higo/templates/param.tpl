@@ -14,6 +14,6 @@ func New(ctx *gin.Context) *{{.StructName}} {
 	return param
 }
 
-func (this *{{.StructName}}) RegisterValidator() *higo.Valid {
+func (this *{{.StructName}}) RegisterValidator() *higo.Verify {
 	return higo.Verifier()
 }
