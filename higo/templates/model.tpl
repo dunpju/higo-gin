@@ -39,6 +39,10 @@ func (this *{{.StructName}}) TableName() string {
 	return "{{.TableName}}"
 }
 
+func (this *{{.StructName}}) Alias(a string) string {
+	return this.TableName() + " AS " + a
+}
+
 func (this *{{.StructName}}) Mutate(attrs ...higo.Property) higo.Model {
 	higo.Propertys(attrs).Apply(this)
 	return this
