@@ -70,30 +70,26 @@ func Raw(sql string) string {
 
 type Perd func() string
 
-func AND(conds ...Perd) Perd {
-	return func() string {
-		if len(conds) == 0 {
-			panic("Condition Can Not Be Empty")
-		}
-		condSlice := make([]string, 0)
-		for _, cond := range conds {
-			condSlice = append(condSlice, cond())
-		}
-		return "(" + strings.Join(condSlice, " AND ") + ")"
+func AND(conds ...Perd) string {
+	if len(conds) == 0 {
+		panic("Condition Can Not Be Empty")
 	}
+	condSlice := make([]string, 0)
+	for _, cond := range conds {
+		condSlice = append(condSlice, cond())
+	}
+	return "(" + strings.Join(condSlice, " AND ") + ")"
 }
 
-func OR(conds ...Perd) Perd {
-	return func() string {
-		if len(conds) == 0 {
-			panic("Condition Can Not Be Empty")
-		}
-		condSlice := make([]string, 0)
-		for _, cond := range conds {
-			condSlice = append(condSlice, cond())
-		}
-		return "(" + strings.Join(condSlice, " OR ") + ")"
+func OR(conds ...Perd) string {
+	if len(conds) == 0 {
+		panic("Condition Can Not Be Empty")
 	}
+	condSlice := make([]string, 0)
+	for _, cond := range conds {
+		condSlice = append(condSlice, cond())
+	}
+	return "(" + strings.Join(condSlice, " OR ") + ")"
 }
 
 func Cond(column, operator string, value interface{}) Perd {
