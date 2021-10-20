@@ -64,15 +64,11 @@ func IF(expr1, expr2, expr3 string) string {
 	return "IF(" + expr1 + "," + expr2 + "," + expr3 + ")"
 }
 
-func Raw(sql string) string {
-	return sql
-}
-
 type Perd func() string
 
-func AND(conds ...Perd) string {
+func Raw(conds ...Perd) string {
 	if len(conds) == 0 {
-		panic("Condition Can Not Be Empty")
+		panic("Raw Condition Can Not Be Empty")
 	}
 	condSlice := make([]string, 0)
 	for _, cond := range conds {
@@ -81,15 +77,30 @@ func AND(conds ...Perd) string {
 	return "(" + strings.Join(condSlice, " AND ") + ")"
 }
 
-func OR(conds ...Perd) string {
-	if len(conds) == 0 {
-		panic("Condition Can Not Be Empty")
+func AND(conds ...Perd) Perd {
+	return func() string {
+		if len(conds) == 0 {
+			panic("AND Condition Can Not Be Empty")
+		}
+		condSlice := make([]string, 0)
+		for _, cond := range conds {
+			condSlice = append(condSlice, cond())
+		}
+		return "(" + strings.Join(condSlice, " AND ") + ")"
 	}
-	condSlice := make([]string, 0)
-	for _, cond := range conds {
-		condSlice = append(condSlice, cond())
+}
+
+func OR(conds ...Perd) Perd {
+	return func() string {
+		if len(conds) == 0 {
+			panic("OR Condition Can Not Be Empty")
+		}
+		condSlice := make([]string, 0)
+		for _, cond := range conds {
+			condSlice = append(condSlice, cond())
+		}
+		return "(" + strings.Join(condSlice, " OR ") + ")"
 	}
-	return "(" + strings.Join(condSlice, " OR ") + ")"
 }
 
 func Cond(column, operator string, value interface{}) Perd {
