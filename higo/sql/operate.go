@@ -5,7 +5,24 @@ import (
 	"strings"
 )
 
-func convert(values interface{}) []string {
+func convertString(values interface{}) string {
+	if value, ok := values.(int); ok {
+		return utils.IntString(value)
+	} else if value, ok := values.(int64); ok {
+		return utils.Int64String(value)
+	} else if value, ok := values.(float32); ok {
+		return utils.FloatString(value)
+	} else if value, ok := values.(float64); ok {
+		utils.Float64String(value)
+	} else if value, ok := values.(string); ok {
+		return value
+	} else {
+		panic("Unsupported types")
+	}
+	return ""
+}
+
+func convertSliceString(values interface{}) []string {
 	conValues := make([]string, 0)
 	if value, ok := values.([]int); ok {
 		for _, v := range value {
@@ -32,11 +49,11 @@ func convert(values interface{}) []string {
 }
 
 func IN(column string, values interface{}) string {
-	return column + " IN(" + strings.Join(convert(values), ",") + ")"
+	return column + " IN(" + strings.Join(convertSliceString(values), ",") + ")"
 }
 
 func NotIn(column string, values interface{}) string {
-	return column + " NOT IN(" + strings.Join(convert(values), ",") + ")"
+	return column + " NOT IN(" + strings.Join(convertSliceString(values), ",") + ")"
 }
 
 func IsNull(column string) string {
@@ -45,4 +62,47 @@ func IsNull(column string) string {
 
 func IF(expr1, expr2, expr3 string) string {
 	return "IF(" + expr1 + "," + expr2 + "," + expr3 + ")"
+}
+
+func Raw(sql string) string {
+	return sql
+}
+
+type Perd func() string
+
+func AND(conds ...Perd) Perd {
+	return func() string {
+		if len(conds) == 0 {
+			panic("Condition Can Not Be Empty")
+		}
+		condSlice := make([]string, 0)
+		for _, cond := range conds {
+			condSlice = append(condSlice, cond())
+		}
+		return "(" + strings.Join(condSlice, " AND ") + ")"
+	}
+}
+
+func OR(conds ...Perd) Perd {
+	return func() string {
+		if len(conds) == 0 {
+			panic("Condition Can Not Be Empty")
+		}
+		condSlice := make([]string, 0)
+		for _, cond := range conds {
+			condSlice = append(condSlice, cond())
+		}
+		return "(" + strings.Join(condSlice, " OR ") + ")"
+	}
+}
+
+func Cond(column, operator string, value interface{}) Perd {
+	return func() string {
+		columns := strings.Split(column, ".")
+		if len(columns) >= 2 {
+			return "(`" + columns[0] + "`.`" + columns[1] + "` " + operator + `'` + convertString(value) + `')`
+		} else {
+			return "(`" + column + "` " + operator + `'` + convertString(value) + `')`
+		}
+	}
 }
