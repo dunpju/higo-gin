@@ -48,69 +48,39 @@ func convertSliceString(values interface{}) []string {
 	return conValues
 }
 
-type Prep func() string
+type ConditionPrepare func() string
 
-func Perd(preps ...Prep) string {
-	if len(preps) == 0 {
-		panic("Raw Preps Can Not Be Empty")
+func Perd(cps ...ConditionPrepare) string {
+	if len(cps) == 0 {
+		panic("Raw Condition Can Not Be Empty")
 	}
 	condSlice := make([]string, 0)
-	for _, cond := range preps {
+	for _, cond := range cps {
 		condSlice = append(condSlice, cond())
 	}
 	return "(" + strings.Join(condSlice, " AND ") + ")"
 }
 
-func IN(column string, values interface{}) Prep {
+func AND(cps ...ConditionPrepare) ConditionPrepare {
 	return func() string {
-		return column + " IN(" + strings.Join(convertSliceString(values), ",") + ")"
-	}
-}
-
-func NotIn(column string, values interface{}) Prep {
-	return func() string {
-		return column + " NOT IN(" + strings.Join(convertSliceString(values), ",") + ")"
-	}
-}
-
-func IsNull(column string) Prep {
-	return func() string {
-		return "isnull(`" + column + "`)"
-	}
-}
-
-func IF(expr1, expr2, expr3 string) Prep {
-	return func() string {
-		return "IF(" + expr1 + "," + expr2 + "," + expr3 + ")"
-	}
-}
-
-func Raw(query string) Prep {
-	return func() string {
-		return query
-	}
-}
-
-func AND(conditions ...Prep) Prep {
-	return func() string {
-		if len(conditions) == 0 {
-			panic("AND Conditions Can Not Be Empty")
+		if len(cps) == 0 {
+			panic("AND Condition Can Not Be Empty")
 		}
 		condSlice := make([]string, 0)
-		for _, cond := range conditions {
+		for _, cond := range cps {
 			condSlice = append(condSlice, cond())
 		}
 		return "(" + strings.Join(condSlice, " AND ") + ")"
 	}
 }
 
-func OR(conditions ...Prep) Prep {
+func OR(cps ...ConditionPrepare) ConditionPrepare {
 	return func() string {
-		if len(conditions) == 0 {
-			panic("OR Conditions Can Not Be Empty")
+		if len(cps) == 0 {
+			panic("OR Condition Can Not Be Empty")
 		}
 		condSlice := make([]string, 0)
-		for _, cond := range conditions {
+		for _, cond := range cps {
 			condSlice = append(condSlice, cond())
 		}
 		return "(" + strings.Join(condSlice, " OR ") + ")"
@@ -118,7 +88,7 @@ func OR(conditions ...Prep) Prep {
 }
 
 // where Condition
-func Cond(column, operator string, value interface{}) Prep {
+func Condition(column, operator string, value interface{}) ConditionPrepare {
 	return func() string {
 		columns := strings.Split(column, ".")
 		if len(columns) >= 2 {
@@ -126,5 +96,35 @@ func Cond(column, operator string, value interface{}) Prep {
 		} else {
 			return "(`" + column + "` " + operator + `'` + convertString(value) + `')`
 		}
+	}
+}
+
+func BETWEEN(column string, value1, value2 interface{}) ConditionPrepare {
+	return func() string {
+		return column + ` BETWEEN ` + convertString(value1) + ` AND ` + convertString(value2)
+	}
+}
+
+func IN(column string, values interface{}) ConditionPrepare {
+	return func() string {
+		return column + " IN(" + strings.Join(convertSliceString(values), ",") + ")"
+	}
+}
+
+func NOTIN(column string, values interface{}) ConditionPrepare {
+	return func() string {
+		return column + " NOT IN(" + strings.Join(convertSliceString(values), ",") + ")"
+	}
+}
+
+func ISNULL(column string) ConditionPrepare {
+	return func() string {
+		return "(`" + column + "`" + `IS NULL)`
+	}
+}
+
+func Raw(query string) ConditionPrepare {
+	return func() string {
+		return query
 	}
 }
