@@ -64,9 +64,9 @@ func IF(expr1, expr2, expr3 string) string {
 	return "IF(" + expr1 + "," + expr2 + "," + expr3 + ")"
 }
 
-type Perd func() string
+type Prep func() string
 
-func Raw(conds ...Perd) string {
+func Perd(conds ...Prep) string {
 	if len(conds) == 0 {
 		panic("Raw Condition Can Not Be Empty")
 	}
@@ -77,7 +77,13 @@ func Raw(conds ...Perd) string {
 	return "(" + strings.Join(condSlice, " AND ") + ")"
 }
 
-func AND(conds ...Perd) Perd {
+func Raw(query string) Prep {
+	return func() string {
+		return query
+	}
+}
+
+func AND(conds ...Prep) Prep {
 	return func() string {
 		if len(conds) == 0 {
 			panic("AND Condition Can Not Be Empty")
@@ -90,7 +96,7 @@ func AND(conds ...Perd) Perd {
 	}
 }
 
-func OR(conds ...Perd) Perd {
+func OR(conds ...Prep) Prep {
 	return func() string {
 		if len(conds) == 0 {
 			panic("OR Condition Can Not Be Empty")
@@ -103,7 +109,7 @@ func OR(conds ...Perd) Perd {
 	}
 }
 
-func Cond(column, operator string, value interface{}) Perd {
+func Cond(column, operator string, value interface{}) Prep {
 	return func() string {
 		columns := strings.Split(column, ".")
 		if len(columns) >= 2 {
