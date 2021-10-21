@@ -48,33 +48,41 @@ func convertSliceString(values interface{}) []string {
 	return conValues
 }
 
-func IN(column string, values interface{}) string {
-	return column + " IN(" + strings.Join(convertSliceString(values), ",") + ")"
-}
-
-func NotIn(column string, values interface{}) string {
-	return column + " NOT IN(" + strings.Join(convertSliceString(values), ",") + ")"
-}
-
-func IsNull(column string) string {
-	return "isnull(`" + column + "`)"
-}
-
-func IF(expr1, expr2, expr3 string) string {
-	return "IF(" + expr1 + "," + expr2 + "," + expr3 + ")"
-}
-
 type Prep func() string
 
-func Perd(conds ...Prep) string {
-	if len(conds) == 0 {
-		panic("Raw Condition Can Not Be Empty")
+func Perd(preps ...Prep) string {
+	if len(preps) == 0 {
+		panic("Raw Preps Can Not Be Empty")
 	}
 	condSlice := make([]string, 0)
-	for _, cond := range conds {
+	for _, cond := range preps {
 		condSlice = append(condSlice, cond())
 	}
 	return "(" + strings.Join(condSlice, " AND ") + ")"
+}
+
+func IN(column string, values interface{}) Prep {
+	return func() string {
+		return column + " IN(" + strings.Join(convertSliceString(values), ",") + ")"
+	}
+}
+
+func NotIn(column string, values interface{}) Prep {
+	return func() string {
+		return column + " NOT IN(" + strings.Join(convertSliceString(values), ",") + ")"
+	}
+}
+
+func IsNull(column string) Prep {
+	return func() string {
+		return "isnull(`" + column + "`)"
+	}
+}
+
+func IF(expr1, expr2, expr3 string) Prep {
+	return func() string {
+		return "IF(" + expr1 + "," + expr2 + "," + expr3 + ")"
+	}
 }
 
 func Raw(query string) Prep {
@@ -83,32 +91,33 @@ func Raw(query string) Prep {
 	}
 }
 
-func AND(conds ...Prep) Prep {
+func AND(conditions ...Prep) Prep {
 	return func() string {
-		if len(conds) == 0 {
-			panic("AND Condition Can Not Be Empty")
+		if len(conditions) == 0 {
+			panic("AND Conditions Can Not Be Empty")
 		}
 		condSlice := make([]string, 0)
-		for _, cond := range conds {
+		for _, cond := range conditions {
 			condSlice = append(condSlice, cond())
 		}
 		return "(" + strings.Join(condSlice, " AND ") + ")"
 	}
 }
 
-func OR(conds ...Prep) Prep {
+func OR(conditions ...Prep) Prep {
 	return func() string {
-		if len(conds) == 0 {
-			panic("OR Condition Can Not Be Empty")
+		if len(conditions) == 0 {
+			panic("OR Conditions Can Not Be Empty")
 		}
 		condSlice := make([]string, 0)
-		for _, cond := range conds {
+		for _, cond := range conditions {
 			condSlice = append(condSlice, cond())
 		}
 		return "(" + strings.Join(condSlice, " OR ") + ")"
 	}
 }
 
+// where Condition
 func Cond(column, operator string, value interface{}) Prep {
 	return func() string {
 		columns := strings.Split(column, ".")
