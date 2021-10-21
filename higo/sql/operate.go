@@ -127,7 +127,13 @@ func NOTIN(column string, values interface{}) ConditionPrepare {
 func ISNULL(column string) ConditionPrepare {
 	return func() string {
 		column = strings.ReplaceAll(column, "`", "")
-		return "(`" + column + "`" + ` IS NULL)`
+		columns := strings.Split(column, ".")
+		if len(columns) >= 2 {
+			return "(`" + columns[0] + "`.`" + columns[1] + "`" + ` IS NULL)`
+		} else {
+			return "(`" + column + "`" + ` IS NULL)`
+		}
+
 	}
 }
 
