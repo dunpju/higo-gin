@@ -90,6 +90,7 @@ func OR(cps ...ConditionPrepare) ConditionPrepare {
 // where Condition
 func Condition(column, operator string, value interface{}) ConditionPrepare {
 	return func() string {
+		column = strings.ReplaceAll(column, "`", "")
 		columns := strings.Split(column, ".")
 		if len(columns) >= 2 {
 			return "(`" + columns[0] + "`.`" + columns[1] + "` " + operator + `'` + convertString(value) + `')`
@@ -119,6 +120,7 @@ func NOTIN(column string, values interface{}) ConditionPrepare {
 
 func ISNULL(column string) ConditionPrepare {
 	return func() string {
+		column = strings.ReplaceAll(column, "`", "")
 		return "(`" + column + "`" + ` IS NULL)`
 	}
 }
