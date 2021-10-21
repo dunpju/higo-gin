@@ -93,10 +93,16 @@ func Condition(column, operator string, value interface{}) ConditionPrepare {
 		column = strings.ReplaceAll(column, "`", "")
 		columns := strings.Split(column, ".")
 		if len(columns) >= 2 {
-			return "(`" + columns[0] + "`.`" + columns[1] + "` " + operator + `'` + convertString(value) + `')`
+			return "(`" + columns[0] + "`.`" + columns[1] + "` " + operator + ` '` + convertString(value) + `')`
 		} else {
-			return "(`" + column + "` " + operator + `'` + convertString(value) + `')`
+			return "(`" + column + "` " + operator + ` '` + convertString(value) + `')`
 		}
+	}
+}
+
+func Raw(query string) ConditionPrepare {
+	return func() string {
+		return query
 	}
 }
 
@@ -125,8 +131,6 @@ func ISNULL(column string) ConditionPrepare {
 	}
 }
 
-func Raw(query string) ConditionPrepare {
-	return func() string {
-		return query
-	}
+func LIKE(column string, value interface{}) ConditionPrepare {
+	return Condition(column, "LIKE", "%"+convertString(value)+"%")
 }
