@@ -119,7 +119,7 @@ func NOTIN(column string, values interface{}) ConditionPrepare {
 
 func ISNULL(column string) ConditionPrepare {
 	return func() string {
-		return "(`" + column + "`" + `IS NULL)`
+		return "(`" + column + "`" + ` IS NULL)`
 	}
 }
 
