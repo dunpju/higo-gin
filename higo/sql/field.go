@@ -16,7 +16,7 @@ func Field(fields ...string) string {
 		if len(fs) >= 2 {
 			tmpFields = append(tmpFields, "`"+fs[0]+"`.`"+fs[1]+"`")
 		} else {
-			tmpFields = append(tmpFields, "`"+fs[0]+"`")
+			tmpFields = append(tmpFields, fs[0])
 		}
 	}
 	return strings.Join(tmpFields, ",")
