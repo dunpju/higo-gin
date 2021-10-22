@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-utils/utils"
 	"strings"
 )
@@ -17,7 +18,7 @@ func convertString(values interface{}) string {
 	} else if value, ok := values.(string); ok {
 		return value
 	} else {
-		panic("Unsupported types")
+		panic(fmt.Errorf("Unsupported types"))
 	}
 	return ""
 }
@@ -43,7 +44,7 @@ func convertSliceString(values interface{}) []string {
 	} else if value, ok := values.([]string); ok {
 		conValues = value
 	} else {
-		panic("Unsupported types")
+		panic(fmt.Errorf("Unsupported types"))
 	}
 	return conValues
 }
@@ -52,19 +53,19 @@ type ConditionPrepare func() string
 
 func Perd(cps ...ConditionPrepare) string {
 	if len(cps) == 0 {
-		panic("Raw Condition Can Not Be Empty")
+		panic(fmt.Errorf("Raw Condition Can Not Be Empty"))
 	}
 	condSlice := make([]string, 0)
 	for _, cond := range cps {
 		condSlice = append(condSlice, cond())
 	}
-	return "(" + strings.Join(condSlice, " AND ") + ")"
+	return strings.Join(condSlice, " AND ")
 }
 
 func AND(cps ...ConditionPrepare) ConditionPrepare {
 	return func() string {
 		if len(cps) == 0 {
-			panic("AND Condition Can Not Be Empty")
+			panic(fmt.Errorf("AND Condition Can Not Be Empty"))
 		}
 		condSlice := make([]string, 0)
 		for _, cond := range cps {
@@ -77,7 +78,7 @@ func AND(cps ...ConditionPrepare) ConditionPrepare {
 func OR(cps ...ConditionPrepare) ConditionPrepare {
 	return func() string {
 		if len(cps) == 0 {
-			panic("OR Condition Can Not Be Empty")
+			panic(fmt.Errorf("OR Condition Can Not Be Empty"))
 		}
 		condSlice := make([]string, 0)
 		for _, cond := range cps {
