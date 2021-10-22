@@ -123,18 +123,18 @@ func newGorm() *gorm.DB {
 }
 
 func sqlReplace(scope *gorm.Scope) {
-	sql := scope.SQL
+	sq := scope.SQL
 	s := reflect.ValueOf(scope.SQLVars)
 	if orm, ok := scope.Value.(*Orm); ok {
-		sql = orm.sql
+		sq = orm.sql
 		s = reflect.ValueOf(orm.args)
 	}
 	for i := 0; i < s.Len(); i++ {
-		sql = strings.Replace(sql, "?", "'%v'", 1)
-		sql = fmt.Sprintf(sql, s.Index(i))
+		sq = strings.Replace(sq, "?", "'%v'", 1)
+		sq = fmt.Sprintf(sq, s.Index(i))
 	}
 	if logMode {
-		logger.Logrus.Debugln(sql)
+		logger.Logrus.Debugln(sq)
 	}
 }
 
@@ -261,7 +261,7 @@ func (this *Orm) Paginate(pager *Pager) *gorm.DB {
 }
 
 func (this *Orm) Table(name string) *Orm {
-	this.DB = this.DB.Table(name)
+	this.DB = this.DB.New().Table(name)
 	this.table = name
 	return this
 }
