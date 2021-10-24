@@ -80,6 +80,7 @@ func (this *{{.StructName}}) Paginate(perPage, page uint64) *higo.Pager {
 	models := make([]*{{.StructName}}, 0)
 	pager := higo.NewPager(perPage, page)
 	this.Table(this.TableName()). /**Where().*/ Paginate(pager).Find(&models)
+	this.CheckError()
 	pager.Items = models
 	return pager
 }
