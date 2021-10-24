@@ -94,7 +94,7 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.Prim
         Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
         {{- end}}
 		ToSql()).Query().Scan(&model)
-	this.model.CheckError()
+	model.CheckError()
 	return model
 }
 
@@ -129,7 +129,7 @@ func (this *Dao) List(perPage, page uint64, where map[string]interface{}, fields
 	pager := higo.NewPager(perPage, page)
 	query := this.model.Table(this.model.TableName())
 	query.Paginate(pager).Find(&models)
-	this.model.CheckError()
+	query.CheckError()
 	pager.Items = models
 	return pager
 }
