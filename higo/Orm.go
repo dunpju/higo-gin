@@ -399,3 +399,9 @@ type Builder struct {
 func newBuilder() *Builder {
 	return &Builder{}
 }
+
+func (this *Orm) CheckError() {
+	if this.Error != nil {
+		panic(this.Error)
+	}
+}
