@@ -94,6 +94,7 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.Prim
         Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
         {{- end}}
 		ToSql()).Query().Scan(&model)
+	this.model.CheckError()
 	return model
 }
 
@@ -103,13 +104,14 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdTyp
 		fields = append(fields, "*")
 	}
 	models := this.Models()
-	this.Model().Mapper(sql.Select(fields...).
+	this.model.Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
 		Where({{.ModelPackageName}}.{{.PrimaryId}}+" IN (?)", {{.SmallHumpPrimaryId}}s).
 		{{- if .HasDeleteTime}}
 		Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
 		{{- end}}
 		ToSql()).Query().Scan(&models)
+	this.model.CheckError()
 	return models
 }
 
@@ -125,8 +127,9 @@ func (this *Dao) DeleteBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType
 func (this *Dao) List(perPage, page uint64, where map[string]interface{}, fields ...string) *higo.Pager {
 	models := this.Models()
 	pager := higo.NewPager(perPage, page)
-	query := this.Model().Table(this.model.TableName())
+	query := this.model.Table(this.model.TableName())
 	query.Paginate(pager).Find(&models)
+	this.model.CheckError()
 	pager.Items = models
 	return pager
 }
