@@ -82,7 +82,7 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 }
 
 //添加路由组
-func (this *Higo) AddGroup(prefix string, callable interface{}, attributes ...*router.RouteAttribute) *Higo {
+func (this *Higo) AddGroup(prefix string, callable func(), attributes ...*router.RouteAttribute) *Higo {
 	router.AddGroup(prefix, callable, attributes...)
 	return this
 }
