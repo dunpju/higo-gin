@@ -12,7 +12,7 @@ require (
 	github.com/dengpju/higo-ioc v1.0.2
 	github.com/dengpju/higo-logger v1.0.7
 	github.com/dengpju/higo-redis v1.0.5
-	github.com/dengpju/higo-router v1.0.22
+	github.com/dengpju/higo-router v1.0.24
 	github.com/dengpju/higo-throw v1.0.14
 	github.com/dengpju/higo-utils v1.0.63
 	github.com/gin-gonic/gin v1.6.3

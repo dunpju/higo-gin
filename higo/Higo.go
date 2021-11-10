@@ -253,6 +253,11 @@ func (this *Higo) IsRedisPool() *Higo {
 	return this
 }
 
+func (this *Higo) InitGroupIsAuth(b bool) *Higo {
+	router.SetInitGroupIsAuth(b)
+	return this
+}
+
 //启动
 func (this *Higo) Boot() {
 	//执行tool命令
