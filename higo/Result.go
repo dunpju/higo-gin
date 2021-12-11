@@ -20,6 +20,10 @@ func (this *ErrorResult) Unwrap() interface{} {
 	return this.data
 }
 
+func (this *ErrorResult) Error() error {
+	return this.err
+}
+
 func Result(values ...interface{}) *ErrorResult {
 	if len(values) == 1 {
 		if values[0] == nil {
