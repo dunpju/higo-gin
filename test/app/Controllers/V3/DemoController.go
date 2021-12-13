@@ -74,8 +74,8 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 //错误码
 type ErrorCode int64
 
-func (this ErrorCode) Message() string {
-	return code.Get(this)
+func (this ErrorCode) Message(variables ...interface{}) string {
+	return code.Get(this, variables...)
 }
 
 func (this ErrorCode) Register() code.Message {

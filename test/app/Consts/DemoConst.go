@@ -10,8 +10,8 @@ const (
 	Success SuccessConst = iota + 20000
 )
 
-func (this SuccessConst) Message() string {
-	return code.Get(this)
+func (this SuccessConst) Message(variables ...interface{}) string {
+	return code.Get(this, variables...)
 }
 
 func (this SuccessConst) Register() code.Message {
@@ -35,8 +35,8 @@ const (
 	TestError
 )
 
-func (this DemoConst) Message() string {
-	return code.Get(this)
+func (this DemoConst) Message(variables ...interface{}) string {
+	return code.Get(this, variables...)
 }
 
 func (this DemoConst) Register() code.Message {
