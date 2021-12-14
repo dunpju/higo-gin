@@ -50,7 +50,8 @@ func NewEnum(pkg string, name string, file string) *Enum {
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
-		outfile.ForEach(func(line int, s string) {
+		err := outfile.ForEach(func(line int, b []byte) {
+			s := string(b)
 			s = strings.Replace(s, "\\", "", -1)
 			s = strings.Trim(s, "\n")
 			s = strings.Trim(s, "\r")
@@ -59,6 +60,7 @@ func NewEnum(pkg string, name string, file string) *Enum {
 				e.Enums = append(e.Enums, newEnum(pkg, s, file))
 			}
 		})
+		log.Fatalln(err)
 	}
 	return e
 }

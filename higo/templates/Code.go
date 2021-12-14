@@ -52,7 +52,8 @@ func NewCode(pkg string, name string, file string) *Code {
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
-		outfile.ForEach(func(line int, s string) {
+		err := outfile.ForEach(func(line int, b []byte) {
+			s := string(b)
 			s = strings.Replace(s, "\\", "", -1)
 			s = strings.Trim(s, "\n")
 			s = strings.Trim(s, "\r")
@@ -61,6 +62,7 @@ func NewCode(pkg string, name string, file string) *Code {
 				C.Codes = append(C.Codes, newCode(pkg, s, file))
 			}
 		})
+		log.Fatalln(err)
 	}
 	return C
 }
@@ -138,7 +140,7 @@ func (this *Code) generate() {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.File, os.O_WRONLY | os.O_TRUNC | os.O_CREATE, 0755)
+	outFile := utils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	defer outFile.Close()
 	tpl := this.Template("code.tpl")
 	tmpl, err := template.New("code.tpl").Parse(tpl)
