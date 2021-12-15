@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/fileutils"
 	"io/ioutil"
 	"os"
 	"path"
@@ -108,11 +109,14 @@ func (this *Dao) Generate() {
 func (this *Dao) generate() {
 	utils.Dir(this.OutDir).Create()
 	fileName := this.OutDir + utils.PathSeparator() + this.FileName + ".go"
-	if utils.FileExist(fileName) {
+	if fileutils.FileExist(fileName) {
 		fmt.Println("dao: " + fileName + " already existed")
 		return
 	}
-	outFile := utils.NewFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := fileutils.NewFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	if !outFile.Exist() {
+		outFile.Create()
+	}
 	defer outFile.Close()
 	tpl := this.Template(DaoFileName + ".tpl")
 	tmpl, err := template.New(DaoFileName + ".tpl").Parse(tpl)

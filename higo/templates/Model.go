@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/fileutils"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"github.com/jinzhu/gorm"
 	"go/ast"
@@ -168,7 +169,7 @@ func (this *Model) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + ModelFileName + ".go"}
+	outfile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + ModelFileName + ".go"}
 	if outfile.Exist() {
 		//生成最新ast buffer
 		bufferbuf := new(bytes.Buffer)
@@ -239,18 +240,18 @@ func (this *Model) Generate() {
 		})
 		//ast.Print(oldfset, oldfd)
 		//fmt.Println(newFileBuf)
-		newFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-		if err != nil {
-			panic(err)
+		newFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		if !newFile.Exist() {
+			newFile.Create()
 		}
 		_, err = newFile.Write(newFileBuf.Bytes())
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		modelFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
-		if err != nil {
-			panic(err)
+		modelFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+		if !modelFile.Exist() {
+			modelFile.Create()
 		}
 		defer modelFile.Close()
 		//生成model.go
@@ -259,10 +260,10 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	}
-	outfile = utils.File{Name: this.OutDir + utils.PathSeparator() + ModelAttributesFileName + ".go"}
-	attributesFile, err := os.OpenFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-	if err != nil {
-		panic(err)
+	outfile = fileutils.File{Name: this.OutDir + utils.PathSeparator() + ModelAttributesFileName + ".go"}
+	attributesFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	if !attributesFile.Exist() {
+		attributesFile.Create()
 	}
 	defer attributesFile.Close()
 	tpl = this.Template(ModelAttributesFileName + ".tpl")

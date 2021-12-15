@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/fileutils"
 	"io/ioutil"
 	"log"
 	"os"
@@ -48,7 +49,7 @@ func NewCode(pkg string, name string, file string) *Code {
 	if fs := reg.FindString(name); fs != "" {
 		C.Codes = append(C.Codes, newCode(pkg, name, file))
 	} else {
-		outfile := utils.ReadFile(name)
+		outfile := fileutils.ReadFile(name)
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
@@ -136,11 +137,14 @@ func (this *Code) Generate() {
 
 func (this *Code) generate() {
 	utils.Dir(this.OutDir).Create()
-	if utils.FileExist(this.File) {
+	if fileutils.FileExist(this.File) {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := utils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := fileutils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	if !outFile.Exist() {
+		outFile.Create()
+	}
 	defer outFile.Close()
 	tpl := this.Template("code.tpl")
 	tmpl, err := template.New("code.tpl").Parse(tpl)

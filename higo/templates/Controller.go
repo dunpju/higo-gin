@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/fileutils"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -57,12 +58,12 @@ func (this *Controller) Template(tplfile string) string {
 }
 
 func (this *Controller) Generate() {
-	if utils.FileExist(this.File) {
+	if fileutils.FileExist(this.File) {
 		log.Fatalln(this.File + " already existed")
 	}
-	outFile, err := os.OpenFile(this.File, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		panic(err)
+	outFile := fileutils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	if !outFile.Exist() {
+		outFile.Create()
 	}
 	defer outFile.Close()
 	tpl := this.Template("controller.tpl")
@@ -79,7 +80,7 @@ func (this *Controller) Generate() {
 	_, mainfile, _, _ := runtime.Caller(3)
 	app := strings.Trim(mainfile, "main.go") + ".." + utils.PathSeparator() + "app"
 	beansGofile := app + utils.PathSeparator() + "Beans" + utils.PathSeparator() + "Bean.go"
-	utifile := utils.File{Name: beansGofile}
+	utifile := fileutils.File{Name: beansGofile}
 	if !utifile.Exist() {
 		log.Fatalln("Bean.go file non-existent, bean route cannot auto-load")
 	}

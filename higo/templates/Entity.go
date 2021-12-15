@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/fileutils"
 	"io/ioutil"
 	"os"
 	"path"
@@ -78,10 +79,10 @@ func (this *Entity) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFileName + ".go"}
-	entityFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		panic(err)
+	outfile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + EntityFileName + ".go"}
+	entityFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	if !entityFile.Exist() {
+		entityFile.Create()
 	}
 	defer entityFile.Close()
 	//生成entity.go
@@ -89,8 +90,8 @@ func (this *Entity) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outFlagFile := utils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
-	if !utils.FileExist(outFlagFile.Name) { // flag.go 不存在则生成
+	outFlagFile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
+	if !fileutils.FileExist(outFlagFile.Name) { // flag.go 不存在则生成
 		flagFile, err := os.OpenFile(outFlagFile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 		if err != nil {
 			panic(err)

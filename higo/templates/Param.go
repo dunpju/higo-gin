@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/fileutils"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"io/ioutil"
 	"log"
@@ -43,7 +44,7 @@ func (this *Param) Template(tplfile string) string {
 }
 
 func (this *Param) Generate() {
-	if utils.FileExist(this.FileName) {
+	if fileutils.FileExist(this.FileName) {
 		log.Fatalln(this.FileName + " already existed")
 	}
 	if _, err := os.Stat(this.OutDir); os.IsNotExist(err) {
@@ -56,10 +57,10 @@ func (this *Param) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := utils.File{Name: this.OutDir + utils.PathSeparator() + this.FileName}
-	paramFile, err := os.OpenFile(outfile.Name, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		panic(err)
+	outfile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + this.FileName}
+	paramFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	if !paramFile.Exist() {
+		paramFile.Create()
 	}
 	defer paramFile.Close()
 	//生成param.go

@@ -1,4 +1,4 @@
-package BusinessException
+package BaseException
 
 import (
 	"github.com/dengpju/higo-gin/higo"

@@ -9,6 +9,7 @@ import (
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/tlsutils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -290,7 +291,7 @@ func (this *Higo) Boot() {
 		//是否使用自带ssl测试https
 		if this.isAutoTLS {
 			//生成ssl证书
-			utils.NewTLS(SslOut, SslCrt, SslKey).SetBits(this.bits).Build()
+			tlsutils.NewTLS(SslOut, SslCrt, SslKey).SetBits(this.bits).Build()
 		}
 		//是否使用redis pool
 		if this.isRedisPool {

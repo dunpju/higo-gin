@@ -7,8 +7,8 @@ import (
 //错误码
 type ErrorCode int64
 
-func (this ErrorCode) Message() string {
-	return code.Get(this)
+func (this ErrorCode) Message(variables ...interface{}) string {
+	return code.Get(this, variables...)
 }
 
 func (this ErrorCode) Register() code.Message {
@@ -17,12 +17,12 @@ func (this ErrorCode) Register() code.Message {
 }
 
 const (
-	AuthError ErrorCode = iota +  1  //认证失败
-	EnumError  //枚举错误
-	ParamError  //参数错误
-	PrimaryIdError  //主键id错误
-	UniqueError  //重复
-	NotExistError  //不存在
+	AuthError      ErrorCode = iota + 1 //认证失败
+	EnumError                           //枚举错误
+	ParamError                          //参数错误
+	PrimaryIdError                      //主键id错误
+	UniqueError                         //重复
+	NotExistError                       //不存在
 
 )
 

@@ -1,7 +1,7 @@
 package DaoException
 
-import "github.com/dengpju/higo-gin/higo/exceptions/BusinessException"
+import "github.com/dengpju/higo-gin/higo/exceptions/BaseException"
 
 func Throw(message string, code int) {
-	BusinessException.Throw(message, code)
+	BaseException.Throw(message, code)
 }
