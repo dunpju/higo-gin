@@ -64,8 +64,7 @@ func (this *Tool) Cmd() {
 				log.Fatalln(`output directory unable empty 
 	eg: -out=test\app\Enums`)
 			}
-			this.Package = dirutil.Basename(this.Out)
-			templates.NewEnum(this.Package, this.Name, this.Out).Generate()
+			templates.NewEnum(this.Name, this.Out).Generate()
 		} else if codes == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`code configure file unable empty 

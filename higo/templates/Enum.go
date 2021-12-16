@@ -39,14 +39,14 @@ type Enum struct {
 	Enums     []*Enum
 }
 
-func NewEnum(pkg string, name string, file string) *Enum {
+func NewEnum(name string, file string) *Enum {
 	reg := regexp.MustCompile(`(-e=[a-zA-Z_]+\s*-f=).*`)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
 	e := &Enum{}
 	if fs := reg.FindString(name); fs != "" {
-		e.Enums = append(e.Enums, newEnum(pkg, name, file))
+		e.Enums = append(e.Enums, newEnum(name, file))
 	} else {
 		outfile := fileutil.ReadFile(name)
 		if !outfile.Exist() {
@@ -59,15 +59,17 @@ func NewEnum(pkg string, name string, file string) *Enum {
 			s = strings.Trim(s, "\r")
 			s = strings.Trim(s, "")
 			if "" != s {
-				e.Enums = append(e.Enums, newEnum(pkg, s, file))
+				e.Enums = append(e.Enums, newEnum(s, file))
 			}
 		})
-		log.Fatalln(err)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 	return e
 }
 
-func newEnum(pkg string, name string, file string) *Enum {
+func newEnum(name string, file string) *Enum {
 	reg := regexp.MustCompile(`(-e=[a-zA-Z_]+\s*-f=).*`)
 	if reg == nil {
 		log.Fatalln("regexp err")
