@@ -2,8 +2,9 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,7 +22,7 @@ type EnumMap struct {
 }
 
 func NewEnumMap(key string, value interface{}, doc string) *EnumMap {
-	return &EnumMap{Key: utils.Ucfirst(utils.CaseToCamel(key)), Value: value, Doc: doc}
+	return &EnumMap{Key: stringutil.Ucfirst(stringutil.CaseToCamel(key)), Value: value, Doc: doc}
 }
 
 type Enum struct {
@@ -47,7 +48,7 @@ func NewEnum(pkg string, name string, file string) *Enum {
 	if fs := reg.FindString(name); fs != "" {
 		e.Enums = append(e.Enums, newEnum(pkg, name, file))
 	} else {
-		outfile := fileutils.ReadFile(name)
+		outfile := fileutil.ReadFile(name)
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
@@ -105,12 +106,12 @@ func newEnum(pkg string, name string, file string) *Enum {
 			}
 		}
 		E.LenMap = len(E.EnumMap) - 1
-		name = utils.Ucfirst(utils.CaseToCamel(name))
+		name = stringutil.Ucfirst(stringutil.CaseToCamel(name))
 		E.Name = name
 		E.RealName = name
-		E.OutDir = file + utils.PathSeparator() + enum + E.RealName
-		E.OutStruct = E.OutDir + utils.PathSeparator() + enum + strings.Replace(name, enum, "", -1)
-		E.File = E.OutDir + utils.PathSeparator() + "enum.go"
+		E.OutDir = file + dirutil.PathSeparator() + enum + E.RealName
+		E.OutStruct = E.OutDir + dirutil.PathSeparator() + enum + strings.Replace(name, enum, "", -1)
+		E.File = E.OutDir + dirutil.PathSeparator() + "enum.go"
 		E.Package = enum + name
 		return E
 	} else {
@@ -121,7 +122,7 @@ func newEnum(pkg string, name string, file string) *Enum {
 
 func (this *Enum) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -141,12 +142,12 @@ func (this *Enum) Generate() {
 }
 
 func (this *Enum) generate() {
-	utils.Dir(this.OutDir).Create()
-	if fileutils.FileExist(this.File) {
+	dirutil.Dir(this.OutDir).Create()
+	if fileutil.FileExist(this.File) {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := fileutils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := fileutil.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !outFile.Exist() {
 		outFile.Create()
 	}

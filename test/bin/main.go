@@ -6,7 +6,8 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Beans"
 	"github.com/dengpju/higo-gin/test/app/Middlewares"
 	"github.com/dengpju/higo-gin/test/router"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/randomutil"
+	"github.com/dengpju/higo-utils/utils/sliceutil"
 	term "github.com/nsf/termbox-go"
 	"os/exec"
 )
@@ -26,7 +27,7 @@ func main() {
 
 	//higo.WsPitpatSleep = time.Second * 5
 
-	higo.Init(utils.NewSliceString(".", "test", "")).
+	higo.Init(sliceutil.NewSliceString(".", "test", "")).
 		Middleware(Middlewares.NewRunLog()).
 		AddServe(router.NewHttp(), Middlewares.NewHttp()).
 		AddServe(router.NewHttps(), beanConfig).
@@ -49,16 +50,16 @@ func tt() {
 			fmt.Println()
 		}
 	begin_a:
-		decade1 := utils.NewRandom().BetweenInt(2, 11) //十位
-		unit1 := utils.NewRandom().BetweenInt(0, 8)    //个位
+		decade1 := randomutil.NewRandom().BetweenInt(2, 11) //十位
+		unit1 := randomutil.NewRandom().BetweenInt(0, 8)    //个位
 		a := fmt.Sprintf("%d%d", decade1, unit1)
 		if _, ok := ra[a]; ok {
 			goto begin_a
 		}
 		ra[a] = true
 	begin_b:
-		decade2 := utils.NewRandom().BetweenInt(0, decade1-1) //十位
-		unit2 := utils.NewRandom().BetweenInt(unit1+1, 9)     //个位
+		decade2 := randomutil.NewRandom().BetweenInt(0, decade1-1) //十位
+		unit2 := randomutil.NewRandom().BetweenInt(unit1+1, 9)     //个位
 		b := fmt.Sprintf("%d%d", decade2, unit2)
 		if _, ok := rb[b]; ok {
 			goto begin_b

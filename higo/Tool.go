@@ -4,7 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"log"
 	"os"
 	"regexp"
@@ -50,7 +51,7 @@ func (this *Tool) Cmd() {
 				log.Fatalln(`output directory unable empty 
 	eg: -out=test\app\Controllers`)
 			}
-			this.Package = utils.Basename(this.Out)
+			this.Package = dirutil.Basename(this.Out)
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if enum == this.Gen {
 			if this.Name == "" {
@@ -63,7 +64,7 @@ func (this *Tool) Cmd() {
 				log.Fatalln(`output directory unable empty 
 	eg: -out=test\app\Enums`)
 			}
-			this.Package = utils.Basename(this.Out)
+			this.Package = dirutil.Basename(this.Out)
 			templates.NewEnum(this.Package, this.Name, this.Out).Generate()
 		} else if codes == this.Gen {
 			if this.Name == "" {
@@ -76,7 +77,7 @@ func (this *Tool) Cmd() {
 				log.Fatalln(`output directory unable empty 
 	eg: -out=test\app\Codes`)
 			}
-			this.Package = utils.Basename(this.Out)
+			this.Package = dirutil.Basename(this.Out)
 			templates.NewCode(this.Package, this.Name, this.Out).Generate()
 		} else if param == this.Gen {
 			if this.Name == "" {
@@ -117,11 +118,11 @@ eg: -out=test\app\Models`)
 					log.Fatalln("regexp err")
 				}
 				daoDir := "dao"
-				isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
+				isMatchCapitalBegan = capitalBeganReg.FindString(dirutil.Basename(this.Out))
 				if isMatchCapitalBegan != "" {
-					daoDir = utils.Ucfirst(daoDir)
+					daoDir = stringutil.Ucfirst(daoDir)
 				}
-				outDaoDir := utils.Dirname(this.Out) + `\` + daoDir
+				outDaoDir := dirutil.Dirname(this.Out) + `\` + daoDir
 				fmt.Printf("Whether To Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", outDaoDir)
 				modelTool.OutDaoDir = outDaoDir
 				n, err = fmt.Scanln(&modelTool.OutDaoDir)
@@ -146,11 +147,11 @@ eg: -out=test\app\Models`)
 			fmt.Printf("Your Choice Generate Entity: %s\n", modelTool.IsGenerateEntity)
 			if modelTool.IsGenerateEntity.Bool() { //确认构建entity
 				entityDir := "entity"
-				isMatchCapitalBegan = capitalBeganReg.FindString(utils.Basename(this.Out))
+				isMatchCapitalBegan = capitalBeganReg.FindString(dirutil.Basename(this.Out))
 				if isMatchCapitalBegan != "" {
-					entityDir = utils.Ucfirst(entityDir)
+					entityDir = stringutil.Ucfirst(entityDir)
 				}
-				outEntityDir := utils.Dirname(this.Out) + `\` + entityDir
+				outEntityDir := dirutil.Dirname(this.Out) + `\` + entityDir
 				fmt.Printf("Whether To Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", outEntityDir)
 				modelTool.OutEntityDir = outEntityDir
 				n, err = fmt.Scanln(&modelTool.OutEntityDir)

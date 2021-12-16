@@ -8,8 +8,10 @@ import (
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/tlsutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/runtimeutil"
+	"github.com/dengpju/higo-utils/utils/sliceutil"
+	"github.com/dengpju/higo-utils/utils/tlsutil"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -44,7 +46,7 @@ type Higo struct {
 }
 
 // 初始化
-func Init(root *utils.SliceString) *Higo {
+func Init(root *sliceutil.SliceString) *Higo {
 	hg = &Higo{
 		Engine: gin.New(),
 		middle: make([]IMiddleware, 0),
@@ -57,7 +59,7 @@ func Init(root *utils.SliceString) *Higo {
 	//设置跨域、鉴权
 	hg.Middleware(NewCors(), NewAuth())
 	// 初始分隔符
-	pathSeparator = utils.PathSeparator()
+	pathSeparator = dirutil.PathSeparator()
 	AppConfigDir.Clone(root)
 	root.ForEach(func(index int, value interface{}) {
 		AppConfigDir.Append(value)
@@ -89,30 +91,30 @@ func (this *Higo) SetBits(bits int) *Higo {
 }
 
 // 设置主目录
-func (this *Higo) setRoot(r *utils.SliceString) *Higo {
+func (this *Higo) setRoot(r *sliceutil.SliceString) *Higo {
 	root = r
 	return this
 }
 
 // 获取主目录
-func (this *Higo) GetRoot() *utils.SliceString {
+func (this *Higo) GetRoot() *sliceutil.SliceString {
 	return Root()
 }
 
 // 加载env
-func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
+func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 
-	utils.SetPathSeparator(pathSeparator)
+	dirutil.SetPathSeparator(pathSeparator)
 	// 设置主目录
 	this.setRoot(root)
 	// 创建runtime
-	utils.Mkdir(this.GetRoot().Join(pathSeparator) + "runtime")
+	dirutil.Mkdir(this.GetRoot().Join(pathSeparator) + "runtime")
 	// 日志
 	logger.Logrus.Root(this.GetRoot().Join(pathSeparator)).File("higo").Init()
 	// 装载env配置
 	env := this.GetRoot().Join(pathSeparator) + "env"
-	if ! utils.DirExist(env) {
-		utils.Mkdir(env)
+	if ! dirutil.DirExist(env) {
+		dirutil.Mkdir(env)
 	}
 	envConf := config.New()
 	filepathErr := filepath.Walk(env,
@@ -126,11 +128,11 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 			if path.Ext(p) == ".yaml" {
 				yamlFile, err := ioutil.ReadFile(p)
 				if err != nil {
-					logger.LoggerStack(err, utils.GoroutineID())
+					logger.LoggerStack(err, runtimeutil.GoroutineID())
 				}
 				yamlMap := make(map[interface{}]interface{})
 				yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
-				envConf.Set(utils.Basename(p, "yaml"), yamlMap)
+				envConf.Set(dirutil.Basename(p, "yaml"), yamlMap)
 				if yamlFileErr != nil {
 					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
 				}
@@ -158,11 +160,11 @@ func (this *Higo) LoadEnv(root *utils.SliceString) *Higo {
 
 // 加载配置
 func (this *Higo) loadConfigur() *Higo {
-	if ! utils.DirExist(AppConfigDir.Join(utils.PathSeparator())) {
-		utils.Mkdir(AppConfigDir.Join(utils.PathSeparator()))
+	if ! dirutil.DirExist(AppConfigDir.Join(dirutil.PathSeparator())) {
+		dirutil.Mkdir(AppConfigDir.Join(dirutil.PathSeparator()))
 	}
 	conf := config.New()
-	filepathErr := filepath.Walk(AppConfigDir.Join(utils.PathSeparator()),
+	filepathErr := filepath.Walk(AppConfigDir.Join(dirutil.PathSeparator()),
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
 				return err
@@ -173,11 +175,11 @@ func (this *Higo) loadConfigur() *Higo {
 			if path.Ext(p) == ".yaml" {
 				yamlFile, err := ioutil.ReadFile(p)
 				if err != nil {
-					logger.LoggerStack(err, utils.GoroutineID())
+					logger.LoggerStack(err, runtimeutil.GoroutineID())
 				}
 				yamlMap := make(map[interface{}]interface{})
 				yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
-				conf.Set(utils.Basename(p, "yaml"), yamlMap)
+				conf.Set(dirutil.Basename(p, "yaml"), yamlMap)
 				if yamlFileErr != nil {
 					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
 				}
@@ -291,7 +293,7 @@ func (this *Higo) Boot() {
 		//是否使用自带ssl测试https
 		if this.isAutoTLS {
 			//生成ssl证书
-			tlsutils.NewTLS(SslOut, SslCrt, SslKey).SetBits(this.bits).Build()
+			tlsutil.NewTLS(SslOut, SslCrt, SslKey).SetBits(this.bits).Build()
 		}
 		//是否使用redis pool
 		if this.isRedisPool {

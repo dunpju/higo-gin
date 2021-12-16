@@ -3,7 +3,7 @@ package higo
 import (
 	"github.com/dengpju/higo-config/config"
 	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/sliceutil"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/robfig/cron/v3"
@@ -31,8 +31,8 @@ var (
 	serves           []*Serve
 	onlySupportServe *router.UniqueString
 	pathSeparator    string
-	AppConfigDir     *utils.SliceString
-	root             *utils.SliceString
+	AppConfigDir     *sliceutil.SliceString
+	root             *sliceutil.SliceString
 	MiddleCorsFunc   func(hg *Higo) gin.HandlerFunc
 	MiddleAuthFunc   func(hg *Higo) gin.HandlerFunc
 	Upgrader         websocket.Upgrader
@@ -55,8 +55,8 @@ func init() {
 			Append(HttpServe).
 			Append(HttpsServe).
 			Append(WebsocketServe)
-		root = utils.NewSliceString(".", "..", "")
-		AppConfigDir = utils.NewSliceString()
+		root = sliceutil.NewSliceString(".", "..", "")
+		AppConfigDir = sliceutil.NewSliceString()
 		MiddleCorsFunc = middleCorsFunc
 		MiddleAuthFunc = middleAuthFunc
 		WsCheckOrigin = func(r *http.Request) bool {
@@ -84,6 +84,6 @@ func init() {
 	}()
 }
 
-func Root() *utils.SliceString {
+func Root() *sliceutil.SliceString {
 	return root
 }

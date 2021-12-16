@@ -7,7 +7,7 @@ import (
 	"github.com/dengpju/higo-gin/higo/request"
 	"github.com/dengpju/higo-gin/higo/responser"
 	"github.com/dengpju/higo-gin/test/app/Services"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/runtimeutil"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -39,7 +39,7 @@ func (this *EventController) Test1() string {
 
 func (this *EventController) Test2() interface{} {
 	fmt.Println(len(higo.Request))
-	fmt.Println(utils.GoroutineID())
+	fmt.Println(runtimeutil.GoroutineID())
 	ctx := request.Context()
 	tt := ctx.Query("tt")
 	return tt
@@ -47,8 +47,8 @@ func (this *EventController) Test2() interface{} {
 var i = 0
 func (this *EventController) Test3() {
 	fmt.Println("请求数量", len(higo.Request))
-	if utils.GoroutineID()%2 == 0 {
-		fmt.Printf("线程: %d 协成: %d  %s\n", utils.ThreadID(), utils.GoroutineID(), "休眠")
+	if runtimeutil.GoroutineID()%2 == 0 {
+		fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), "休眠")
 		time.Sleep(2 * time.Second)
 		i++
 		if i == 1 {
@@ -58,9 +58,9 @@ func (this *EventController) Test3() {
 	//fmt.Println(len(higo.Request))
 	ctx := request.Context()
 	tt := ctx.Query("tt")
-	fmt.Printf("线程: %d 协成: %d  %s\n", utils.ThreadID(), utils.GoroutineID(), tt)
+	fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), tt)
 	go func() {
-		fmt.Printf("线程: %d 子协成: %d 数据:%s\n", utils.ThreadID(), utils.GoroutineID(), tt)
+		fmt.Printf("线程: %d 子协成: %d 数据:%s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), tt)
 	}()
 	//exception.Throw(exception.Message(tt), exception.Code(1))
 	responser.SuccessJson("success", 10000, tt)
@@ -69,7 +69,7 @@ func (this *EventController) Test3() {
 func Test4() {
 	fmt.Println(len(higo.Request))
 	ctx := request.Context()
-	fmt.Println(utils.GoroutineID())
+	fmt.Println(runtimeutil.GoroutineID())
 	tt := ctx.Query("tt")
 	fmt.Println(tt)
 	//exception.Throw(exception.Message(tt), exception.Code(1))

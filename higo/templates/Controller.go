@@ -3,8 +3,9 @@ package templates
 import (
 	"bytes"
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -35,16 +36,16 @@ type FuncDecl struct {
 }
 
 func NewController(pkg string, name string, file string) *Controller {
-	name = utils.Ucfirst(name)
+	name = stringutil.Ucfirst(name)
 	name = name + controller
-	outStruct := file + utils.PathSeparator() + strings.Replace(name, controller, "", -1) + controller
+	outStruct := file + dirutil.PathSeparator() + strings.Replace(name, controller, "", -1) + controller
 	file = outStruct + ".go"
 	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, File: file}
 }
 
 func (this *Controller) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -58,10 +59,10 @@ func (this *Controller) Template(tplfile string) string {
 }
 
 func (this *Controller) Generate() {
-	if fileutils.FileExist(this.File) {
+	if fileutil.FileExist(this.File) {
 		log.Fatalln(this.File + " already existed")
 	}
-	outFile := fileutils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := fileutil.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !outFile.Exist() {
 		outFile.Create()
 	}
@@ -78,9 +79,9 @@ func (this *Controller) Generate() {
 	}
 	//bean route
 	_, mainfile, _, _ := runtime.Caller(3)
-	app := strings.Trim(mainfile, "main.go") + ".." + utils.PathSeparator() + "app"
-	beansGofile := app + utils.PathSeparator() + "Beans" + utils.PathSeparator() + "Bean.go"
-	utifile := fileutils.File{Name: beansGofile}
+	app := strings.Trim(mainfile, "main.go") + ".." + dirutil.PathSeparator() + "app"
+	beansGofile := app + dirutil.PathSeparator() + "Beans" + dirutil.PathSeparator() + "Bean.go"
+	utifile := fileutil.File{Name: beansGofile}
 	if !utifile.Exist() {
 		log.Fatalln("Bean.go file non-existent, bean route cannot auto-load")
 	}
@@ -97,7 +98,7 @@ func (this *Controller) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	newPkgPath := GetModName() + "/" + strings.ReplaceAll(utils.Dirname(this.File), "\\", "/")
+	newPkgPath := GetModName() + "/" + strings.ReplaceAll(dirutil.Dirname(this.File), "\\", "/")
 	funcName := strings.ReplaceAll(newPkgPath, "/", "_")
 	funcName = strings.ReplaceAll(funcName, ".", "8")
 	funcName = "New_gen_" + strings.ReplaceAll(funcName, "-", "9") + "_" + this.Name

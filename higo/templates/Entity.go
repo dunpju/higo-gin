@@ -2,8 +2,8 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
 	"io/ioutil"
 	"os"
 	"path"
@@ -48,14 +48,14 @@ func NewEntity(modelTool ModelTool, model Model) *Entity {
 		HasUpdateTime:   model.HasUpdateTime,
 		UpdateTimeField: model.UpdateTimeField,
 		DeleteTimeField: model.DeleteTimeField,
-		OutDir:          modelTool.OutEntityDir + utils.PathSeparator() + packageName,
+		OutDir:          modelTool.OutEntityDir + dirutil.PathSeparator() + packageName,
 		FileName:        EntityFileName,
 	}
 }
 
 func (this *Entity) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -79,8 +79,8 @@ func (this *Entity) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + EntityFileName + ".go"}
-	entityFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outfile := fileutil.File{Name: this.OutDir + dirutil.PathSeparator() + EntityFileName + ".go"}
+	entityFile := fileutil.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !entityFile.Exist() {
 		entityFile.Create()
 	}
@@ -90,8 +90,8 @@ func (this *Entity) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outFlagFile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + EntityFlagFileName + ".go"}
-	if !fileutils.FileExist(outFlagFile.Name) { // flag.go 不存在则生成
+	outFlagFile := fileutil.File{Name: this.OutDir + dirutil.PathSeparator() + EntityFlagFileName + ".go"}
+	if !fileutil.FileExist(outFlagFile.Name) { // flag.go 不存在则生成
 		flagFile, err := os.OpenFile(outFlagFile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 		if err != nil {
 			panic(err)

@@ -2,8 +2,9 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,7 +22,7 @@ type CodeMap struct {
 }
 
 func NewCodeMap(key string, value interface{}, doc string) *CodeMap {
-	return &CodeMap{Key: utils.Ucfirst(utils.CaseToCamel(key)), Value: value, Doc: doc}
+	return &CodeMap{Key: stringutil.Ucfirst(stringutil.CaseToCamel(key)), Value: value, Doc: doc}
 }
 
 type Code struct {
@@ -49,7 +50,7 @@ func NewCode(pkg string, name string, file string) *Code {
 	if fs := reg.FindString(name); fs != "" {
 		C.Codes = append(C.Codes, newCode(pkg, name, file))
 	} else {
-		outfile := fileutils.ReadFile(name)
+		outfile := fileutil.ReadFile(name)
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
@@ -100,12 +101,12 @@ func newCode(pkg string, name string, file string) *Code {
 			C.CodeMap = append(C.CodeMap, NewCodeMap(k, v, d))
 		}
 		C.LenMap = len(C.CodeMap) - 1
-		name = utils.Ucfirst(utils.CaseToCamel(structName))
+		name = stringutil.Ucfirst(stringutil.CaseToCamel(structName))
 		C.Name = code + name
 		C.RealName = name
 		C.OutDir = file
-		C.OutStruct = C.OutDir + utils.PathSeparator() + code + strings.Trim(name, code)
-		C.File = C.OutDir + utils.PathSeparator() + C.RealName + ".go"
+		C.OutStruct = C.OutDir + dirutil.PathSeparator() + code + strings.Trim(name, code)
+		C.File = C.OutDir + dirutil.PathSeparator() + C.RealName + ".go"
 		C.Package = pkg
 		return C
 	} else {
@@ -116,7 +117,7 @@ func newCode(pkg string, name string, file string) *Code {
 
 func (this *Code) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -136,12 +137,12 @@ func (this *Code) Generate() {
 }
 
 func (this *Code) generate() {
-	utils.Dir(this.OutDir).Create()
-	if fileutils.FileExist(this.File) {
+	dirutil.Dir(this.OutDir).Create()
+	if fileutil.FileExist(this.File) {
 		log.Println(this.File + " already existed")
 		return
 	}
-	outFile := fileutils.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := fileutil.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !outFile.Exist() {
 		outFile.Create()
 	}

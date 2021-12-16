@@ -4,7 +4,8 @@ import (
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/maputil"
+	"github.com/dengpju/higo-utils/utils/runtimeutil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
@@ -21,7 +22,7 @@ func init() {
 		RecoverHandle = func(cxt *gin.Context, r interface{}) {
 
 			//记录debug调用栈
-			logger.LoggerStack(r, utils.GoroutineID())
+			logger.LoggerStack(r, runtimeutil.GoroutineID())
 
 			//封装通用json返回
 			if h, ok := r.(gin.H); ok {
@@ -32,7 +33,7 @@ func init() {
 					"message": cd.Message,
 					"data":    nil,
 				})
-			} else if arrayMap, ok := r.(*utils.ArrayMap); ok {
+			} else if arrayMap, ok := r.(*maputil.ArrayMap); ok {
 				cxt.JSON(http.StatusOK, arrayMap.Value())
 			} else if validate, ok := r.(*ValidateError); ok {
 				cxt.JSON(http.StatusOK, gin.H{

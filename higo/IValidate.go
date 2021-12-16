@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"log"
@@ -72,9 +72,9 @@ func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
 			}
 			binding := ""
 			for i := 0; i < refVerifierType.NumField(); i++ {
-				reg := regexp.MustCompile("Go struct field " + refVerifierType.Name() + "." + utils.CamelToCase(refVerifierType.Field(i).Name) + " of type") //类型错误
+				reg := regexp.MustCompile("Go struct field " + refVerifierType.Name() + "." + stringutil.CamelToCase(refVerifierType.Field(i).Name) + " of type") //类型错误
 				if reg.MatchString(errStr) {
-					binding = utils.CamelToCase(refVerifierType.Field(i).Tag.Get("binding"))
+					binding = stringutil.CamelToCase(refVerifierType.Field(i).Tag.Get("binding"))
 					break
 				}
 			}

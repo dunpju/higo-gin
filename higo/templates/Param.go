@@ -2,8 +2,8 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"io/ioutil"
 	"log"
@@ -23,14 +23,14 @@ type Param struct {
 func NewParam(name string, out string) *Param {
 	humpUnpreName := generator.CamelCase(name)
 	pkg := "Param" + humpUnpreName
-	outDir := out + utils.PathSeparator() + pkg
+	outDir := out + dirutil.PathSeparator() + pkg
 	file := pkg + ".go"
 	return &Param{Package: pkg, StructName: humpUnpreName, OutDir: outDir, FileName: file}
 }
 
 func (this *Param) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -44,7 +44,7 @@ func (this *Param) Template(tplfile string) string {
 }
 
 func (this *Param) Generate() {
-	if fileutils.FileExist(this.FileName) {
+	if fileutil.FileExist(this.FileName) {
 		log.Fatalln(this.FileName + " already existed")
 	}
 	if _, err := os.Stat(this.OutDir); os.IsNotExist(err) {
@@ -57,8 +57,8 @@ func (this *Param) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + this.FileName}
-	paramFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outfile := fileutil.File{Name: this.OutDir + dirutil.PathSeparator() + this.FileName}
+	paramFile := fileutil.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !paramFile.Exist() {
 		paramFile.Create()
 	}

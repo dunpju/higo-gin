@@ -3,7 +3,7 @@ package higo
 import (
 	"fmt"
 	"github.com/dengpju/higo-ioc/injector"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -19,7 +19,7 @@ type DepBuild func() IClass
 type Dependency map[string]DepBuild
 
 func Scan() {
-	scanFiles := utils.Dir("./test/app/Controllers").Suffix("go").Scan().Get()
+	scanFiles := dirutil.Dir("./test/app/Controllers").Suffix("go").Scan().Get()
 	fmt.Println(scanFiles)
 	fmt.Println(container)
 

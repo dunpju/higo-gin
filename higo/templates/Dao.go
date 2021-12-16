@@ -2,8 +2,9 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"io/ioutil"
 	"os"
 	"path"
@@ -19,7 +20,7 @@ type DaoMap struct {
 }
 
 func NewDaoMap(key string, value interface{}, doc string) *DaoMap {
-	return &DaoMap{Key: utils.Ucfirst(utils.CaseToCamel(key)), Value: value, Doc: doc}
+	return &DaoMap{Key: stringutil.Ucfirst(stringutil.CaseToCamel(key)), Value: value, Doc: doc}
 }
 
 type Dao struct {
@@ -54,11 +55,11 @@ const (
 
 func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 	packageName := model.HumpUnpreTableName + DaoDirSuffix
-	modName := GetModName() + utils.PathSeparator()
+	modName := GetModName() + dirutil.PathSeparator()
 	modelImport := `"` + modName + model.OutDir + `"`
-	modelImport = strings.ReplaceAll(modelImport, utils.PathSeparator(), "/")
+	modelImport = strings.ReplaceAll(modelImport, dirutil.PathSeparator(), "/")
 	entityImport := `"` + modName + entity.OutDir + `"`
-	entityImport = strings.ReplaceAll(entityImport, utils.PathSeparator(), "/")
+	entityImport = strings.ReplaceAll(entityImport, dirutil.PathSeparator(), "/")
 	return &Dao{
 		PackageName: packageName,
 		Imports: map[string]string{
@@ -82,14 +83,14 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 		HasDeleteTime:         model.HasDeleteTime,
 		EntityUpdateTimeField: entity.UpdateTimeField,
 		EntityDeleteTimeField: entity.DeleteTimeField,
-		OutDir:                modelTool.OutDaoDir + utils.PathSeparator() + packageName,
+		OutDir:                modelTool.OutDaoDir + dirutil.PathSeparator() + packageName,
 		FileName:              DaoFileName,
 	}
 }
 
 func (this *Dao) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -107,13 +108,13 @@ func (this *Dao) Generate() {
 }
 
 func (this *Dao) generate() {
-	utils.Dir(this.OutDir).Create()
-	fileName := this.OutDir + utils.PathSeparator() + this.FileName + ".go"
-	if fileutils.FileExist(fileName) {
+	dirutil.Dir(this.OutDir).Create()
+	fileName := this.OutDir + dirutil.PathSeparator() + this.FileName + ".go"
+	if fileutil.FileExist(fileName) {
 		fmt.Println("dao: " + fileName + " already existed")
 		return
 	}
-	outFile := fileutils.NewFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+	outFile := fileutil.NewFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !outFile.Exist() {
 		outFile.Create()
 	}

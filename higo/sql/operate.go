@@ -2,19 +2,19 @@ package sql
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"strings"
 )
 
 func convertString(values interface{}) string {
 	if value, ok := values.(int); ok {
-		return utils.IntString(value)
+		return stringutil.IntString(value)
 	} else if value, ok := values.(int64); ok {
-		return utils.Int64String(value)
+		return stringutil.Int64String(value)
 	} else if value, ok := values.(float32); ok {
-		return utils.FloatString(value)
+		return stringutil.FloatString(value)
 	} else if value, ok := values.(float64); ok {
-		utils.Float64String(value)
+		stringutil.Float64String(value)
 	} else if value, ok := values.(string); ok {
 		return value
 	} else {
@@ -27,19 +27,19 @@ func convertSliceString(values interface{}) []string {
 	conValues := make([]string, 0)
 	if value, ok := values.([]int); ok {
 		for _, v := range value {
-			conValues = append(conValues, utils.IntString(v))
+			conValues = append(conValues, stringutil.IntString(v))
 		}
 	} else if value, ok := values.([]int64); ok {
 		for _, v := range value {
-			conValues = append(conValues, utils.Int64String(v))
+			conValues = append(conValues, stringutil.Int64String(v))
 		}
 	} else if value, ok := values.([]float32); ok {
 		for _, v := range value {
-			conValues = append(conValues, utils.FloatString(v))
+			conValues = append(conValues, stringutil.FloatString(v))
 		}
 	} else if value, ok := values.([]float64); ok {
 		for _, v := range value {
-			conValues = append(conValues, utils.Float64String(v))
+			conValues = append(conValues, stringutil.Float64String(v))
 		}
 	} else if value, ok := values.([]string); ok {
 		conValues = value

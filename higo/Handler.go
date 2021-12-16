@@ -1,7 +1,7 @@
 package higo
 
 import (
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/runtimeutil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
@@ -21,17 +21,17 @@ func init() {
 type Req map[uint64]*gin.Context
 
 func (this Req) Context() *gin.Context {
-	goid := utils.GoroutineID()
+	goid := runtimeutil.GoroutineID()
 	return this[goid]
 }
 
 func (this Req) Set(ctx *gin.Context) {
-	goid := utils.GoroutineID()
+	goid := runtimeutil.GoroutineID()
 	this[goid] = ctx
 }
 
 func (this Req) Remove() {
-	goid := utils.GoroutineID()
+	goid := runtimeutil.GoroutineID()
 	delete(this, goid)
 }
 

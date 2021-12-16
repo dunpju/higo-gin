@@ -2,7 +2,7 @@ package higo
 
 import (
 	"encoding/json"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dengpju/higo-utils/utils/maputil"
 )
 
 type WsReadMessage struct {
@@ -23,7 +23,7 @@ func WsRespString(messageData string) WsWriteMessage {
 	return WsWriteMessage{MessageType: WsRespstring, MessageData: []byte(messageData)}
 }
 
-func WsRespMap(messageData utils.ArrayMap) WsWriteMessage {
+func WsRespMap(messageData maputil.ArrayMap) WsWriteMessage {
 	return WsWriteMessage{MessageType: WsRespmap, MessageData: []byte(messageData.String())}
 }
 

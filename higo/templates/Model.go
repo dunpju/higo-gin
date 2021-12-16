@@ -3,8 +3,9 @@ package templates
 import (
 	"bytes"
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutils"
+	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dengpju/higo-utils/utils/fileutil"
+	"github.com/dengpju/higo-utils/utils/stringutil"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"github.com/jinzhu/gorm"
 	"go/ast"
@@ -90,7 +91,7 @@ func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
 		HumpUnpreTableName: humpUnpreTableName,
 		PackageName:        packageName,
 		StructName:         ModelStructName,
-		OutDir:             outDir + utils.PathSeparator() + packageName,
+		OutDir:             outDir + dirutil.PathSeparator() + packageName,
 		Database:           db,
 		Prefix:             pre,
 		Imports:            make(map[string]string),
@@ -99,7 +100,7 @@ func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
 
 func (this *Model) Template(tplfile string) string {
 	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.PathSeparator() + tplfile
+	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -144,7 +145,7 @@ func (this *Model) Generate() {
 			this.TablePrimaryId = structField.TableFieldName
 			this.PrimaryIdType = structField.FieldType
 			this.PrimaryId = generator.CamelCase(this.TablePrimaryId)
-			this.SmallHumpPrimaryId = utils.Lcfirst(this.PrimaryId)
+			this.SmallHumpPrimaryId = stringutil.Lcfirst(this.PrimaryId)
 			structField.FieldName = this.PrimaryId
 		}
 		if structField.FieldType == "time.Time" {
@@ -169,7 +170,7 @@ func (this *Model) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	outfile := fileutils.File{Name: this.OutDir + utils.PathSeparator() + ModelFileName + ".go"}
+	outfile := fileutil.File{Name: this.OutDir + dirutil.PathSeparator() + ModelFileName + ".go"}
 	if outfile.Exist() {
 		//生成最新ast buffer
 		bufferbuf := new(bytes.Buffer)
@@ -240,7 +241,7 @@ func (this *Model) Generate() {
 		})
 		//ast.Print(oldfset, oldfd)
 		//fmt.Println(newFileBuf)
-		newFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		newFile := fileutil.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 		if !newFile.Exist() {
 			newFile.Create()
 		}
@@ -249,7 +250,7 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	} else {
-		modelFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
+		modelFile := fileutil.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 		if !modelFile.Exist() {
 			modelFile.Create()
 		}
@@ -260,8 +261,8 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	}
-	outfile = fileutils.File{Name: this.OutDir + utils.PathSeparator() + ModelAttributesFileName + ".go"}
-	attributesFile := fileutils.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	outfile = fileutil.File{Name: this.OutDir + dirutil.PathSeparator() + ModelAttributesFileName + ".go"}
+	attributesFile := fileutil.NewFile(outfile.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if !attributesFile.Exist() {
 		attributesFile.Create()
 	}

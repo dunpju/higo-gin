@@ -10,11 +10,11 @@ require (
 	github.com/dengpju/higo-config v1.0.8
 	github.com/dengpju/higo-enum v1.0.4
 	github.com/dengpju/higo-ioc v1.0.2
-	github.com/dengpju/higo-logger v1.0.7
+	github.com/dengpju/higo-logger v1.0.8
 	github.com/dengpju/higo-redis v1.0.5
 	github.com/dengpju/higo-router v1.0.24
-	github.com/dengpju/higo-throw v1.0.14
-	github.com/dengpju/higo-utils v1.0.76
+	github.com/dengpju/higo-throw v1.0.15
+	github.com/dengpju/higo-utils v1.0.80
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/go-sql-driver/mysql v1.5.0
