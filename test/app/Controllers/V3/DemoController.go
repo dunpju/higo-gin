@@ -40,7 +40,7 @@ func (this *DemoController) Route(hg *higo.Higo) {
 		//})
 		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
 		hg.Post("/test_get1111", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
-		hg.Get("/test_validator", this.HttpsTestValidate, hg.Flag("HttpsTestValidate"), hg.Desc("V3 测试校验器"), router.IsAuth(false))
+		hg.Post("/test_validator", this.HttpsTestValidate, hg.Flag("HttpsTestValidate"), hg.Desc("V3 测试校验器"), router.IsAuth(false))
 	})
 }
 
@@ -132,13 +132,14 @@ func (this *DutyUser) RegisterValidator() *higo.Verify {
 func (this *DemoController) HttpsTestValidate() {
 	//ctx := request.Context()
 	param := NewDutyUser()
-	param.DutyUserId = 1
-	param.EducationClassId = 2
+	//param.DutyUserId = 1
+	//param.EducationClassId = 2
 	fmt.Println("DemoController:135", higo.VerifyContainer)
 	//校验数据
 	//higo.Receiver(ctx.ShouldBindJSON(param)).Unwrap()
-	higo.Validate(param).Unwrap()
+	//higo.Validate(param).Unwrap()
 	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
+	higo.Validate(param).Receiver(param).Unwrap()
 
 	log.Fatalln(param)
 }

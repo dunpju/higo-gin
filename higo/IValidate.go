@@ -68,6 +68,7 @@ func (this *Verify) Unwrap() interface{} {
 
 //接收数据
 func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
+	fmt.Println("IValidate:71", values)
 	if len(values) > 0 {
 		if err, ok := values[0].(error); ok {
 			errStr := exception.ErrorToString(err)
@@ -86,7 +87,7 @@ func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
 			if "" != binding {
 				bindings := strings.Split(binding, ",")
 				rules := strings.Split(this.VerifyRules[bindings[0]].rule, ",")
-				this.VerifyRules[bindings[0]].throw(rules[0]) //抛出第一规则
+				this.VerifyRules[bindings[0]].Throw(rules[0]) //抛出第一规则
 			}
 		}
 	}
@@ -138,6 +139,7 @@ func NewVerifyRules(rules ...*VerifyRule) *VerifyRules {
 type VerifyRules struct {
 	rule    string
 	message map[string]interface{}
+	fl      validator.FieldLevel
 	Rules   []*VerifyRule
 }
 
@@ -147,7 +149,7 @@ func (this *VerifyRules) setRule() *VerifyRules {
 	for _, vrs := range this.Rules {
 		rules = append(rules, vrs.Rule)
 		key := strings.Split(vrs.Rule, "=")
-		fmt.Println("IValidate:150", vrs, vrs.Rule, key)
+		fmt.Println("IValidate:152", vrs, vrs.Rule, key)
 		if len(key) > 1 {
 			this.message[key[0]] = vrs.Code
 		} else {
@@ -166,6 +168,7 @@ type ValidatorToFunc func(fl validator.FieldLevel) (bool, code.ICode)
 
 func (this *VerifyRules) ToFunc() validator.Func {
 	return func(fl validator.FieldLevel) bool {
+		this.fl = fl
 		if v, ok := fl.Field().Interface().(string); ok {
 			this.throw(fl, v)
 			return true
@@ -219,12 +222,10 @@ func (this *VerifyRules) ToFunc() validator.Func {
 
 //抛异常
 func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
-	fmt.Println(v)
 	if msg, ok := v.(code.ICode); ok {
 		panic(NewValidateError(msg))
 	}
 	if err := Validator.Var(v, this.rule); err != nil {
-		fmt.Println(err.Error())
 		estring := strings.Split(err.Error(), "failed on the '")
 		rule := strings.Split(estring[1], "' tag")
 		if msg, ok := this.message[rule[0]]; ok {
@@ -239,5 +240,19 @@ func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
 			}
 		}
 		panic("validator error")
+	}
+}
+
+func (this *VerifyRules) Throw(rule string) {
+	fmt.Println(this.fl)
+	if msg, ok := this.message[rule]; ok {
+		if m, ok := msg.(code.ICode); ok {
+			panic(NewValidateError(m))
+		} else if fn, ok := msg.(ValidatorToFunc); ok {
+			boo, v := fn(this.fl) //自定义函数校验
+			if !boo {
+				this.throw(this.fl, v)
+			}
+		}
 	}
 }
