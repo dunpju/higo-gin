@@ -3,18 +3,19 @@ package UserModel
 import (
 	//"gitee.com/dengpju/higo-code/code"
 	"github.com/Masterminds/squirrel"
-    "github.com/dengpju/higo-gin/higo"
-    "github.com/dengpju/higo-ioc/injector"
-    "github.com/jinzhu/gorm"
-    "strings"
+	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/errcodg"
+	"github.com/dengpju/higo-ioc/injector"
+	"github.com/jinzhu/gorm"
+	"strings"
 )
 
 type Impl struct {
-	*higo.Orm    `inject:"Bean.NewOrm()"`
-	Id    int    `gorm:"column:id" json:"id" comment:""`
-	Uname    string    `gorm:"column:uname" json:"uname" comment:""`
-	UTel    string    `gorm:"column:u_tel" json:"u_tel" comment:""`
-	Score    int    `gorm:"column:score" json:"score" comment:""`
+	*higo.Orm `inject:"Bean.NewOrm()"`
+	Id        int    `gorm:"column:id" json:"id" comment:"" binding:"custom_tag_name"`
+	Uname     string `gorm:"column:uname" json:"uname" comment:""`
+	UTel      string `gorm:"column:u_tel" json:"u_tel" comment:""`
+	Score     int    `gorm:"column:score" json:"score" comment:""`
 }
 
 //init Validator
@@ -55,7 +56,10 @@ func (this *Impl) Mutate(attrs ...higo.Property) higo.Model {
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
 func (this *Impl) RegisterValidator() *higo.Verify {
-    return higo.RegisterValidator(this)
+	return higo.RegisterValidator(this).
+		Tag("custom_tag_name",
+			higo.Rule("required", errcodg.EnumError),
+			higo.Rule("min=5", errcodg.EnumError))
 }
 
 func (this *Impl) Exist() bool {
@@ -63,11 +67,11 @@ func (this *Impl) Exist() bool {
 }
 
 func (this *Impl) GetById(id int, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where(Id + " = ?", id).ToSql()).Query()
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where(Id+" = ?", id).ToSql()).Query()
 }
 
 func (this *Impl) GetByIds(ids []string, columns ...string) *gorm.DB {
-	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where(Id + " IN(?)", strings.Join(ids, ",")).ToSql()).Query()
+	return this.Mapper(squirrel.Select(columns...).From(this.TableName()).Where(Id+" IN(?)", strings.Join(ids, ",")).ToSql()).Query()
 }
 
 func (this *Impl) Paginate(perPage, page uint64) *higo.Pager {

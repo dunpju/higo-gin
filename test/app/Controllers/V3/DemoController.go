@@ -8,8 +8,10 @@ import (
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
+	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"time"
@@ -38,6 +40,7 @@ func (this *DemoController) Route(hg *higo.Higo) {
 		//})
 		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
 		hg.Post("/test_get1111", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
+		hg.Get("/test_validator", this.HttpsTestValidate, hg.Flag("HttpsTestValidate"), hg.Desc("V3 测试校验器"), router.IsAuth(false))
 	})
 }
 
@@ -84,18 +87,18 @@ func (this ErrorCode) Register() code.Message {
 }
 
 const (
-	TokenEmpty ErrorCode = iota +  400001  //token不存在
-	TokenError  //token错误
-	TokenSetError  //设置token失败
-	TokenExpiredError  //无效token
+	MobileEmpty   ErrorCode = iota + 400001 //mobile错误
+	PasswordError                           //password错误
+	UseridsError                            //user_ids错误
+	MinError                                //不能小于4位
 )
 
 func code400001() {
 	code.Container().
-		Put(TokenEmpty, "token不存在1").
-		Put(TokenError, "token错误").
-		Put(TokenSetError, "设置token失败").
-		Put(TokenExpiredError, "无效token")
+		Put(MobileEmpty, "mobile错误").
+		Put(PasswordError, "password错误").
+		Put(UseridsError, "user_ids错误").
+		Put(MinError, "不能小于4位")
 }
 
 //测试验证器
@@ -112,12 +115,32 @@ func NewDutyUser() *DutyUser {
 func (this *DutyUser) RegisterValidator() *higo.Verify {
 	return higo.Verifier().
 		Tag("mobile",
-			higo.Rule("required", TokenEmpty)).
+			higo.Rule("required", MobileEmpty)).
 		Tag("password",
-			higo.Rule("required", TokenError),
-			higo.Rule("min=4", TokenSetError)).
+			higo.Rule("required", PasswordError),
+			higo.Rule("min=4", func() higo.ValidatorToFunc {
+				return func(fl validator.FieldLevel) (bool, code.ICode) {
+					fmt.Println("DemoController:130", fl.Field().Interface())
+					return false, MinError
+				}
+			}())).
 		Tag("user_ids",
-			higo.Rule("required", TokenExpiredError))
+			higo.Rule("required", UseridsError))
+}
+
+// 测试校验
+func (this *DemoController) HttpsTestValidate() {
+	//ctx := request.Context()
+	param := NewDutyUser()
+	param.DutyUserId = 1
+	param.EducationClassId = 2
+	fmt.Println("DemoController:135", higo.VerifyContainer)
+	//校验数据
+	//higo.Receiver(ctx.ShouldBindJSON(param)).Unwrap()
+	higo.Validate(param).Unwrap()
+	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
+
+	log.Fatalln(param)
 }
 
 // 测试get请求

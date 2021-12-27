@@ -33,15 +33,20 @@ type IValidate interface {
 	RegisterValidator() *Verify
 }
 
+//校验者
+func Verifier() *Verify {
+	return NewVerify()
+}
+
+func NewVerify() *Verify {
+	return &Verify{Validator: Validator, VerifyRules: make(map[string]*VerifyRules)}
+}
+
 type Verify struct {
 	Validator      *validator.Validate
 	VerifierStruct interface{}
 	Verifier       IValidate               //校验者
 	VerifyRules    map[string]*VerifyRules //规则map
-}
-
-func NewVerify() *Verify {
-	return &Verify{Validator: Validator, VerifyRules: make(map[string]*VerifyRules)}
 }
 
 //自定义tag
@@ -88,50 +93,52 @@ func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
 	return Receiver(values...)
 }
 
-//注册校验规则
-func RegisterValidator(verifier IValidate) *Verify {
-	v := reflect.ValueOf(verifier)
+//注册规则
+func RegisterValidator(validate IValidate) *Verify {
+	v := reflect.ValueOf(validate)
 	verify := NewVerify()
-	verify.Verifier = verifier
+	verify.Verifier = validate
 	VerifyContainer[v.Type().String()] = verify
 	return verify
 }
 
-//校验者
-func Verifier() *Verify {
-	return NewVerify()
+//注册自定义校验规则
+func RegisterValidation(tag string, fn validator.Func) {
+	err := Validator.RegisterValidation(tag, fn)
+	if err != nil {
+		panic(fmt.Sprintf("register validator %s error, msg: %s", tag, err.Error()))
+	}
 }
 
 //手动调用注册校验
-func Validate(verifier IValidate) *Verify {
-	verify := verifier.RegisterValidator()
-	verify.Verifier = verifier
+func Validate(validate IValidate) *Verify {
+	verify := validate.RegisterValidator()
+	verify.Verifier = validate
 	for tag, va := range verify.VerifyRules {
 		RegisterValidation(tag, va.ToFunc())
 	}
-	verify.VerifierStruct = verifier
+	verify.VerifierStruct = validate
 	return verify
+}
+
+func Rule(rule string, cod interface{}) *VerifyRule {
+	return &VerifyRule{Rule: rule, Code: cod}
 }
 
 type VerifyRule struct {
 	Rule string
-	Code code.ICode
+	Code interface{}
 }
 
-func Rule(rule string, code code.ICode) *VerifyRule {
-	return &VerifyRule{Rule: rule, Code: code}
+func NewVerifyRules(rules ...*VerifyRule) *VerifyRules {
+	vr := &VerifyRules{message: make(map[string]interface{}), Rules: rules}
+	return vr.setRule()
 }
 
 type VerifyRules struct {
 	rule    string
-	message map[string]code.ICode
+	message map[string]interface{}
 	Rules   []*VerifyRule
-}
-
-func NewVerifyRules(rules ...*VerifyRule) *VerifyRules {
-	vr := &VerifyRules{message: make(map[string]code.ICode), Rules: rules}
-	vr.setRule()
-	return vr
 }
 
 //设置规则
@@ -140,6 +147,7 @@ func (this *VerifyRules) setRule() *VerifyRules {
 	for _, vrs := range this.Rules {
 		rules = append(rules, vrs.Rule)
 		key := strings.Split(vrs.Rule, "=")
+		fmt.Println("IValidate:150", vrs, vrs.Rule, key)
 		if len(key) > 1 {
 			this.message[key[0]] = vrs.Code
 		} else {
@@ -154,63 +162,82 @@ func (this *VerifyRules) Rule() string {
 	return this.rule
 }
 
+type ValidatorToFunc func(fl validator.FieldLevel) (bool, code.ICode)
+
 func (this *VerifyRules) ToFunc() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		if v, ok := fl.Field().Interface().(string); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().([]string); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().(int64); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().([]int64); ok {
-			this.Throw(v)
+			this.throw(fl, v)
+			return true
+		} else if v, ok := fl.Field().Interface().(uint64); ok {
+			this.throw(fl, v)
+			return true
+		} else if v, ok := fl.Field().Interface().([]uint64); ok {
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().(int); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().([]int); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().(float32); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().([]float32); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().(float64); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
 		} else if v, ok := fl.Field().Interface().([]float64); ok {
-			this.Throw(v)
+			this.throw(fl, v)
 			return true
+		}
+		//未匹配到类型
+		for _, msg := range this.message {
+			if fn, ok := msg.(ValidatorToFunc); ok {
+				boo, v := fn(fl) //自定义函数校验
+				if !boo {
+					this.throw(fl, v)
+					return boo
+				}
+			}
 		}
 		return false
 	}
 }
 
 //抛异常
-func (this *VerifyRules) Throw(v interface{}) {
-	if err := Validator.Var(v, this.rule); err != nil {
-		estring := strings.Split(err.Error(), "failed on the '")
-		rule := strings.Split(estring[1], "' tag")
-		this.throw(rule[0])
-		panic("validator error")
-	}
-}
-
-func (this *VerifyRules) throw(rule string) {
-	if msg, ok := this.message[rule]; ok {
+func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
+	fmt.Println(v)
+	if msg, ok := v.(code.ICode); ok {
 		panic(NewValidateError(msg))
 	}
-}
-
-//注册自定义校验规则
-func RegisterValidation(tag string, fn validator.Func) {
-	err := Validator.RegisterValidation(tag, fn)
-	if err != nil {
-		panic(fmt.Sprintf("register validator %s error, msg: %s", tag, err.Error()))
+	if err := Validator.Var(v, this.rule); err != nil {
+		fmt.Println(err.Error())
+		estring := strings.Split(err.Error(), "failed on the '")
+		rule := strings.Split(estring[1], "' tag")
+		if msg, ok := this.message[rule[0]]; ok {
+			if co, ok := msg.(code.ICode); ok {
+				panic(NewValidateError(co))
+			} else if fn, ok := msg.(ValidatorToFunc); ok {
+				boo, v := fn(fl) //自定义函数校验
+				if !boo {
+					this.throw(fl, v)
+				}
+				return
+			}
+		}
+		panic("validator error")
 	}
 }

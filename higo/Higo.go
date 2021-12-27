@@ -267,8 +267,9 @@ func (this *Higo) Boot() {
 	NewTool().Cmd()
 	//自动注册校验
 	for _, verify := range VerifyContainer {
-		for tag, rule := range verify.VerifyRules {
-			RegisterValidation(tag, rule.ToFunc())
+		for tag, rules := range verify.VerifyRules {
+			fmt.Println("Higo:271", rules)
+			RegisterValidation(tag, rules.ToFunc())
 		}
 	}
 	//启动服务
