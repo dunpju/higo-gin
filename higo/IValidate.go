@@ -97,6 +97,11 @@ func Validate(validate IValidate) *Verify {
 }
 
 func Rule(rule string, cod interface{}) *VerifyRule {
+	_, ok1 := cod.(code.ICode)
+	_, ok2 := cod.(ValidatorToFunc)
+	if !ok1 && !ok2 {
+		panic(fmt.Errorf("does not support verify rule"))
+	}
 	return &VerifyRule{Rule: rule, Code: cod}
 }
 

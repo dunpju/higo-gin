@@ -136,7 +136,7 @@ func (this *DemoController) HttpsTestValidate() {
 	param := NewDutyUser()
 	//param.DutyUserId = 1
 	//param.EducationClassId = 2
-	fmt.Println("DemoController:137", higo.VerifyContainer)
+	fmt.Println("DemoController:139", higo.VerifyContainer)
 	//校验数据
 	//higo.Receiver(ctx.ShouldBindJSON(param)).Unwrap()
 	//higo.Validate(param).Unwrap()
