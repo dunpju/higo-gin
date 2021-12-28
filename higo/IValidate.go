@@ -3,13 +3,10 @@ package higo
 import (
 	"fmt"
 	"gitee.com/dengpju/higo-code/code"
-	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils/stringutil"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"log"
 	"reflect"
-	"regexp"
 	"strings"
 )
 
@@ -68,28 +65,6 @@ func (this *Verify) Unwrap() interface{} {
 
 //接收数据
 func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
-	if len(values) > 0 {
-		if err, ok := values[0].(error); ok {
-			errStr := exception.ErrorToString(err)
-			refVerifierType := reflect.TypeOf(this.Verifier)
-			if reflect.Ptr == refVerifierType.Kind() {
-				refVerifierType = refVerifierType.Elem()
-			}
-			binding := ""
-			for i := 0; i < refVerifierType.NumField(); i++ {
-				reg := regexp.MustCompile("Go struct field " + refVerifierType.Name() + "." + stringutil.CamelToCase(refVerifierType.Field(i).Name) + " of type") //类型错误
-				if reg.MatchString(errStr) {
-					binding = stringutil.CamelToCase(refVerifierType.Field(i).Tag.Get("binding"))
-					break
-				}
-			}
-			if "" != binding {
-				bindings := strings.Split(binding, ",")
-				rules := strings.Split(this.VerifyRules[bindings[0]].rule, ",")
-				this.VerifyRules[bindings[0]].Throw(rules[0]) //抛出第一个规则
-			}
-		}
-	}
 	return Receiver(values...)
 }
 
@@ -247,7 +222,6 @@ func (this *VerifyRules) Throw(rule string) {
 		rule = keys[0]
 	}
 	if msg, ok := this.message[rule]; ok {
-		fmt.Printf("IValidate:256 %T\n", msg)
 		if m, ok := msg.(code.ICode); ok {
 			panic(NewValidateError(m))
 		} else if fn, ok := msg.(ValidatorToFunc); ok {
