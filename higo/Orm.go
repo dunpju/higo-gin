@@ -31,6 +31,10 @@ var (
 	registerCallbackCounter int
 )
 
+func GetDbConfig() *Dbconfig {
+	return dbConfig
+}
+
 type Dbconfig struct {
 	Username string
 	Password string
@@ -42,30 +46,7 @@ type Dbconfig struct {
 	Prefix   string
 }
 
-type Orm struct {
-	*gorm.DB
-	sql          string
-	args         []interface{}
-	orms         []*Orm
-	table        string
-	statement    *higosql.Statement
-	builder      *Builder
-	result       sql.Result
-	lastInsertId int64
-}
-
-func GetDbConfig() *Dbconfig {
-	return dbConfig
-}
-
-func (this *Orm) Args() []interface{} {
-	return this.args
-}
-
-func (this *Orm) Sql() string {
-	return this.sql
-}
-
+// gorm实例
 func newGorm() *gorm.DB {
 	dbConfigOnce.Do(func() {
 		confDefault = config.Db("DB.Default").(*config.Configure)
@@ -138,6 +119,11 @@ func sqlReplace(scope *gorm.Scope) {
 	}
 }
 
+func NewOrm() *Orm {
+	return newOrm()
+}
+
+// 单例
 func SingleOrm() *Orm {
 	onceGorm.Do(func() {
 		orm = newOrm()
@@ -145,15 +131,31 @@ func SingleOrm() *Orm {
 	return orm
 }
 
-func NewOrm() *Orm {
-	return newOrm()
-}
-
 func newOrm() *Orm {
 	registerCallbackCounter++
 	return &Orm{DB: newGorm(), orms: make([]*Orm, 0),
 		builder: newBuilder(),
 	}
+}
+
+type Orm struct {
+	*gorm.DB
+	sql          string
+	args         []interface{}
+	orms         []*Orm
+	table        string
+	statement    *higosql.Statement
+	builder      *Builder
+	result       sql.Result
+	lastInsertId int64
+}
+
+func (this *Orm) Args() []interface{} {
+	return this.args
+}
+
+func (this *Orm) Sql() string {
+	return this.sql
 }
 
 func (this *Orm) Mapper(sql string, args []interface{}, err error) *Orm {
@@ -203,11 +205,12 @@ func (this *Orm) Begin(orms ...*Orm) *Orm {
 }
 
 func (this *Orm) apply(tx *gorm.DB) {
-	for _, sql := range this.orms {
-		sql.setDB(tx)
+	for _, s := range this.orms {
+		s.setDB(tx)
 	}
 }
 
+// 事务
 func (this *Orm) Transaction(fn func() error) {
 	err := this.DB.Transaction(func(tx *gorm.DB) (err error) {
 		defer func() {
@@ -230,34 +233,6 @@ func (this *Orm) Transaction(fn func() error) {
 			panic(err)
 		}
 	}
-}
-
-type Pager struct {
-	Total       uint64      `json:"total"`
-	CurrentPage uint64      `json:"current_page"`
-	PerPage     uint64      `json:"per_page"`
-	LastPage    uint64      `json:"last_page"`
-	Items       interface{} `json:"items"`
-}
-
-func NewPager(perPage, page uint64) *Pager {
-	return &Pager{CurrentPage: page, PerPage: perPage}
-}
-
-func (this *Orm) Paginate(pager *Pager) *gorm.DB {
-	if pager.CurrentPage <= 0 {
-		panic("Current Page: Can't be less than or equal to 0")
-	}
-	if pager.PerPage <= 0 {
-		panic("Per Page: Can't be less than or equal to 0")
-	}
-	this.DB.Count(&pager.Total)
-	if this.DB.Error != nil {
-		panic(this.DB.Error)
-	}
-	pager.LastPage = uint64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
-	return this.DB.Limit(pager.PerPage).
-		Offset((pager.CurrentPage - 1) * pager.PerPage)
 }
 
 func (this *Orm) Table(name string) *Orm {
@@ -390,18 +365,46 @@ func (this *Orm) Build() {
 	this.setBuilder(this.ToSql())
 }
 
-type Builder struct {
-	sql  string
-	args []interface{}
-	err  error
+func (this *Orm) CheckError() {
+	if this.Error != nil {
+		panic(this.Error)
+	}
+}
+
+func (this *Orm) Paginate(pager *Pager) *gorm.DB {
+	if pager.CurrentPage <= 0 {
+		panic("Current Page: Can't be less than or equal to 0")
+	}
+	if pager.PerPage <= 0 {
+		panic("Per Page: Can't be less than or equal to 0")
+	}
+	this.DB.Count(&pager.Total)
+	if this.DB.Error != nil {
+		panic(this.DB.Error)
+	}
+	pager.LastPage = uint64(math.Ceil(float64(pager.Total) / float64(pager.PerPage)))
+	return this.DB.Limit(pager.PerPage).
+		Offset((pager.CurrentPage - 1) * pager.PerPage)
+}
+
+func NewPager(perPage, page uint64) *Pager {
+	return &Pager{CurrentPage: page, PerPage: perPage}
+}
+
+type Pager struct {
+	Total       uint64      `json:"total"`
+	CurrentPage uint64      `json:"current_page"`
+	PerPage     uint64      `json:"per_page"`
+	LastPage    uint64      `json:"last_page"`
+	Items       interface{} `json:"items"`
 }
 
 func newBuilder() *Builder {
 	return &Builder{}
 }
 
-func (this *Orm) CheckError() {
-	if this.Error != nil {
-		panic(this.Error)
-	}
+type Builder struct {
+	sql  string
+	args []interface{}
+	err  error
 }

@@ -268,7 +268,6 @@ func (this *Higo) Boot() {
 	//自动注册校验
 	for _, verify := range VerifyContainer {
 		for tag, rules := range verify.VerifyRules {
-			fmt.Println("Higo:271", rules)
 			RegisterValidation(tag, rules.ToFunc())
 		}
 	}

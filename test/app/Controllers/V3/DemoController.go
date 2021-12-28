@@ -13,7 +13,6 @@ import (
 	"github.com/dengpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/gomodule/redigo/redis"
 	"log"
 	"time"
 )
@@ -21,8 +20,8 @@ import (
 type DemoController struct {
 	Age         *anno.Value           `prefix:"user.age"`
 	DemoService *Services.DemoService `inject:"MyBean.DemoService()"`
-	*higo.Orm   `inject:"Bean.NewOrm()"`
-	*redis.Pool `inject:"Bean.NewRedisPool()"`
+	//*higo.Orm   `inject:"Bean.NewOrm()"`
+	//*redis.Pool `inject:"Bean.NewRedisPool()"`
 	Name        string
 }
 

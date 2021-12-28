@@ -9,8 +9,8 @@ import (
 )
 
 type RedisController struct {
-	*higo.Orm `inject:"Bean.NewOrm()"`
-	Redis      *higo.RedisAdapter `inject:"Bean.NewRedisAdapter()"`
+	//*higo.Orm `inject:"Bean.NewOrm()"`
+	//Redis      *higo.RedisAdapter `inject:"Bean.NewRedisAdapter()"`
 }
 
 func NewRedisController() *RedisController {

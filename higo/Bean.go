@@ -1,9 +1,5 @@
 package higo
 
-import (
-	"github.com/gomodule/redigo/redis"
-)
-
 type Bean struct {
 	Middleware
 }
@@ -18,14 +14,17 @@ func (this *Bean) NewServe(conf string) *Serve {
 	return NewServe(conf)
 }
 
-func (this *Bean) NewOrm() *Orm {
-	return NewOrm()
-}
+// 使用权交由用户决定
+//func (this *Bean) NewOrm() *Orm {
+//	return NewOrm()
+//}
 
-func (this *Bean) NewRedisPool() *redis.Pool {
-	return RedisPool
-}
+// 使用权交由用户决定
+//func (this *Bean) NewRedisPool() *redis.Pool {
+//	return RedisPool
+//}
 
-func (this *Bean) NewRedisAdapter() *RedisAdapter {
-	return NewRedisAdapter()
-}
+// 使用权交由用户决定
+//func (this *Bean) NewRedisAdapter() *RedisAdapter {
+//	return NewRedisAdapter()
+//}
