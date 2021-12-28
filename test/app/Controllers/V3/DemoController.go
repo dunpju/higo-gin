@@ -5,6 +5,7 @@ import (
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/request"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
@@ -117,29 +118,29 @@ func (this *DutyUser) RegisterValidator() *higo.Verify {
 		Tag("mobile",
 			higo.Rule("required", MobileEmpty)).
 		Tag("password",
-			higo.Rule("required", PasswordError),
 			higo.Rule("min=4", func() higo.ValidatorToFunc {
 				return func(fl validator.FieldLevel) (bool, code.ICode) {
 					fmt.Println("DemoController:130", fl.Field().Interface())
 					return false, MinError
 				}
-			}())).
+			}()),
+		higo.Rule("required", PasswordError),
+		).
 		Tag("user_ids",
 			higo.Rule("required", UseridsError))
 }
 
 // 测试校验
 func (this *DemoController) HttpsTestValidate() {
-	//ctx := request.Context()
+	ctx := request.Context()
 	param := NewDutyUser()
 	//param.DutyUserId = 1
 	//param.EducationClassId = 2
-	fmt.Println("DemoController:135", higo.VerifyContainer)
+	fmt.Println("DemoController:137", higo.VerifyContainer)
 	//校验数据
 	//higo.Receiver(ctx.ShouldBindJSON(param)).Unwrap()
 	//higo.Validate(param).Unwrap()
-	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
-	higo.Validate(param).Receiver(param).Unwrap()
+	higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap()
 
 	log.Fatalln(param)
 }

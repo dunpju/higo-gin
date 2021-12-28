@@ -68,7 +68,6 @@ func (this *Verify) Unwrap() interface{} {
 
 //接收数据
 func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
-	fmt.Println("IValidate:71", values)
 	if len(values) > 0 {
 		if err, ok := values[0].(error); ok {
 			errStr := exception.ErrorToString(err)
@@ -87,7 +86,7 @@ func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
 			if "" != binding {
 				bindings := strings.Split(binding, ",")
 				rules := strings.Split(this.VerifyRules[bindings[0]].rule, ",")
-				this.VerifyRules[bindings[0]].Throw(rules[0]) //抛出第一规则
+				this.VerifyRules[bindings[0]].Throw(rules[0]) //抛出第一个规则
 			}
 		}
 	}
@@ -149,7 +148,6 @@ func (this *VerifyRules) setRule() *VerifyRules {
 	for _, vrs := range this.Rules {
 		rules = append(rules, vrs.Rule)
 		key := strings.Split(vrs.Rule, "=")
-		fmt.Println("IValidate:152", vrs, vrs.Rule, key)
 		if len(key) > 1 {
 			this.message[key[0]] = vrs.Code
 		} else {
@@ -244,8 +242,12 @@ func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
 }
 
 func (this *VerifyRules) Throw(rule string) {
-	fmt.Println(this.fl)
+	keys := strings.Split(rule, "=")
+	if len(keys) > 1 {
+		rule = keys[0]
+	}
 	if msg, ok := this.message[rule]; ok {
+		fmt.Printf("IValidate:256 %T\n", msg)
 		if m, ok := msg.(code.ICode); ok {
 			panic(NewValidateError(m))
 		} else if fn, ok := msg.(ValidatorToFunc); ok {
