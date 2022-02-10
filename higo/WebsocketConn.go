@@ -82,7 +82,10 @@ func (this *WebsocketConn) ReadLoop() {
 }
 
 func (this *WebsocketConn) Close() {
-	this.conn.Close()
+	err := this.conn.Close()
+	if err != nil {
+		panic(err)
+	}
 	WsContainer.Remove(this.conn)
 	this.closeChan <- 1
 }
