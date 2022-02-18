@@ -141,13 +141,21 @@ func (this *Higo) Desc(value string) *router.RouteAttribute {
 }
 
 //单路由中间件
-func (this *Higo) Middle(value gin.HandlerFunc) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.RouteMiddleware, value)
+func (this *Higo) Middle(handlers ...gin.HandlerFunc) *router.RouteAttribute {
+	values := make([]interface{}, 0)
+	for _, handler := range handlers {
+		values = append(values, handler)
+	}
+	return router.NewRouteAttribute(router.RouteMiddleware, values...)
 }
 
 //组中间件
-func (this *Higo) GroupMiddle(value gin.HandlerFunc) *router.RouteAttribute {
-	return router.NewRouteAttribute(router.RouteGroupMiddle, value)
+func (this *Higo) GroupMiddle(handlers ...gin.HandlerFunc) *router.RouteAttribute {
+	values := make([]interface{}, 0)
+	for _, handler := range handlers {
+		values = append(values, handler)
+	}
+	return router.NewRouteAttribute(router.RouteGroupMiddle, values...)
 }
 
 func (this *Higo) SetServe(value interface{}) *router.RouteAttribute {

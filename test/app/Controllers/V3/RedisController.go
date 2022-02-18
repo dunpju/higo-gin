@@ -32,7 +32,10 @@ func (this *RedisController) Route(hg *higo.Higo) {
 		hg.AddGroup("/v5", func() {
 			hg.Get("/get_test_redis", this.Test, hg.Flag("get_test_redis"), hg.Middle(this.MiddleWare()))
 		}, hg.GroupMiddle(this.V5GroupMiddleWare()))
-	}, hg.GroupMiddle(this.V4GroupMiddleWare()))
+	}, hg.GroupMiddle(this.V4GroupMiddleWare(), func(context *gin.Context) {
+		fmt.Println(111)
+		context.Next()
+	}))
 }
 
 func (this *RedisController) Test(ctx *gin.Context) string {
