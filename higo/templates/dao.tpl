@@ -11,7 +11,8 @@ import (
 )
 
 type {{.StructName}} struct {
-	model *{{.ModelPackageName}}.{{.ModelName}}
+	model  *{{.ModelPackageName}}.{{.ModelName}}
+	entity *{{.EntityPackageName}}.{{.EntityName}}
 }
 
 func New() *{{.StructName}} {
@@ -31,6 +32,7 @@ func (this *{{.StructName}}) Models() []*{{.ModelPackageName}}.{{.ModelName}} {
 }
 
 func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityName}}) {
+    this.entity = entity
 	if ! entity.PriEmpty() || entity.IsEdit() { //编辑
 		if !this.GetBy{{.PrimaryId}}(entity.{{.PrimaryId}}).Exist() {
 			DaoException.Throw(errcodg.NotExistError.Message(), int(errcodg.NotExistError))
@@ -72,6 +74,9 @@ func (this *{{.StructName}}) Add() {{.PrimaryIdType}} {
 
 //更新
 func (this *{{.StructName}}) Update() bool {
+    if entity.PriEmpty() {
+		DaoException.Throw("{{.PrimaryId}}"+errcodg.PrimaryIdError.Message(), int(errcodg.PrimaryIdError))
+	}
 	higo.Result(this.model.Mapper(this.model.GetBuilder()).Exec().Error).Unwrap()
 	return true
 }
