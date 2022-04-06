@@ -31,10 +31,7 @@ func (this *{{.StructName}}) Models() []*{{.ModelPackageName}}.{{.ModelName}} {
 }
 
 func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityName}}) {
-	if entity.IsEdit() { //编辑
-		if entity.PriEmpty() {
-			DaoException.Throw("{{.PrimaryId}}"+errcodg.PrimaryIdError.Message(), int(errcodg.PrimaryIdError))
-		}
+	if ! entity.PriEmpty() { //编辑
 		if !this.GetBy{{.PrimaryId}}(entity.{{.PrimaryId}}).Exist() {
 			DaoException.Throw(errcodg.NotExistError.Message(), int(errcodg.NotExistError))
 		}
