@@ -42,9 +42,9 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 		}
 
 		{{- if .HasUpdateTime}}
-		builder := this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
+		builder := this.model.Update(this.model.TableName()).Where("`"+{{.ModelPackageName}}.{{.PrimaryId}}+"`", entity.{{.PrimaryId}})
 		{{- else}}
-		_ = this.model.Update(this.model.TableName()).Where({{.ModelPackageName}}.{{.PrimaryId}}, entity.{{.PrimaryId}})
+		_ = this.model.Update(this.model.TableName()).Where("`"+{{.ModelPackageName}}.{{.PrimaryId}}+"`", entity.{{.PrimaryId}})
 		{{- end}}
 		if {{.EntityPackageName}}.FlagDelete == entity.Flag() {
 
@@ -52,16 +52,16 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 
 		}
 		{{- if .HasUpdateTime}}
-		builder.Set({{.ModelPackageName}}.{{.EntityUpdateTimeField}}, entity.{{.EntityUpdateTimeField}})
+		builder.Set("`"+{{.ModelPackageName}}.{{.EntityUpdateTimeField}}+"`", entity.{{.EntityUpdateTimeField}})
 		{{- end}}
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
 		{{- range $v := .ModelFields}}
 		{{- if ne $v.FieldName $.EntityDeleteTimeField}}
 		    {{- if ne $v.FieldName $.ModelEndField}}
-            Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}}).  //{{$v.TableFieldComment}}
+            Set("`"+{{$.ModelPackageName}}.{{$v.FieldName}}+"`", entity.{{$v.FieldName}}).  //{{$v.TableFieldComment}}
             {{- else}}
-            Set({{$.ModelPackageName}}.{{$v.FieldName}}, entity.{{$v.FieldName}})  //{{$v.TableFieldComment}}
+            Set("`"+{{$.ModelPackageName}}.{{$v.FieldName}}+"`", entity.{{$v.FieldName}})  //{{$v.TableFieldComment}}
             {{- end}}
 		{{- end}}
         {{- end}}
@@ -89,7 +89,7 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.Prim
 	model := this.Model()
 	model.Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where({{.ModelPackageName}}.{{.PrimaryId}}+" = ?", {{.SmallHumpPrimaryId}}).
+		Where("`"+{{.ModelPackageName}}.{{.PrimaryId}}+"` = ?", {{.SmallHumpPrimaryId}}).
 		{{- if .HasDeleteTime}}
         Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
         {{- end}}
@@ -106,7 +106,7 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdTyp
 	models := this.Models()
 	this.model.Mapper(sql.Select(fields...).
 		From(this.model.TableName()).
-		Where({{.ModelPackageName}}.{{.PrimaryId}}+" IN (?)", {{.SmallHumpPrimaryId}}s).
+		Where("`"+{{.ModelPackageName}}.{{.PrimaryId}}+"` IN (?)", {{.SmallHumpPrimaryId}}s).
 		{{- if .HasDeleteTime}}
 		Where("isnull(`"+{{.ModelPackageName}}.{{.EntityDeleteTimeField}}+"`)").
 		{{- end}}
@@ -119,7 +119,7 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdTyp
 func (this *Dao) DeleteBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
 	higo.Result(this.model.Mapper(sql.Delete(this.model.TableName()).
 		DeleteBuilder().
-		Where({{.ModelPackageName}}.{{.PrimaryId}}+" = ?", {{.SmallHumpPrimaryId}}).
+		Where("`"+{{.ModelPackageName}}.{{.PrimaryId}}+"` = ?", {{.SmallHumpPrimaryId}}).
 		ToSql()).Exec().Error).Unwrap()
 }
 
