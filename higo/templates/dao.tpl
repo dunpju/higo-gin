@@ -74,7 +74,7 @@ func (this *{{.StructName}}) Add() {{.PrimaryIdType}} {
 
 //更新
 func (this *{{.StructName}}) Update() bool {
-    if entity.PriEmpty() {
+    if this.entity.PriEmpty() {
 		DaoException.Throw("{{.PrimaryId}}"+errcodg.PrimaryIdError.Message(), int(errcodg.PrimaryIdError))
 	}
 	higo.Result(this.model.Mapper(this.model.GetBuilder()).Exec().Error).Unwrap()
