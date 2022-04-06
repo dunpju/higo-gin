@@ -64,7 +64,9 @@ func NewCode(pkg string, name string, file string) *Code {
 				C.Codes = append(C.Codes, newCode(pkg, s, file))
 			}
 		})
-		log.Fatalln(err)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 	return C
 }
