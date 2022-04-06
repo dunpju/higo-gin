@@ -5,8 +5,6 @@ import (
 	"github.com/dengpju/higo-gin/higo/errcodg"
 	"github.com/dengpju/higo-gin/higo/exceptions/DaoException"
 	"github.com/dengpju/higo-gin/higo/sql"
-	"github.com/dengpju/higo-utils/utils"
-	"strings"
 	{{- range $impo := .Imports}}
     {{$impo}}
     {{- end}}
