@@ -5,8 +5,8 @@ import "gitee.com/dengpju/higo-code/code"
 //{{.Doc}}
 type {{.Name}} int64
 
-func (this {{.Name}}) Message() string {
-	return code.Get(this)
+func (this {{.Name}}) Message(variables ...interface{}) string {
+	return code.Get(this, variables...)
 }
 
 const (

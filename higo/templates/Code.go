@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
@@ -39,32 +40,52 @@ type Code struct {
 	Codes     []*Code
 }
 
-var codeRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
+var (
+	codeRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
+	autoRegexpStr = `(\s*-auto).*`
+)
 
+// go run test\bin\main.go -gen=code -name="test\bin\md -auto" -out=test\app\Codes
 func NewCode(pkg string, name string, file string) *Code {
 	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
-		log.Fatalln("regexp err")
+		log.Fatalln("code regexp err")
 	}
 	C := &Code{}
 	if fs := reg.FindString(name); fs != "" {
 		C.Codes = append(C.Codes, newCode(pkg, name, file))
 	} else {
-		outfile := fileutil.ReadFile(name)
+		reg := regexp.MustCompile(autoRegexpStr)
+		if reg == nil {
+			log.Fatalln("auto regexp err")
+		}
+		if auto := reg.ReplaceAllString(name, ""); auto != "" {
+			name = auto
+		}
+		outfile := utils.File.ReadFile(name)
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
-		err := outfile.ForEach(func(line int, b []byte) {
-			s := string(b)
-			s = strings.Replace(s, "\\", "", -1)
-			s = strings.Trim(s, "\n")
-			s = strings.Trim(s, "\r")
-			s = strings.Trim(s, "")
-			if "" != s {
-				C.Codes = append(C.Codes, newCode(pkg, s, file))
+		if outfile.IsDir() {
+			files := utils.Dir.Open(name).Suffix("md").Scan().Get()
+			for _, filePath := range files {
+
 			}
-		})
-		log.Fatalln(err)
+		} else {
+			err := outfile.ForEach(func(line int, b []byte) {
+				s := string(b)
+				s = strings.Replace(s, "\\", "", -1)
+				s = strings.Trim(s, "\n")
+				s = strings.Trim(s, "\r")
+				s = strings.Trim(s, "")
+				if "" != s {
+					C.Codes = append(C.Codes, newCode(pkg, s, file))
+				}
+			})
+			if err != nil {
+				log.Fatalln(err)
+			}
+		}
 	}
 	return C
 }

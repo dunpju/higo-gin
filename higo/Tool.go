@@ -35,67 +35,67 @@ func NewTool() *Tool {
 func (this *Tool) Cmd() {
 	if len(os.Args) >= 2 {
 		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller or Model or Enum or Code or Dao or Entity
-	--option[controller | model | enum | code | dao | entity | param]
-	eg:-gen=controller`)
+    --option[controller | model | enum | code | dao | entity | param]
+    eg:-gen=controller`)
 		flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
-	eg:-name=Test`)
+    eg:-name=Test`)
 		flag.StringVar(&this.Out, "out", "", `explain: Generate file output path 
-	eg:-out=test\app\Controllers`)
+    eg:-out=test\app\Controllers`)
 		flag.Parse()
 		if controller == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`controller name unable empty 
-	eg: -name=Test`)
+    eg: -name=Test`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-	eg: -out=test\app\Controllers`)
+    eg: -out=test\app\Controllers`)
 			}
 			this.Package = dirutil.Basename(this.Out)
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if enum == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`enum configure file unable empty 
-	eg: -name=test\bin\enum_cmd.md 
-	or format
-	eg: -name="-e=state -f=状态:issue-1-发布,draft-2-草稿"`)
+    eg: -name=test\bin\enum_cmd.md
+    eg: -name="-e=state -f=状态:issue-1-发布,draft-2-草稿"`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-	eg: -out=test\app\Enums`)
+    eg: -out=test\app\Enums`)
 			}
 			templates.NewEnum(this.Name, this.Out).Generate()
 		} else if codes == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`code configure file unable empty 
-	eg: -name=test\bin\code_cmd.md 
-	or format
-	eg: -name="-c=token -i=400001 -f=token码:token_empty-token为空"`)
+    eg: -name="test\bin\code_cmd.md"
+    eg: -name="test\bin\400001.md -auto"
+    eg: -name="test\bin\md -auto"
+    eg: -name="-c=token -i=400001 -f=token码:token_empty-token为空"`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-	eg: -out=test\app\Codes`)
+    eg: -out=test\app\Codes`)
 			}
 			this.Package = dirutil.Basename(this.Out)
 			templates.NewCode(this.Package, this.Name, this.Out).Generate()
 		} else if param == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`param name unable empty 
-	eg: -name=list`)
+    eg: -name=list`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-	eg: -out=test\app\Params`)
+    eg: -out=test\app\Params`)
 			}
 			templates.NewParam(this.Name, this.Out).Generate()
 		} else if model == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`table name unable empty 
-eg: -name=ts_user`)
+    eg: -name=ts_user`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-eg: -out=test\app\Models`)
+    eg: -out=test\app\Models`)
 			}
 		loopDao:
 			capitalBeganReg := regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
@@ -189,8 +189,8 @@ eg: -out=test\app\Models`)
 		} else {
 			log.Fatalln(`gen Arguments Error! 
 Explain: Generate Controller or Model or Enum or Code or Dao or Entity
-	--option[controller | model | enum | code | dao | entity | param] 
-	eg:-gen=controller`)
+    --option[controller | model | enum | code | dao | entity | param]
+    eg:-gen=controller`)
 		}
 		os.Exit(1)
 	}
