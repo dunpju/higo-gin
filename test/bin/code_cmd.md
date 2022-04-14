@@ -1,2 +1,2 @@
--c=token -i=400001 -f=token码:token_empty-token为空
--c=error_code -i=400001 -f=error_code码:success-成功
+-c=token -i=400001 -f=token:token_empty-token为空
+-c=error_code -i=400001 -f=error_code:success-成功
