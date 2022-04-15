@@ -34,13 +34,13 @@ func NewTool() *Tool {
 
 func (this *Tool) Cmd() {
 	if len(os.Args) >= 2 {
-		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller or Model or Enum or Code or Dao or Entity
+		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller Model Enum Code Dao Entity
     --option[controller | model | enum | code | dao | entity | param]
     eg:-gen=controller`)
 		flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
     eg:-name=Test`)
 		flag.StringVar(&this.Out, "out", "", `explain: Generate file output path 
-    eg:-out=test\app\Controllers`)
+    eg:-out=app\Controllers`)
 		flag.Parse()
 		if controller == this.Gen {
 			if this.Name == "" {
@@ -49,32 +49,32 @@ func (this *Tool) Cmd() {
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-    eg: -out=test\app\Controllers`)
+    eg: -out=app\Controllers`)
 			}
 			this.Package = dirutil.Basename(this.Out)
 			templates.NewController(this.Package, this.Name, this.Out).Generate()
 		} else if enum == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`enum configure file unable empty 
-    eg: -name=test\bin\enum_cmd.md
+    eg: -name=bin\enum_cmd.md
     eg: -name="-e=state -f=状态:issue-1-发布,draft-2-草稿"`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-    eg: -out=test\app\Enums`)
+    eg: -out=app\Enums`)
 			}
 			templates.NewEnum(this.Name, this.Out).Generate()
 		} else if codes == this.Gen {
 			if this.Name == "" {
 				log.Fatalln(`code configure file unable empty 
-    eg: -name="test\bin\code_cmd.md"
-    eg: -name="test\bin\400001.md -auto"
-    eg: -name="test\bin\md -auto"
+    eg: -name="bin\code_cmd.md"
+    eg: -name="bin\400001.md -auto"
+    eg: -name="bin\md -auto"
     eg: -name="-c=token -i=400001 -f=token码:token_empty-token为空"`)
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-    eg: -out=test\app\Codes`)
+    eg: -out=app\Codes`)
 			}
 			this.Package = dirutil.Basename(this.Out)
 			templates.NewCode(this.Package, this.Name, this.Out).Generate()
@@ -85,7 +85,7 @@ func (this *Tool) Cmd() {
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-    eg: -out=test\app\Params`)
+    eg: -out=app\Params`)
 			}
 			templates.NewParam(this.Name, this.Out).Generate()
 		} else if model == this.Gen {
@@ -95,7 +95,7 @@ func (this *Tool) Cmd() {
 			}
 			if this.Out == "" {
 				log.Fatalln(`output directory unable empty 
-    eg: -out=test\app\Models`)
+    eg: -out=app\Models`)
 			}
 		loopDao:
 			capitalBeganReg := regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
@@ -103,7 +103,7 @@ func (this *Tool) Cmd() {
 			modelTool := templates.NewModelTool()
 			modelTool.Name = this.Name
 			modelTool.Out = this.Out
-			fmt.Print("Whether To Generate Dao [yes|no] (default:yes):")
+			fmt.Print("Generate Dao [yes|no] (default:yes):")
 			n, err := fmt.Scanln(&modelTool.IsGenerateDao)
 			if nil != err && n > 0 {
 				panic(err)
@@ -122,7 +122,7 @@ func (this *Tool) Cmd() {
 					daoDir = stringutil.Ucfirst(daoDir)
 				}
 				outDaoDir := dirutil.Dirname(this.Out) + `\` + daoDir
-				fmt.Printf("Whether To Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", outDaoDir)
+				fmt.Printf("Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", outDaoDir)
 				modelTool.OutDaoDir = outDaoDir
 				n, err = fmt.Scanln(&modelTool.OutDaoDir)
 				if nil != err && n > 0 {
@@ -134,7 +134,7 @@ func (this *Tool) Cmd() {
 				goto loopChoiceGenerateEntity
 			}
 		loopEntity:
-			fmt.Print("Whether To Generate Entity [yes|no] (default:yes):")
+			fmt.Print("Generate Entity [yes|no] (default:yes):")
 			n, err = fmt.Scanln(&modelTool.IsGenerateEntity)
 			if nil != err && n > 0 {
 				panic(err)
@@ -151,7 +151,7 @@ func (this *Tool) Cmd() {
 					entityDir = stringutil.Ucfirst(entityDir)
 				}
 				outEntityDir := dirutil.Dirname(this.Out) + `\` + entityDir
-				fmt.Printf("Whether To Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", outEntityDir)
+				fmt.Printf("Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", outEntityDir)
 				modelTool.OutEntityDir = outEntityDir
 				n, err = fmt.Scanln(&modelTool.OutEntityDir)
 				if nil != err && n > 0 {
@@ -161,7 +161,7 @@ func (this *Tool) Cmd() {
 			}
 			//确认开始构建
 		loopConfirmBeginGenerate:
-			fmt.Print("Confirm To Start Generate [yes|no] (default:yes):")
+			fmt.Print("Start Generate [yes|no] (default:yes):")
 			n, err = fmt.Scanln(&modelTool.ConfirmBeginGenerate)
 			if (yes != modelTool.ConfirmBeginGenerate && no != modelTool.ConfirmBeginGenerate) && n > 0 {
 				goto loopConfirmBeginGenerate
@@ -188,7 +188,7 @@ func (this *Tool) Cmd() {
 			}
 		} else {
 			log.Fatalln(`gen Arguments Error! 
-Explain: Generate Controller or Model or Enum or Code or Dao or Entity
+Explain: Generate Controller Model Enum Code Dao Entity
     --option[controller | model | enum | code | dao | entity | param]
     eg:-gen=controller`)
 		}
