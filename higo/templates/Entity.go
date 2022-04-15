@@ -2,13 +2,10 @@ package templates
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
-	"io/ioutil"
 	"os"
-	"path"
-	"runtime"
-	"text/template"
 )
 
 type Entity struct {
@@ -53,19 +50,8 @@ func NewEntity(modelTool ModelTool, model Model) *Entity {
 	}
 }
 
-func (this *Entity) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Entity) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Entity) Generate() {
@@ -74,8 +60,7 @@ func (this *Entity) Generate() {
 			panic(err)
 		}
 	}
-	tpl := this.Template(EntityFileName + ".tpl")
-	tmpl, err := template.New(EntityFileName + ".tpl").Parse(tpl)
+	tmpl, err := this.Template(EntityFileName + ".tpl").Parse()
 	if err != nil {
 		panic(err)
 	}
@@ -97,8 +82,7 @@ func (this *Entity) Generate() {
 			panic(err)
 		}
 		defer flagFile.Close()
-		tpl = this.Template(EntityFileName + "_" + EntityFlagFileName + ".tpl")
-		tmpl, err = template.New(attributes).Parse(tpl)
+		tmpl, err = this.Template(EntityFileName + "_" + EntityFlagFileName + ".tpl").Parse()
 		if err != nil {
 			panic(err)
 		}

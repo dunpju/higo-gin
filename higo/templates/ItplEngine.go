@@ -1,5 +1,7 @@
 package templates
 
+import "github.com/dengpju/higo-gin/higo/templates/tpls"
+
 const (
 	controller  = "Controller"
 	model       = "Model"
@@ -11,6 +13,6 @@ const (
 )
 
 type ItplEngine interface {
-	Template(tplfile string) string
+	Template(tplfile string) *tpls.Tpl
 	Generate()
 }

@@ -3,6 +3,7 @@ package templates
 import (
 	"bytes"
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
@@ -13,10 +14,7 @@ import (
 	"go/token"
 	"io/ioutil"
 	"os"
-	"path"
-	"runtime"
 	"strings"
-	"text/template"
 )
 
 type YesNo string
@@ -98,19 +96,8 @@ func NewModel(DB *gorm.DB, name, outDir, db, pre string) *Model {
 	}
 }
 
-func (this *Model) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Model) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Model) Generate() {
@@ -165,8 +152,7 @@ func (this *Model) Generate() {
 			panic(err)
 		}
 	}
-	tpl := this.Template(ModelFileName + ".tpl")
-	tmpl, err := template.New(ModelFileName + ".tpl").Parse(tpl)
+	tmpl, err := this.Template(ModelFileName + ".tpl").Parse()
 	if err != nil {
 		panic(err)
 	}
@@ -267,8 +253,7 @@ func (this *Model) Generate() {
 		attributesFile.Create()
 	}
 	defer attributesFile.Close()
-	tpl = this.Template(ModelAttributesFileName + ".tpl")
-	tmpl, err = template.New(attributes).Parse(tpl)
+	tmpl, err = this.Template(ModelAttributesFileName + ".tpl").Parse()
 	if err != nil {
 		panic(err)
 	}

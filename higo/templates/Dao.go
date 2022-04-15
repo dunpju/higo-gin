@@ -2,15 +2,12 @@ package templates
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
-	"io/ioutil"
 	"os"
-	"path"
-	"runtime"
 	"strings"
-	"text/template"
 )
 
 type DaoMap struct {
@@ -88,19 +85,8 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 	}
 }
 
-func (this *Dao) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Dao) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Dao) Generate() {
@@ -119,8 +105,7 @@ func (this *Dao) generate() {
 		outFile.Create()
 	}
 	defer outFile.Close()
-	tpl := this.Template(DaoFileName + ".tpl")
-	tmpl, err := template.New(DaoFileName + ".tpl").Parse(tpl)
+	tmpl, err := this.Template(DaoFileName + ".tpl").Parse()
 	if err != nil {
 		panic(err)
 	}

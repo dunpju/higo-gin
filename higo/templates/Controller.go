@@ -3,6 +3,7 @@ package templates
 import (
 	"bytes"
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
@@ -13,12 +14,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
-	"text/template"
 )
 
 type Controller struct {
@@ -43,19 +42,8 @@ func NewController(pkg string, name string, file string) *Controller {
 	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, File: file}
 }
 
-func (this *Controller) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Controller) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Controller) Generate() {
@@ -67,8 +55,7 @@ func (this *Controller) Generate() {
 		outFile.Create()
 	}
 	defer outFile.Close()
-	tpl := this.Template("controller.tpl")
-	tmpl, err := template.New("controller.tpl").Parse(tpl)
+	tmpl, err := this.Template("controller.tpl").Parse()
 	if err != nil {
 		panic(err)
 	}
@@ -184,8 +171,7 @@ func (this *Controller) Generate() {
 	})
 	//追加
 	if !hasFuncDecl {
-		tpl := this.Template("func_decl.tpl")
-		tmpl, err := template.New(NewFuncDecl).Parse(tpl)
+		tmpl, err := this.Template("func_decl.tpl").Parse()
 		if err != nil {
 			panic(err)
 		}

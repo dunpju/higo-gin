@@ -8,14 +8,10 @@ import (
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/maputil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
-	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"regexp"
-	"runtime"
 	"strings"
-	"text/template"
 )
 
 type CodeMap struct {
@@ -254,19 +250,8 @@ func newCode(pkg string, name string, out string) *Code {
 	return C
 }
 
-func (this *Code) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Code) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Code) Generate() {
@@ -286,8 +271,7 @@ func (this *Code) generate() {
 		outFile.Create()
 	}
 	defer outFile.Close()
-	tpl := this.Template("code.tpl")
-	tmpl, err := template.New("code.tpl").Parse(tpl)
+	tmpl, err := this.Template("code.tpl").Parse()
 	if err != nil {
 		panic(err)
 	}

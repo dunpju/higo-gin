@@ -2,15 +2,12 @@ package templates
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
-	"io/ioutil"
 	"log"
 	"os"
-	"path"
-	"runtime"
-	"text/template"
 )
 
 type Param struct {
@@ -28,19 +25,8 @@ func NewParam(name string, out string) *Param {
 	return &Param{Package: pkg, StructName: humpUnpreName, OutDir: outDir, FileName: file}
 }
 
-func (this *Param) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Param) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Param) Generate() {
@@ -52,8 +38,7 @@ func (this *Param) Generate() {
 			panic(err)
 		}
 	}
-	tpl := this.Template("param.tpl")
-	tmpl, err := template.New("param.tpl").Parse(tpl)
+	tmpl, err := this.Template("param.tpl").Parse()
 	if err != nil {
 		panic(err)
 	}

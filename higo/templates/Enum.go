@@ -2,17 +2,14 @@ package templates
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
-	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"regexp"
-	"runtime"
 	"strings"
-	"text/template"
 )
 
 type EnumMap struct {
@@ -122,19 +119,8 @@ func newEnum(name string, file string) *Enum {
 	return E
 }
 
-func (this *Enum) Template(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + dirutil.PathSeparator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *Enum) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 func (this *Enum) Generate() {
@@ -154,8 +140,7 @@ func (this *Enum) generate() {
 		outFile.Create()
 	}
 	defer outFile.Close()
-	tpl := this.Template("enum.tpl")
-	tmpl, err := template.New("enum.tpl").Parse(tpl)
+	tmpl, err := this.Template("enum.tpl").Parse()
 	if err != nil {
 		panic(err)
 	}
