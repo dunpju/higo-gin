@@ -1,4 +1,4 @@
-package errcode
+package {{.Package}}
 
 func autoload() {
     {{- range .FuncNames}}

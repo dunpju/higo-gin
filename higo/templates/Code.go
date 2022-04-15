@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
@@ -42,6 +43,7 @@ type Code struct {
 }
 
 type CodeBuilder struct {
+	Package      string
 	Name         string
 	Len          int
 	FuncName     string
@@ -49,8 +51,8 @@ type CodeBuilder struct {
 	OutDir       string
 }
 
-func NewCodeBuilder(name string) *CodeBuilder {
-	return &CodeBuilder{Name: name}
+func NewCodeBuilder(name string, out string) *CodeBuilder {
+	return &CodeBuilder{Package: utils.Dir.Basename(out), Name: name, OutDir: out}
 }
 
 func (this *CodeBuilder) parse(doc string) *CodeBuilder {
@@ -101,8 +103,7 @@ func (this *CodeBuilder) generate() {
 		}
 		outFile := utils.File.New(File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 		defer outFile.Close()
-		tpl := this.Template("code.tpl")
-		tmpl, err := template.New("code.tpl").Parse(tpl)
+		tmpl, err := this.Template("code_builder.tpl").Parse()
 		if err != nil {
 			panic(err)
 		}
@@ -115,32 +116,18 @@ func (this *CodeBuilder) generate() {
 	}
 }
 
-func (this *CodeBuilder) Template(tplfile string) string {
-	return tpl(tplfile)
-}
-
-func tpl(tplfile string) string {
-	_, file, _, _ := runtime.Caller(0)
-	file = path.Dir(file) + utils.Dir.Separator() + tplfile
-	f, err := os.Open(file)
-	defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	context, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(context)
+func (this *CodeBuilder) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 type Autoload struct {
+	Package   string
 	FuncNames []string
 	OutDir    string
 }
 
-func NewAutoload(funcNames []string) *Autoload {
-	return &Autoload{FuncNames: funcNames}
+func NewAutoload(funcNames []string, out string) *Autoload {
+	return &Autoload{Package: utils.Dir.Basename(out), FuncNames: funcNames, OutDir: out}
 }
 
 func (this *Autoload) generate() {
@@ -148,8 +135,7 @@ func (this *Autoload) generate() {
 	File := this.OutDir + utils.Dir.Separator() + "Autoload.go"
 	outFile := utils.File.New(File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	defer outFile.Close()
-	tpl := this.Template("autoload.tpl")
-	tmpl, err := template.New("autoload.tpl").Parse(tpl)
+	tmpl, err := this.Template("autoload.tpl").Parse()
 	if err != nil {
 		panic(err)
 	}
@@ -161,8 +147,8 @@ func (this *Autoload) generate() {
 	fmt.Println("Autoload file " + File + " generate success!")
 }
 
-func (this *Autoload) Template(tplfile string) string {
-	return tpl(tplfile)
+func (this *Autoload) Template(tplfile string) *tpls.Tpl {
+	return tpls.New(tplfile)
 }
 
 var (
@@ -172,14 +158,14 @@ var (
 )
 
 // go run test\bin\main.go -gen=code -name="test\bin\md -auto" -out=test\app\Codes
-func NewCode(pkg string, name string, file string) *Code {
+func NewCode(pkg string, name string, out string) *Code {
 	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
 		log.Fatalln("code regexp err")
 	}
 	C := &Code{}
 	if fs := reg.FindString(name); fs != "" {
-		C.Codes = append(C.Codes, newCode(pkg, name, file))
+		C.Codes = append(C.Codes, newCode(pkg, name, out))
 	} else {
 		reg := regexp.MustCompile(autoRegexpStr)
 		if reg == nil {
@@ -196,13 +182,12 @@ func NewCode(pkg string, name string, file string) *Code {
 			files := utils.Dir.Open(name).Suffix("md").Scan().Get()
 			for _, filePath := range files {
 				fileContext := string(utils.File.Read(filePath).ReadAll())
-				build := NewCodeBuilder("CodeErrorCode").parse(fileContext)
+				build := NewCodeBuilder("CodeErrorCode", out).parse(fileContext)
 				build.generate()
 				funcNames = append(funcNames, build.FuncName)
 			}
-			log.Fatalln("ddd")
 			if len(funcNames) > 0 {
-				NewAutoload(funcNames).generate()
+				NewAutoload(funcNames, out).generate()
 			}
 		} else {
 			err := outfile.ForEach(func(line int, b []byte) {
@@ -212,7 +197,7 @@ func NewCode(pkg string, name string, file string) *Code {
 				s = strings.Trim(s, "\r")
 				s = strings.Trim(s, "")
 				if "" != s {
-					C.Codes = append(C.Codes, newCode(pkg, s, file))
+					C.Codes = append(C.Codes, newCode(pkg, s, out))
 				}
 			})
 			if err != nil {
@@ -223,7 +208,7 @@ func NewCode(pkg string, name string, file string) *Code {
 	return C
 }
 
-func newCode(pkg string, name string, file string) *Code {
+func newCode(pkg string, name string, out string) *Code {
 	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
 		log.Fatalln("regexp err")
@@ -258,7 +243,7 @@ func newCode(pkg string, name string, file string) *Code {
 		name = stringutil.Ucfirst(stringutil.CaseToCamel(structName))
 		C.Name = code + name
 		C.RealName = name
-		C.OutDir = file
+		C.OutDir = out
 		C.OutStruct = C.OutDir + dirutil.PathSeparator() + code + strings.Trim(name, code)
 		C.File = C.OutDir + dirutil.PathSeparator() + C.RealName + ".go"
 		C.Package = pkg
