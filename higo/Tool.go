@@ -28,7 +28,11 @@ type Tool struct {
 	Package string
 	Auto    string
 	Force   string
-	Extends string
+	Path    string
+	Const   string
+	Code    string
+	Message string
+	Iota    string
 }
 
 func NewTool() *Tool {
@@ -44,9 +48,13 @@ func (this *Tool) Cmd() {
     eg:-name=Test`)
 		flag.StringVar(&this.Out, "out", "", `explain: Generate file output directory 
     eg:-out=app\Controllers`)
-		flag.StringVar(&this.Auto, "auto", "no", `explain: Autoloading`)
-		flag.StringVar(&this.Force, "force", "no", `explain: Forced updating`)
-		flag.StringVar(&this.Extends, "extends", "", `explain: Extends struct`)
+		flag.StringVar(&this.Auto, "auto", "no", `explain: Code Autoloading yes/no`)
+		flag.StringVar(&this.Force, "force", "no", `explain: Forced updating yes/no`)
+		flag.StringVar(&this.Path, "path", "", `explain: A configuration file of code path`)
+		flag.StringVar(&this.Const, "const", "", `explain: Code const`)
+		flag.StringVar(&this.Code, "code", "", `explain: Code number`)
+		flag.StringVar(&this.Message, "message", "", `explain: Code message`)
+		flag.StringVar(&this.Iota, "iota", "no", `explain: Code iota yes/no`)
 		flag.Parse()
 		if controller == this.Gen {
 			this.controller()
@@ -106,8 +114,8 @@ func (this *Tool) enum() {
 
 func (this *Tool) code() {
 	if this.Name == "" {
-		log.Fatalln(`code configure file unable empty 
-    eg: -name="bin\code_cmd.md"
+		log.Fatalln(`code struct name unable empty
+    eg: -name=CodeErrorCode
     eg: -name="bin\200.yaml"
     eg: -name="bin\yaml" a directory
     eg: -name="-c=token -i=400001 -f=token码:token_empty-token为空"`)
@@ -116,9 +124,25 @@ func (this *Tool) code() {
 		log.Fatalln(`output directory unable empty 
     eg: -out=app\Codes`)
 	}
-	if this.Extends == "" {
-		log.Fatalln(`extends struct unable empty 
-    eg: -extends=CodeErrorCode`)
+	if this.Path == "" {
+		if this.Const == "" && this.Code == "" && this.Message == "" {
+			log.Fatalln(`a configuration file of code path unable empty or code const unable empty
+    eg: -const=success
+    eg: bin\200.yaml a file Or bin\yaml a directory of yaml file
+    yaml file format
+success:
+  code: 200
+  message: "成功"`)
+		} else if this.Const == "" {
+			log.Fatalln(`code const unable empty 
+    eg: -const=success`)
+		} else if this.Code == "" {
+			log.Fatalln(`code number unable empty 
+    eg: -code=200`)
+		} else if this.Message == "" {
+			log.Fatalln(`code message unable empty 
+    eg: -message=成功`)
+		}
 	}
 	this.Package = dirutil.Basename(this.Out)
 	codeArguments := &templates.CodeArguments{
@@ -127,7 +151,10 @@ func (this *Tool) code() {
 		Out:     this.Out,
 		Auto:    this.Auto,
 		Force:   this.Force,
-		Extends: this.Extends,
+		Path:    this.Path,
+		Const:   this.Const,
+		Code:    this.Code,
+		Message: this.Message,
 	}
 	templates.NewCode(codeArguments).Generate()
 }

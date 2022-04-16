@@ -159,7 +159,11 @@ type CodeArguments struct {
 	Out     string
 	Auto    string
 	Force   string
-	Extends string
+	Path    string
+	Const   string
+	Code    string
+	Message string
+	Iota    string
 }
 
 // go run test\bin\main.go -gen=code -name="test\bin\yaml" -out=test\app\Codes -auto=yes -force=yes -extends=CodeErrorCode
@@ -180,17 +184,17 @@ func NewCode(args *CodeArguments) *Code {
 			files := utils.Dir.Open(args.Name).Scan().Get()
 			for _, filePath := range files {
 				suffix := path.Ext(filePath)
-				if ".md"== suffix {
+				if ".md" == suffix {
 					outfile := utils.File.Read(filePath)
 					outfile.ForEach(func(line int, b []byte) {
 						log.Println(string(b))
 					})
 					log.Fatalln(outfile)
 					fileContext := string(utils.File.Read(filePath).ReadAll())
-					build := NewCodeBuilder(args.Extends, args.Out).parse(fileContext)
+					build := NewCodeBuilder(args.Name, args.Out).parse(fileContext)
 					build.generate()
 					funcNames = append(funcNames, build.FuncName)
-				} else if ".yaml"== suffix {
+				} else if ".yaml" == suffix {
 					//funcNames = append(funcNames, build.FuncName)
 				}
 			}
