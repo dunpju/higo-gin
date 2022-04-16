@@ -10,6 +10,7 @@ import (
 	"github.com/dengpju/higo-utils/utils/stringutil"
 	"log"
 	"os"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -149,41 +150,52 @@ func (this *Autoload) Template(tplfile string) *tpls.Tpl {
 
 var (
 	codeRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
-	autoRegexpStr = `(\s*-auto).*`
 	funcNames     []string
 )
 
-// go run test\bin\main.go -gen=code -name="test\bin\md -auto" -out=test\app\Codes
-func NewCode(pkg string, name string, out string) *Code {
+type CodeArguments struct {
+	Package string
+	Name    string
+	Out     string
+	Auto    string
+	Force   string
+	Extends string
+}
+
+// go run test\bin\main.go -gen=code -name="test\bin\yaml" -out=test\app\Codes -auto=yes -force=yes -extends=CodeErrorCode
+func NewCode(args *CodeArguments) *Code {
 	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
 		log.Fatalln("code regexp err")
 	}
 	C := &Code{}
-	if fs := reg.FindString(name); fs != "" {
-		C.Codes = append(C.Codes, newCode(pkg, name, out))
+	if fs := reg.FindString(args.Name); fs != "" {
+		C.Codes = append(C.Codes, newCode(args))
 	} else {
-		reg := regexp.MustCompile(autoRegexpStr)
-		if reg == nil {
-			log.Fatalln("auto regexp err")
-		}
-		if auto := reg.ReplaceAllString(name, ""); auto != "" {
-			name = auto
-		}
-		outfile := utils.File.Read(name)
+		outfile := utils.File.Read(args.Name)
 		if !outfile.Exist() {
-			log.Fatalln(name + " configure file non-exist")
+			log.Fatalln(args.Name + " configure file non-exist")
 		}
 		if outfile.IsDir() {
-			files := utils.Dir.Open(name).Suffix("md").Scan().Get()
+			files := utils.Dir.Open(args.Name).Scan().Get()
 			for _, filePath := range files {
-				fileContext := string(utils.File.Read(filePath).ReadAll())
-				build := NewCodeBuilder("CodeErrorCode", out).parse(fileContext)
-				build.generate()
-				funcNames = append(funcNames, build.FuncName)
+				suffix := path.Ext(filePath)
+				if ".md"== suffix {
+					outfile := utils.File.Read(filePath)
+					outfile.ForEach(func(line int, b []byte) {
+						log.Println(string(b))
+					})
+					log.Fatalln(outfile)
+					fileContext := string(utils.File.Read(filePath).ReadAll())
+					build := NewCodeBuilder(args.Extends, args.Out).parse(fileContext)
+					build.generate()
+					funcNames = append(funcNames, build.FuncName)
+				} else if ".yaml"== suffix {
+					//funcNames = append(funcNames, build.FuncName)
+				}
 			}
-			if len(funcNames) > 0 {
-				NewAutoload(funcNames, out).generate()
+			if args.Auto == "yes" && len(funcNames) > 0 {
+				NewAutoload(funcNames, args.Out).generate()
 			}
 		} else {
 			err := outfile.ForEach(func(line int, b []byte) {
@@ -193,7 +205,8 @@ func NewCode(pkg string, name string, out string) *Code {
 				s = strings.Trim(s, "\r")
 				s = strings.Trim(s, "")
 				if "" != s {
-					C.Codes = append(C.Codes, newCode(pkg, s, out))
+					args.Name = s
+					C.Codes = append(C.Codes, newCode(args))
 				}
 			})
 			if err != nil {
@@ -204,12 +217,12 @@ func NewCode(pkg string, name string, out string) *Code {
 	return C
 }
 
-func newCode(pkg string, name string, out string) *Code {
+func newCode(args *CodeArguments) *Code {
 	reg := regexp.MustCompile(codeRegexpStr)
 	if reg == nil {
 		log.Fatalln("regexp err")
 	}
-	name = strings.Replace(name, "\\", "", -1)
+	name := strings.Replace(args.Name, "\\", "", -1)
 	name = strings.Trim(name, "\n")
 	name = strings.Trim(name, "\r")
 	name = strings.Trim(name, "")
@@ -239,10 +252,10 @@ func newCode(pkg string, name string, out string) *Code {
 		name = stringutil.Ucfirst(stringutil.CaseToCamel(structName))
 		C.Name = code + name
 		C.RealName = name
-		C.OutDir = out
+		C.OutDir = args.Out
 		C.OutStruct = C.OutDir + dirutil.PathSeparator() + code + strings.Trim(name, code)
 		C.File = C.OutDir + dirutil.PathSeparator() + C.RealName + ".go"
-		C.Package = pkg
+		C.Package = args.Package
 		return C
 	} else {
 		log.Fatalln(`name format error: ` + name)
