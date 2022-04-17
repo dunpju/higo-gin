@@ -8,6 +8,8 @@ import (
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/maputil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -24,28 +26,13 @@ func NewCodeMap(key string, value interface{}, doc string) *CodeMap {
 	return &CodeMap{Key: stringutil.Ucfirst(stringutil.CaseToCamel(key)), Value: value, Doc: doc}
 }
 
-type Code struct {
-	Package   string
-	Name      string
-	OutStruct string
-	OutDir    string
-	File      string
-	Doc       string
-	RealName  string
-	Code      string
-	Iota      string
-	LenMap    int
-	CodeMap   []*CodeMap
-	Codes     []*Code
-	Arguments CodeArguments
-}
-
 type CodeBuilder struct {
 	Package      string
 	Name         string
 	Len          int
 	FuncName     string
 	KeyValueDocs []maputil.KeyValueDoc
+	File         string
 	OutDir       string
 }
 
@@ -93,8 +80,8 @@ func (this *CodeBuilder) generate() {
 	this.Len = len(this.KeyValueDocs) - 1
 	if len(keyValueDocs) > 0 {
 		utils.Dir.Open(this.OutDir).Create()
-		File := this.OutDir + utils.Dir.Separator() + strings.Replace(keyValueDocs[0].Value.(string), " ", "", -1) + ".go"
-		this.FuncName = "code" + strings.Replace(keyValueDocs[0].Value.(string), " ", "", -1)
+		File := this.OutDir + utils.Dir.Separator() + this.File + ".go"
+		this.FuncName = "code" + this.File
 		if utils.File.Exist(File) {
 			log.Println(File + " already existed")
 			return
@@ -149,11 +136,6 @@ func (this *Autoload) Template(tplfile string) *tpls.Tpl {
 	return tpls.New(tplfile)
 }
 
-var (
-	codeRegexpStr = `(-c=[a-zA-Z_]+\s*-i=[0-9]+\s*-f=).*`
-	funcNames     []string
-)
-
 type CodeArguments struct {
 	Package string
 	Doc     string
@@ -168,57 +150,68 @@ type CodeArguments struct {
 	Iota    string
 }
 
-// go run test\bin\main.go -gen=code -name="test\bin\yaml" -out=test\app\Codes -auto=yes -force=yes -extends=CodeErrorCode
-// go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -const=success -code=200 -message=成功
+type Code struct {
+	Package      string
+	Name         string
+	OutStruct    string
+	OutDir       string
+	File         string
+	Doc          string
+	RealName     string
+	Code         string
+	Iota         string
+	LenMap       int
+	CodeMap      []*CodeMap
+	Codes        []*Code
+	CodeBuilders []*CodeBuilder
+	Arguments    CodeArguments
+	funcNames    []string
+}
+
+// go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -path=test\bin\yaml
+// go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -const=success -code=200 -message=成功 -iota=yes
 func NewCode(args *CodeArguments) *Code {
 	c := &Code{}
 	if args.Const != "" && args.Code != "" && args.Message != "" {
 		c.Codes = append(c.Codes, newCode(args))
-	} else if args.Path == "" {
+	} else if args.Path != "" {
+		c.OutDir = args.Out
+		outfile := utils.File.Read(args.Path)
+		if !outfile.Exist() {
+			log.Fatalln(args.Path + " configure file or directory non-exist")
+		}
+		if outfile.IsDir() {
+			files := utils.Dir.Open(args.Path).Suffix("yaml").Scan().Get()
+			for _, file := range files {
+				fileName := utils.Dir.Basename(file, ".yaml")
+				yamlFile, err := ioutil.ReadFile(file)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				yamlMap := make(map[interface{}]interface{})
+				err = yaml.Unmarshal(yamlFile, yamlMap)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				codeBuilder := &CodeBuilder{
+					Package: args.Package,
+					Name:    args.Name,
+					File:    fileName,
+					OutDir:  args.Out,
+				}
+				for k, v := range yamlMap {
+					kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k.(string), "")))
+					codeBuilder.KeyValueDocs = append(codeBuilder.KeyValueDocs,
+						*maputil.NewKeyValueDoc(kk, v.(map[interface{}]interface{})["code"], v.(map[interface{}]interface{})["message"].(string)))
+				}
+				c.CodeBuilders = append(c.CodeBuilders, codeBuilder)
+			}
+		} else {
+
+		}
+	} else {
 
 	}
-
-	//C := &Code{}
-	//if fs := reg.FindString(args.Name); fs != "" {
-	//	C.Codes = append(C.Codes, newCode(args))
-	//} else {
-	//	outfile := utils.File.Read(args.Name)
-	//	if !outfile.Exist() {
-	//		log.Fatalln(args.Name + " configure file non-exist")
-	//	}
-	//	if outfile.IsDir() {
-	//		files := utils.Dir.Open(args.Name).Scan().Get()
-	//		for _, filePath := range files {
-	//			suffix := path.Ext(filePath)
-	//			if ".md" == suffix {
-	//				fileContext := string(utils.File.Read(filePath).ReadAll())
-	//				build := NewCodeBuilder(args.Name, args.Out).parse(fileContext)
-	//				build.generate()
-	//				funcNames = append(funcNames, build.FuncName)
-	//			} else if ".yaml" == suffix {
-	//				//funcNames = append(funcNames, build.FuncName)
-	//			}
-	//		}
-	//		if args.Auto == "yes" && len(funcNames) > 0 {
-	//			NewAutoload(funcNames, args.Out).generate()
-	//		}
-	//	} else {
-	//		err := outfile.ForEach(func(line int, b []byte) {
-	//			s := string(b)
-	//			s = strings.Replace(s, "\\", "", -1)
-	//			s = strings.Trim(s, "\n")
-	//			s = strings.Trim(s, "\r")
-	//			s = strings.Trim(s, "")
-	//			if "" != s {
-	//				args.Name = s
-	//				C.Codes = append(C.Codes, newCode(args))
-	//			}
-	//		})
-	//		if err != nil {
-	//			log.Fatalln(err)
-	//		}
-	//	}
-	//}
 	return c
 }
 
@@ -247,6 +240,13 @@ func (this *Code) Template(tplfile string) *tpls.Tpl {
 func (this *Code) Generate() {
 	for _, e := range this.Codes {
 		e.generate()
+	}
+	for _, b := range this.CodeBuilders {
+		b.generate()
+		this.funcNames = append(this.funcNames, b.FuncName)
+	}
+	if len(this.funcNames) > 0 {
+		NewAutoload(this.funcNames, this.OutDir).generate()
 	}
 }
 

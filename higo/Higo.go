@@ -28,8 +28,7 @@ import (
 
 var (
 	hg *Higo
-	// ssl 证书
-	SslOut, SslCrt, SslKey string
+	SslOut, SslCrt, SslKey string // ssl
 	isLoadEnv              bool
 )
 
@@ -56,7 +55,7 @@ func Init(root *sliceutil.SliceString) *Higo {
 
 	// 全局异常
 	hg.Engine.Use(NewRecover().Exception(hg))
-	//设置跨域、鉴权
+	// 设置跨域、鉴权
 	hg.Middleware(NewCors(), NewAuth())
 	// 初始分隔符
 	pathSeparator = dirutil.PathSeparator()
