@@ -4,10 +4,14 @@ import "gitee.com/dengpju/higo-code/code"
 
 const (
 	{{- range $i,$v := .KeyValueDocs}}
-	{{- if eq $i 0}}
+	{{- if eq $v.Iota "yes"}}
 	{{$v.Key}} {{$.Name}} = iota + {{$v.Value}}  //{{$v.Doc}}
 	{{- else}}
+	{{- if eq $v.Value ""}}
 	{{$v.Key}}  //{{$v.Doc}}
+	{{- else}}
+	{{$v.Key}} {{$.Name}} = {{$v.Value}}  //{{$v.Doc}}
+	{{- end}}
 	{{- end}}
     {{- end}}
 )

@@ -1,18 +1,15 @@
 package templates
 
-import "C"
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils"
 	"github.com/dengpju/higo-utils/utils/fileutil"
-	"github.com/dengpju/higo-utils/utils/maputil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -31,48 +28,10 @@ type CodeBuilder struct {
 	Name         string
 	Len          int
 	FuncName     string
-	KeyValueDocs []maputil.KeyValueDoc
+	KeyValueDocs []KeyValueDoc
 	File         string
 	OutDir       string
-}
-
-func NewCodeBuilder(name string, out string) *CodeBuilder {
-	return &CodeBuilder{Package: utils.Dir.Basename(out), Name: name, OutDir: out}
-}
-
-func (this *CodeBuilder) parse(doc string) *CodeBuilder {
-	messagePattern := `(@Message\(").*?("\))`
-	messageRegexp := regexp.MustCompile(messagePattern)
-	if messageRegexp == nil {
-		log.Fatalln("regexp err")
-	}
-	messages := messageRegexp.FindAllStringSubmatch(doc, -1)
-	message := make([]string, 0)
-	for _, msg := range messages {
-		msg0 := strings.Replace(msg[0], "\n", "", -1)
-		msg0 = strings.Replace(msg0, `@Message("`, "", -1)
-		msg0 = strings.Replace(msg0, `")`, "", -1)
-		message = append(message, msg0)
-	}
-
-	codePattern := `(const\s+).*?(;)`
-	codeRegexp := regexp.MustCompile(codePattern)
-	if codeRegexp == nil {
-		log.Fatalln("regexp err")
-	}
-	codes := codeRegexp.FindAllStringSubmatch(doc, -1)
-	codd := make([]maputil.KeyValueDoc, 0)
-	for i, cod := range codes {
-		cod0 := strings.Replace(cod[0], "\n", "", -1)
-		cod0 = strings.Replace(cod0, `const `, "", -1)
-		cod0 = strings.Replace(cod0, `;`, "", -1)
-		codSplit := strings.Split(cod0, "=")
-		key := utils.String.CaseToCamel(strings.ToLower(strings.Trim(codSplit[0], "")))
-		value := strings.ToLower(strings.Trim(codSplit[1], ""))
-		codd = append(codd, *utils.Map.NewKeyValueDoc(key, value, message[i]))
-	}
-	this.KeyValueDocs = codd
-	return this
+	Arguments    *CodeArguments
 }
 
 func (this *CodeBuilder) generate() {
@@ -82,7 +41,7 @@ func (this *CodeBuilder) generate() {
 		utils.Dir.Open(this.OutDir).Create()
 		File := this.OutDir + utils.Dir.Separator() + this.File + ".go"
 		this.FuncName = "code" + this.File
-		if utils.File.Exist(File) {
+		if utils.File.Exist(File) && this.Arguments.Force != "yes" {
 			log.Println(File + " already existed")
 			return
 		}
@@ -176,43 +135,65 @@ func NewCode(args *CodeArguments) *Code {
 		c.Codes = append(c.Codes, newCode(args))
 	} else if args.Path != "" {
 		c.OutDir = args.Out
-		outfile := utils.File.Read(args.Path)
-		if !outfile.Exist() {
+		inputfile := utils.File.Read(args.Path)
+		if !inputfile.Exist() {
 			log.Fatalln(args.Path + " configure file or directory non-exist")
 		}
-		if outfile.IsDir() {
+		if inputfile.IsDir() {
 			files := utils.Dir.Open(args.Path).Suffix("yaml").Scan().Get()
 			for _, file := range files {
-				fileName := utils.Dir.Basename(file, ".yaml")
-				yamlFile, err := ioutil.ReadFile(file)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				yamlMap := make(map[interface{}]interface{})
-				err = yaml.Unmarshal(yamlFile, yamlMap)
-				if err != nil {
-					log.Fatalln(err)
-				}
-				codeBuilder := &CodeBuilder{
-					Package: args.Package,
-					Name:    args.Name,
-					File:    fileName,
-					OutDir:  args.Out,
-				}
-				for k, v := range yamlMap {
-					kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k.(string), "")))
-					codeBuilder.KeyValueDocs = append(codeBuilder.KeyValueDocs,
-						*maputil.NewKeyValueDoc(kk, v.(map[interface{}]interface{})["code"], v.(map[interface{}]interface{})["message"].(string)))
-				}
-				c.CodeBuilders = append(c.CodeBuilders, codeBuilder)
+				load(c, file, args)
 			}
 		} else {
-
+			load(c, args.Path, args)
 		}
 	} else {
-
+		log.Fatalln(" build parameter error")
 	}
 	return c
+}
+
+type KeyValueDoc struct {
+	Key   interface{}
+	Value interface{}
+	Doc   string
+	Iota  string
+}
+
+func load(c *Code, file string, args *CodeArguments) {
+	fileName := utils.Dir.Basename(file, ".yaml")
+	yamlFile, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	yamlMap := make(map[interface{}]interface{})
+	err = yaml.Unmarshal(yamlFile, yamlMap)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	codeBuilder := &CodeBuilder{
+		Package:   args.Package,
+		Name:      args.Name,
+		File:      fileName,
+		OutDir:    args.Out,
+		Arguments: args,
+	}
+	fmt.Println(yamlMap)
+	for k, v := range yamlMap {
+		kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k.(string), "")))
+		iota, ok := v.(map[interface{}]interface{})["iota"]
+		if !ok {
+			iota = "no"
+		}
+		code := utils.Convert.String(v.(map[interface{}]interface{})["code"])
+		codeBuilder.KeyValueDocs = append(codeBuilder.KeyValueDocs, KeyValueDoc{
+			Key:   kk,
+			Value: code,
+			Doc:   v.(map[interface{}]interface{})["message"].(string),
+			Iota:  iota.(string),
+		})
+	}
+	c.CodeBuilders = append(c.CodeBuilders, codeBuilder)
 }
 
 func newCode(args *CodeArguments) *Code {
@@ -245,7 +226,7 @@ func (this *Code) Generate() {
 		b.generate()
 		this.funcNames = append(this.funcNames, b.FuncName)
 	}
-	if len(this.funcNames) > 0 {
+	if this.Arguments.Auto == "yes" && len(this.funcNames) > 0 {
 		NewAutoload(this.funcNames, this.OutDir).generate()
 	}
 }
