@@ -166,7 +166,7 @@ func load(c *Code, file string, args *CodeArguments) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	yamlMap := make(map[interface{}]interface{})
+	yamlMap := make(map[string]interface{})
 	err = yaml.Unmarshal(yamlFile, yamlMap)
 	if err != nil {
 		log.Fatalln(err)
@@ -178,9 +178,10 @@ func load(c *Code, file string, args *CodeArguments) {
 		OutDir:    args.Out,
 		Arguments: args,
 	}
-	fmt.Println(yamlMap)
+	s := fmt.Sprintf("%s", yamlMap)
+	fmt.Println(s)
 	for k, v := range yamlMap {
-		kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k.(string), "")))
+		kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k, "")))
 		iota, ok := v.(map[interface{}]interface{})["iota"]
 		if !ok {
 			iota = "no"
