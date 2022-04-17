@@ -12,7 +12,11 @@ func (this {{.Name}}) Message(variables ...interface{}) string {
 const (
 	{{- range $i,$v := .CodeMap}}
 	{{- if eq $i 0}}
-	{{$v.Key}} {{$.Name}} = iota + {{$.Iota}}  //{{$v.Doc}}
+	{{- if eq $.Iota "yes"}}
+	{{$v.Key}} {{$.Name}} = iota + {{$.Code}}  //{{$v.Doc}}
+	{{- else}}
+	{{$v.Key}} {{$.Name}} = {{$.Code}}  //{{$v.Doc}}
+	{{- end}}
 	{{- else}}
 	{{$v.Key}}  //{{$v.Doc}}
 	{{- end}}

@@ -1,16 +1,15 @@
 package templates
 
+import "C"
 import (
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates/tpls"
 	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/maputil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
 	"log"
 	"os"
-	"path"
 	"regexp"
 	"strings"
 )
@@ -33,10 +32,12 @@ type Code struct {
 	File      string
 	Doc       string
 	RealName  string
+	Code      string
 	Iota      string
 	LenMap    int
 	CodeMap   []*CodeMap
 	Codes     []*Code
+	Arguments CodeArguments
 }
 
 type CodeBuilder struct {
@@ -155,6 +156,7 @@ var (
 
 type CodeArguments struct {
 	Package string
+	Doc     string
 	Name    string
 	Out     string
 	Auto    string
@@ -167,104 +169,75 @@ type CodeArguments struct {
 }
 
 // go run test\bin\main.go -gen=code -name="test\bin\yaml" -out=test\app\Codes -auto=yes -force=yes -extends=CodeErrorCode
+// go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -const=success -code=200 -message=成功
 func NewCode(args *CodeArguments) *Code {
-	reg := regexp.MustCompile(codeRegexpStr)
-	if reg == nil {
-		log.Fatalln("code regexp err")
+	c := &Code{}
+	if args.Const != "" && args.Code != "" && args.Message != "" {
+		c.Codes = append(c.Codes, newCode(args))
+	} else if args.Path == "" {
+
 	}
-	C := &Code{}
-	if fs := reg.FindString(args.Name); fs != "" {
-		C.Codes = append(C.Codes, newCode(args))
-	} else {
-		outfile := utils.File.Read(args.Name)
-		if !outfile.Exist() {
-			log.Fatalln(args.Name + " configure file non-exist")
-		}
-		if outfile.IsDir() {
-			files := utils.Dir.Open(args.Name).Scan().Get()
-			for _, filePath := range files {
-				suffix := path.Ext(filePath)
-				if ".md" == suffix {
-					outfile := utils.File.Read(filePath)
-					outfile.ForEach(func(line int, b []byte) {
-						log.Println(string(b))
-					})
-					log.Fatalln(outfile)
-					fileContext := string(utils.File.Read(filePath).ReadAll())
-					build := NewCodeBuilder(args.Name, args.Out).parse(fileContext)
-					build.generate()
-					funcNames = append(funcNames, build.FuncName)
-				} else if ".yaml" == suffix {
-					//funcNames = append(funcNames, build.FuncName)
-				}
-			}
-			if args.Auto == "yes" && len(funcNames) > 0 {
-				NewAutoload(funcNames, args.Out).generate()
-			}
-		} else {
-			err := outfile.ForEach(func(line int, b []byte) {
-				s := string(b)
-				s = strings.Replace(s, "\\", "", -1)
-				s = strings.Trim(s, "\n")
-				s = strings.Trim(s, "\r")
-				s = strings.Trim(s, "")
-				if "" != s {
-					args.Name = s
-					C.Codes = append(C.Codes, newCode(args))
-				}
-			})
-			if err != nil {
-				log.Fatalln(err)
-			}
-		}
-	}
-	return C
+
+	//C := &Code{}
+	//if fs := reg.FindString(args.Name); fs != "" {
+	//	C.Codes = append(C.Codes, newCode(args))
+	//} else {
+	//	outfile := utils.File.Read(args.Name)
+	//	if !outfile.Exist() {
+	//		log.Fatalln(args.Name + " configure file non-exist")
+	//	}
+	//	if outfile.IsDir() {
+	//		files := utils.Dir.Open(args.Name).Scan().Get()
+	//		for _, filePath := range files {
+	//			suffix := path.Ext(filePath)
+	//			if ".md" == suffix {
+	//				fileContext := string(utils.File.Read(filePath).ReadAll())
+	//				build := NewCodeBuilder(args.Name, args.Out).parse(fileContext)
+	//				build.generate()
+	//				funcNames = append(funcNames, build.FuncName)
+	//			} else if ".yaml" == suffix {
+	//				//funcNames = append(funcNames, build.FuncName)
+	//			}
+	//		}
+	//		if args.Auto == "yes" && len(funcNames) > 0 {
+	//			NewAutoload(funcNames, args.Out).generate()
+	//		}
+	//	} else {
+	//		err := outfile.ForEach(func(line int, b []byte) {
+	//			s := string(b)
+	//			s = strings.Replace(s, "\\", "", -1)
+	//			s = strings.Trim(s, "\n")
+	//			s = strings.Trim(s, "\r")
+	//			s = strings.Trim(s, "")
+	//			if "" != s {
+	//				args.Name = s
+	//				C.Codes = append(C.Codes, newCode(args))
+	//			}
+	//		})
+	//		if err != nil {
+	//			log.Fatalln(err)
+	//		}
+	//	}
+	//}
+	return c
 }
 
 func newCode(args *CodeArguments) *Code {
-	reg := regexp.MustCompile(codeRegexpStr)
-	if reg == nil {
-		log.Fatalln("regexp err")
+	c := &Code{
+		Package:   args.Package,
+		Doc:       args.Doc,
+		Name:      args.Name,
+		Code:      args.Code,
+		Iota:      args.Iota,
+		CodeMap:   make([]*CodeMap, 0),
+		OutDir:    args.Out,
+		OutStruct: args.Out + utils.Dir.Separator() + args.Name,
+		RealName:  args.Name,
+		File:      args.Out + utils.Dir.Separator() + args.Name + ".go",
+		Arguments: *args,
 	}
-	name := strings.Replace(args.Name, "\\", "", -1)
-	name = strings.Trim(name, "\n")
-	name = strings.Trim(name, "\r")
-	name = strings.Trim(name, "")
-	C := &Code{}
-	if fs := reg.FindString(name); fs != "" {
-		name = strings.Trim(fs, "")
-		name = strings.Trim(name, "-c=")
-		codeName := strings.Split(name, "-i=")
-		structName := codeName[0]
-		flags := strings.Split(codeName[1], "-f=")
-		if len(flags) != 2 {
-			log.Fatalln("name err")
-		}
-		C.Iota = strings.Trim(flags[0], "")
-		docs := strings.Split(flags[1], ":")
-		doc := strings.Trim(docs[0], "")
-		C.Doc = doc
-		es := strings.Split(docs[1], ",")
-		for _, v := range es {
-			em := strings.Split(v, "-")
-			k := strings.Trim(em[0], "")
-			v := strings.Trim(C.Iota, "")
-			d := strings.Trim(strings.Trim(strings.Trim(em[1], "\n"), "\r"), "")
-			C.CodeMap = append(C.CodeMap, NewCodeMap(k, v, d))
-		}
-		C.LenMap = len(C.CodeMap) - 1
-		name = stringutil.Ucfirst(stringutil.CaseToCamel(structName))
-		C.Name = code + name
-		C.RealName = name
-		C.OutDir = args.Out
-		C.OutStruct = C.OutDir + dirutil.PathSeparator() + code + strings.Trim(name, code)
-		C.File = C.OutDir + dirutil.PathSeparator() + C.RealName + ".go"
-		C.Package = args.Package
-		return C
-	} else {
-		log.Fatalln(`name format error: ` + name)
-	}
-	return C
+	c.CodeMap = append(c.CodeMap, NewCodeMap(args.Const, args.Code, args.Message))
+	return c
 }
 
 func (this *Code) Template(tplfile string) *tpls.Tpl {
@@ -278,8 +251,8 @@ func (this *Code) Generate() {
 }
 
 func (this *Code) generate() {
-	dirutil.Dir(this.OutDir).Create()
-	if fileutil.FileExist(this.File) {
+	utils.Dir.Open(this.OutDir).Create()
+	if utils.File.Exist(this.File) && this.Arguments.Force != "yes" {
 		log.Println(this.File + " already existed")
 		return
 	}

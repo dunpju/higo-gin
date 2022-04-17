@@ -155,6 +155,7 @@ success:
 		Const:   this.Const,
 		Code:    this.Code,
 		Message: this.Message,
+		Iota:    this.Iota,
 	}
 	templates.NewCode(codeArguments).Generate()
 }
