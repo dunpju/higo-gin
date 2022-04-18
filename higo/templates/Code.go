@@ -7,9 +7,9 @@ import (
 	"github.com/dengpju/higo-utils/utils/fileutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -128,6 +128,7 @@ type Code struct {
 }
 
 // go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -path=test\bin\yaml
+// go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -path=test\bin\yaml\400.yaml
 // go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -const=success -code=200 -message=成功 -iota=yes
 func NewCode(args *CodeArguments) *Code {
 	c := &Code{}
@@ -162,12 +163,23 @@ type KeyValueDoc struct {
 
 func load(c *Code, file string, args *CodeArguments) {
 	fileName := utils.Dir.Basename(file, ".yaml")
-	yamlFile, err := ioutil.ReadFile(file)
+	yamlFile := utils.File.Read(file)
+	keysort := make([]string, 0)
+	err := yamlFile.ForEach(func(line int, b []byte) {
+		ok, err := regexp.Match("^[a-zA-Z]", b)
+		if err != nil {
+			panic(err)
+		}
+		if ok {
+			keysort = append(keysort, strings.TrimRight(string(b), ":"))
+		}
+	})
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
+	yamlFile = utils.File.Read(file)
 	yamlMap := make(map[string]interface{})
-	err = yaml.Unmarshal(yamlFile, yamlMap)
+	err = yaml.Unmarshal(yamlFile.Bytes(), yamlMap)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -178,15 +190,17 @@ func load(c *Code, file string, args *CodeArguments) {
 		OutDir:    args.Out,
 		Arguments: args,
 	}
-	s := fmt.Sprintf("%s", yamlMap)
-	fmt.Println(s)
-	for k, v := range yamlMap {
+	for _, k := range keysort {
 		kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k, "")))
+		v := yamlMap[k]
 		iota, ok := v.(map[interface{}]interface{})["iota"]
 		if !ok {
 			iota = "no"
 		}
 		code := utils.Convert.String(v.(map[interface{}]interface{})["code"])
+		if code == "" {
+			iota = "no"
+		}
 		codeBuilder.KeyValueDocs = append(codeBuilder.KeyValueDocs, KeyValueDoc{
 			Key:   kk,
 			Value: code,
