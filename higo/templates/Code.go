@@ -193,19 +193,22 @@ func load(c *Code, file string, args *CodeArguments) {
 	}
 	for _, k := range keysort {
 		kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k, "")))
-		v := yamlMap[k]
-		iota, ok := v.(map[interface{}]interface{})["iota"]
+		v := yamlMap[k].(map[interface{}]interface{})
+		iota, ok := v["iota"]
 		if !ok {
 			iota = "no"
 		}
-		code := utils.Convert.String(v.(map[interface{}]interface{})["code"])
+		code, ok := v["code"]
+		if !ok {
+			code = ""
+		}
 		if code == "" {
 			iota = "no"
 		}
 		codeBuilder.KeyValueDocs = append(codeBuilder.KeyValueDocs, KeyValueDoc{
 			Key:   kk,
 			Value: code,
-			Doc:   v.(map[interface{}]interface{})["message"].(string),
+			Doc:   v["message"].(string),
 			Iota:  iota.(string),
 		})
 	}
