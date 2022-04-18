@@ -132,6 +132,7 @@ type Code struct {
 // go run test\bin\main.go -gen=code -name=CodeErrorCode -out=test\app\Codes -auto=yes -force=yes -const=success -code=200 -message=成功 -iota=yes
 func NewCode(args *CodeArguments) *Code {
 	c := &Code{}
+	c.Arguments = *args
 	if args.Const != "" && args.Code != "" && args.Message != "" {
 		c.Codes = append(c.Codes, newCode(args))
 	} else if args.Path != "" {
