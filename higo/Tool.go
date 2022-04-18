@@ -115,10 +115,7 @@ func (this *Tool) enum() {
 func (this *Tool) code() {
 	if this.Name == "" {
 		log.Fatalln(`code struct name unable empty
-    eg: -name=CodeErrorCode
-    eg: -name="bin\200.yaml"
-    eg: -name="bin\yaml" a directory
-    eg: -name="-c=token -i=400001 -f=token码:token_empty-token为空"`)
+    eg: -name=CodeErrorCode`)
 	}
 	if this.Out == "" {
 		log.Fatalln(`output directory unable empty 
