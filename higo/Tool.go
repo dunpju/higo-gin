@@ -124,8 +124,7 @@ func (this *Tool) code() {
 	if this.Path == "" {
 		if this.Const == "" && this.Code == "" && this.Message == "" {
 			log.Fatalln(`a configuration file of code path unable empty or code const unable empty
-    eg: -const=success
-    eg: bin\200.yaml a file Or bin\yaml a directory of yaml file
+    eg: -path=bin\200.yaml a file Or bin\yaml a directory of yaml file
     yaml file format
 success:
   code: 200
