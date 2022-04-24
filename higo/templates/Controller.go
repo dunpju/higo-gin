@@ -65,7 +65,7 @@ func (this *Controller) Generate() {
 		panic(err)
 	}
 	//bean route
-	_, mainfile, _, _ := runtime.Caller(3)
+	_, mainfile, _, _ := runtime.Caller(4)
 	app := strings.Trim(mainfile, "main.go") + ".." + dirutil.PathSeparator() + "app"
 	beansGofile := app + dirutil.PathSeparator() + "Beans" + dirutil.PathSeparator() + "Bean.go"
 	utifile := fileutil.File{Name: beansGofile}
