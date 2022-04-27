@@ -46,6 +46,14 @@ type Verify struct {
 	VerifyRules    map[string]*VerifyRules //规则map
 }
 
+func (this *Verify) Use(validate IValidate) *Verify {
+	v := validate.RegisterValidator()
+	for tag, r := range v.VerifyRules {
+		this.VerifyRules[tag] = r
+	}
+	return this
+}
+
 //自定义tag
 func (this *Verify) Tag(tag string, rules ...*VerifyRule) *Verify {
 	if tag != "" && len(rules) > 0 {
