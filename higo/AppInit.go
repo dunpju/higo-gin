@@ -47,7 +47,7 @@ func init() {
 	initOnce.Do(func() {
 		serves = make([]*Serve, 0)
 		container = make(Dependency)
-		RouterContainer = make(RouterCollect)
+		RouterContainer = NewRouterCollect()
 		taskList = make(chan *TaskExecutor)
 		taskCron = cron.New(cron.WithSeconds())
 		onlySupportServe = router.NewUniqueString()

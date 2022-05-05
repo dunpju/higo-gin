@@ -120,7 +120,7 @@ func (this *DutyUser) RegisterValidator() *higo.Verify {
 			higo.Rule("min=4", func() higo.ValidatorToFunc {
 				return func(fl validator.FieldLevel) (bool, code.ICode) {
 					fmt.Println("DemoController:123", fl.Field().Interface())
-					return true, MinError
+					return false, MinError
 				}
 			}()),
 		higo.Rule("required", PasswordError),

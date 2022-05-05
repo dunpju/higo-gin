@@ -8,15 +8,16 @@ import (
 	"log"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 var (
 	Validator       *validator.Validate
-	VerifyContainer map[string]*Verify
+	VerifyContainer *sync.Map
 )
 
 func init() {
-	VerifyContainer = make(map[string]*Verify)
+	VerifyContainer = &sync.Map{}
 	//初始化校验引擎
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		Validator = v
@@ -87,7 +88,7 @@ func RegisterValidator(validate IValidate) *Verify {
 	v := reflect.ValueOf(validate)
 	verify := NewVerify()
 	verify.Verifier = validate
-	VerifyContainer[v.Type().String()] = verify
+	VerifyContainer.Store(v.Type().String(), verify)
 	return verify
 }
 

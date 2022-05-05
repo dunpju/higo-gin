@@ -9,17 +9,24 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 //路由容器
-var RouterContainer RouterCollect
+var RouterContainer *RouterCollect
 
-type RouterCollect map[string]*router.Route
+type RouterCollect struct {
+	value *sync.Map
+}
+
+func NewRouterCollect() *RouterCollect {
+	return &RouterCollect{value: &sync.Map{}}
+}
 
 // 添加路由容器
-func (this RouterCollect) Add(unique string, route *router.Route) *RouterCollect {
-	this[unique] = route
-	return &this
+func (this *RouterCollect) Add(unique string, route *router.Route) *RouterCollect {
+	this.value.Store(unique, route)
+	return this
 }
 
 // 所有路由
@@ -38,11 +45,11 @@ func (this RouterCollect) Unique(method, absolutePath string) string {
 
 // 获取路由
 func (this RouterCollect) Get(method, relativePath string) *router.Route {
-	route, ok := this[Unique(method, relativePath)]
+	route, ok := this.value.Load(Unique(method, relativePath))
 	if !ok {
 		exception.Throw(exception.Message(relativePath+" Undefined route"), exception.Code(0))
 	}
-	return route
+	return route.(*router.Route)
 }
 
 //添加路由

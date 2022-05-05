@@ -265,11 +265,12 @@ func (this *Higo) Boot() {
 	//执行tool命令
 	NewTool().Cmd()
 	//自动注册校验
-	for _, verify := range VerifyContainer {
-		for tag, rules := range verify.VerifyRules {
+	VerifyContainer.Range(func(key, verify interface{}) bool {
+		for tag, rules := range verify.(*Verify).VerifyRules {
 			RegisterValidation(tag, rules.ToFunc())
 		}
-	}
+		return true
+	})
 	//启动服务
 	for _, ser := range serves {
 		//初始化
