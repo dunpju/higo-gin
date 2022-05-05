@@ -37,26 +37,28 @@ func Verifier() *Verify {
 }
 
 func NewVerify() *Verify {
-	return &Verify{Validator: Validator, VerifyRules: make(map[string]*VerifyRules)}
+	return &Verify{Validator: Validator, VerifyRules: &sync.Map{}}
 }
 
 type Verify struct {
 	Validator      *validator.Validate
 	VerifierStruct interface{}
-	Verifier       IValidate               //校验者
-	VerifyRules    map[string]*VerifyRules //规则map
+	Verifier       IValidate //校验者
+	VerifyRules    *sync.Map //规则map map[string]*VerifyRules
 }
 
 func (this *Verify) Use(validate IValidate, validates ...IValidate) *Verify {
 	v := validate.RegisterValidator()
-	for tag, r := range v.VerifyRules {
-		this.VerifyRules[tag] = r
-	}
+	v.VerifyRules.Range(func(tag, r interface{}) bool {
+		this.VerifyRules.Store(tag, r)
+		return true
+	})
 	for _, validate := range validates {
 		v := validate.RegisterValidator()
-		for tag, r := range v.VerifyRules {
-			this.VerifyRules[tag] = r
-		}
+		v.VerifyRules.Range(func(tag, r interface{}) bool {
+			this.VerifyRules.Store(tag, r)
+			return true
+		})
 	}
 	return this
 }
@@ -64,7 +66,7 @@ func (this *Verify) Use(validate IValidate, validates ...IValidate) *Verify {
 //自定义tag
 func (this *Verify) Tag(tag string, rules ...*VerifyRule) *Verify {
 	if tag != "" && len(rules) > 0 {
-		this.VerifyRules[tag] = NewVerifyRules(rules...)
+		this.VerifyRules.Store(tag, NewVerifyRules(rules...))
 	}
 	return this
 }
@@ -104,9 +106,10 @@ func RegisterValidation(tag string, fn validator.Func) {
 func Validate(validate IValidate) *Verify {
 	verify := validate.RegisterValidator()
 	verify.Verifier = validate
-	for tag, va := range verify.VerifyRules {
-		RegisterValidation(tag, va.ToFunc())
-	}
+	verify.VerifyRules.Range(func(tag, va interface{}) bool {
+		RegisterValidation(tag.(string), va.(*VerifyRules).ToFunc())
+		return true
+	})
 	verify.VerifierStruct = validate
 	return verify
 }
@@ -126,13 +129,13 @@ type VerifyRule struct {
 }
 
 func NewVerifyRules(rules ...*VerifyRule) *VerifyRules {
-	vr := &VerifyRules{message: make(map[string]interface{}), Rules: rules}
+	vr := &VerifyRules{message: &sync.Map{}, Rules: rules}
 	return vr.setRule()
 }
 
 type VerifyRules struct {
 	rule    string
-	message map[string]interface{}
+	message *sync.Map //map[string]interface{}
 	fl      validator.FieldLevel
 	Rules   []*VerifyRule
 }
@@ -144,9 +147,9 @@ func (this *VerifyRules) setRule() *VerifyRules {
 		rules = append(rules, vrs.Rule)
 		key := strings.Split(vrs.Rule, "=")
 		if len(key) > 1 {
-			this.message[key[0]] = vrs.Code
+			this.message.Store(key[0], vrs.Code)
 		} else {
-			this.message[vrs.Rule] = vrs.Code
+			this.message.Store(vrs.Rule, vrs.Code)
 		}
 	}
 	this.rule = strings.Join(rules, ",")
@@ -199,17 +202,24 @@ func (this *VerifyRules) ToFunc() validator.Func {
 			this.throw(fl, v)
 			return true
 		}
+		msgThrowOk := false // 默认校验不通过
+		var vtf interface{}
 		//未匹配到类型
-		for _, msg := range this.message {
+		this.message.Range(func(key, msg interface{}) bool {
 			if fn, ok := msg.(ValidatorToFunc); ok {
-				boo, v := fn(fl) //自定义函数校验
+				boo, v := fn(fl) // 自定义函数校验
+				msgThrowOk = boo
 				if !boo {
-					this.throw(fl, v)
-					return boo
+					vtf = v
+					return false // 结束循环
 				}
 			}
+			return true // 继续循环
+		})
+		if !msgThrowOk && vtf != nil {
+			this.throw(fl, vtf)
 		}
-		return false
+		return msgThrowOk
 	}
 }
 
@@ -221,7 +231,7 @@ func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
 	if err := Validator.Var(v, this.rule); err != nil {
 		estring := strings.Split(err.Error(), "failed on the '")
 		rule := strings.Split(estring[1], "' tag")
-		if msg, ok := this.message[rule[0]]; ok {
+		if msg, ok := this.message.Load(rule[0]); ok {
 			if co, ok := msg.(code.ICode); ok {
 				panic(NewValidateError(co))
 			} else if fn, ok := msg.(ValidatorToFunc); ok {
@@ -241,7 +251,7 @@ func (this *VerifyRules) Throw(rule string) {
 	if len(keys) > 1 {
 		rule = keys[0]
 	}
-	if msg, ok := this.message[rule]; ok {
+	if msg, ok := this.message.Load(rule); ok {
 		if m, ok := msg.(code.ICode); ok {
 			panic(NewValidateError(m))
 		} else if fn, ok := msg.(ValidatorToFunc); ok {

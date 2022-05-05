@@ -22,7 +22,7 @@ type DemoController struct {
 	DemoService *Services.DemoService `inject:"MyBean.DemoService()"`
 	//*higo.Orm   `inject:"Bean.NewOrm()"`
 	//*redis.Pool `inject:"Bean.NewRedisPool()"`
-	Name        string
+	Name string
 }
 
 func NewDemoController() *DemoController {
@@ -90,6 +90,7 @@ const (
 	MobileEmpty   ErrorCode = iota + 400001 //mobile错误
 	PasswordError                           //password错误
 	UseridsError                            //user_ids错误
+	UserError                               //user错误
 	MinError                                //不能小于4位
 )
 
@@ -98,6 +99,7 @@ func code400001() {
 		Put(MobileEmpty, "mobile错误").
 		Put(PasswordError, "password错误").
 		Put(UseridsError, "user_ids错误").
+		Put(UserError, "user错误").
 		Put(MinError, "不能小于4位")
 }
 
@@ -106,6 +108,11 @@ type DutyUser struct {
 	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
 	EducationClassId int64   `json:"education_class_id" binding:"password"`
 	UserIds          []int64 `json:"user_ids" binding:"user_ids"`
+	User             User    `json:"user"`
+}
+
+type User struct {
+	Name string `json:"name" binding:"user.name"`
 }
 
 func NewDutyUser() *DutyUser {
@@ -120,13 +127,15 @@ func (this *DutyUser) RegisterValidator() *higo.Verify {
 			higo.Rule("min=4", func() higo.ValidatorToFunc {
 				return func(fl validator.FieldLevel) (bool, code.ICode) {
 					fmt.Println("DemoController:123", fl.Field().Interface())
-					return false, MinError
+					return true, MinError
 				}
 			}()),
-		higo.Rule("required", PasswordError),
+			higo.Rule("required", PasswordError),
 		).
 		Tag("user_ids",
-			higo.Rule("required", UseridsError))
+			higo.Rule("required", UseridsError)).
+		Tag("user.name",
+			higo.Rule("required", UserError))
 }
 
 // 测试校验
