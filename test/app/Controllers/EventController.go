@@ -38,7 +38,6 @@ func (this *EventController) Test1() string {
 }
 
 func (this *EventController) Test2() interface{} {
-	fmt.Println(len(higo.Request))
 	fmt.Println(runtimeutil.GoroutineID())
 	ctx := request.Context()
 	tt := ctx.Query("tt")
@@ -46,7 +45,7 @@ func (this *EventController) Test2() interface{} {
 }
 var i = 0
 func (this *EventController) Test3() {
-	fmt.Println("请求数量", len(higo.Request))
+	fmt.Println("请求数量")
 	if runtimeutil.GoroutineID()%2 == 0 {
 		fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), "休眠")
 		time.Sleep(2 * time.Second)
@@ -67,7 +66,6 @@ func (this *EventController) Test3() {
 }
 
 func Test4() {
-	fmt.Println(len(higo.Request))
 	ctx := request.Context()
 	fmt.Println(runtimeutil.GoroutineID())
 	tt := ctx.Query("tt")

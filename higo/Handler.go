@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"fmt"
 	"github.com/dengpju/higo-utils/utils/runtimeutil"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -14,25 +15,31 @@ var (
 
 func init() {
 	onceRequest.Do(func() {
-		Request = make(Req)
+		Request = Req{value: &sync.Map{}}
 	})
 }
 
-type Req map[uint64]*gin.Context
+type Req struct {
+	value *sync.Map
+}
 
 func (this Req) Context() *gin.Context {
 	goid := runtimeutil.GoroutineID()
-	return this[goid]
+	v, ok := this.value.Load(goid)
+	if ok {
+		return v.(*gin.Context)
+	}
+	panic(fmt.Errorf("goroutine id %d gin context empty", goid))
 }
 
 func (this Req) Set(ctx *gin.Context) {
 	goid := runtimeutil.GoroutineID()
-	this[goid] = ctx
+	this.value.Store(goid, ctx)
 }
 
 func (this Req) Remove() {
 	goid := runtimeutil.GoroutineID()
-	delete(this, goid)
+	this.value.Delete(goid)
 }
 
 func handleConvert(handler interface{}) interface{} {
