@@ -216,7 +216,11 @@ func (this *Orm) Transaction(fn func() error) {
 		defer func() {
 			if r := recover(); r != nil {
 				tx.Rollback()
-				err = r.(error)
+				if er, ok := r.(error); ok {
+					err = er
+				} else {
+					panic(r)
+				}
 				return
 			}
 		}()
