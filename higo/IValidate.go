@@ -66,7 +66,7 @@ func (this *Verify) Use(validate IValidate, validates ...IValidate) *Verify {
 //自定义tag
 func (this *Verify) Tag(tag string, rules ...*VerifyRule) *Verify {
 	if tag != "" && len(rules) > 0 {
-		this.VerifyRules.Store(tag, NewVerifyRules(rules...))
+		this.VerifyRules.Store(tag, NewRuleGroup(tag, rules...))
 	}
 	return this
 }
@@ -107,7 +107,7 @@ func Validate(validate IValidate) *Verify {
 	verify := validate.RegisterValidator()
 	verify.Verifier = validate
 	verify.VerifyRules.Range(func(tag, va interface{}) bool {
-		RegisterValidation(tag.(string), va.(*VerifyRules).ToFunc())
+		RegisterValidation(tag.(string), va.(*RuleGroup).ToFunc())
 		return true
 	})
 	verify.VerifierStruct = validate
@@ -123,17 +123,23 @@ func Rule(rule string, cod interface{}) *VerifyRule {
 	return &VerifyRule{Rule: rule, Code: cod}
 }
 
+func RuleFunc(rule string, cod ValidatorToFunc) *VerifyRule {
+	return &VerifyRule{Rule: rule, Code: cod}
+}
+
 type VerifyRule struct {
 	Rule string
 	Code interface{}
 }
 
-func NewVerifyRules(rules ...*VerifyRule) *VerifyRules {
-	vr := &VerifyRules{message: &sync.Map{}, Rules: rules}
-	return vr.setRule()
+func NewRuleGroup(tag string, rules ...*VerifyRule) *RuleGroup {
+	rg := &RuleGroup{tag: tag, message: &sync.Map{}, Rules: rules}
+	return rg.setRule()
 }
 
-type VerifyRules struct {
+// 规则组
+type RuleGroup struct {
+	tag     string
 	rule    string
 	message *sync.Map //map[string]interface{}
 	fl      validator.FieldLevel
@@ -141,7 +147,7 @@ type VerifyRules struct {
 }
 
 //设置规则
-func (this *VerifyRules) setRule() *VerifyRules {
+func (this *RuleGroup) setRule() *RuleGroup {
 	rules := make([]string, 0)
 	for _, vrs := range this.Rules {
 		rules = append(rules, vrs.Rule)
@@ -152,92 +158,57 @@ func (this *VerifyRules) setRule() *VerifyRules {
 			this.message.Store(vrs.Rule, vrs.Code)
 		}
 	}
+	// 转换 required,min=4
 	this.rule = strings.Join(rules, ",")
 	return this
 }
 
-func (this *VerifyRules) Rule() string {
+func (this *RuleGroup) Rule() string {
 	return this.rule
 }
 
-type ValidatorToFunc func(fl validator.FieldLevel) (bool, code.ICode)
+type ValidatorToFunc func(fieldLevel validator.FieldLevel) (bool, code.ICode)
 
-func (this *VerifyRules) ToFunc() validator.Func {
+// 自定义规则校验顺序优先与gin原始binging tag `json:"xxx" binding:"required"`
+// 自定义tag转换Func
+func (this *RuleGroup) ToFunc() validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		this.fl = fl
-		if v, ok := fl.Field().Interface().(string); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().([]string); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().(int64); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().([]int64); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().(uint64); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().([]uint64); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().(int); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().([]int); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().(float32); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().([]float32); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().(float64); ok {
-			this.throw(fl, v)
-			return true
-		} else if v, ok := fl.Field().Interface().([]float64); ok {
-			this.throw(fl, v)
-			return true
-		}
-		msgThrowOk := false // 默认校验不通过
-		var vtf interface{}
-		//未匹配到类型
-		this.message.Range(func(key, msg interface{}) bool {
-			if fn, ok := msg.(ValidatorToFunc); ok {
-				boo, v := fn(fl) // 自定义函数校验
-				msgThrowOk = boo
-				if !boo {
-					vtf = v
-					return false // 结束循环
+		// 遍历规则
+		for _, rule := range this.Rules {
+			if customValidFunc, ok := rule.Code.(ValidatorToFunc); ok {
+				b, c := customValidFunc(fl)
+				if !b {
+					this.valid(rule.Rule, fl, c)
 				}
+			} else {
+				this.valid(rule.Rule, fl, fl.Field().Interface())
 			}
-			return true // 继续循环
-		})
-		if !msgThrowOk && vtf != nil {
-			this.throw(fl, vtf)
 		}
-		return msgThrowOk
+		return true
 	}
 }
 
-//抛异常
-func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
+// 校验值
+func (this *RuleGroup) valid(rule string, fl validator.FieldLevel, v interface{}) {
 	if msg, ok := v.(code.ICode); ok {
 		panic(NewValidateError(msg))
 	}
 	if err := Validator.Var(v, this.rule); err != nil {
-		estring := strings.Split(err.Error(), "failed on the '")
-		rule := strings.Split(estring[1], "' tag")
-		if msg, ok := this.message.Load(rule[0]); ok {
+		key := strings.Split(rule, "=")
+		if len(key) > 1 {
+			rule = key[0]
+		}
+		log.Println(this.tag)
+		log.Println(rule)
+		log.Println(this.rule, fl.GetTag(), v, err.Error())
+		if msg, ok := this.message.Load(rule); ok {
 			if co, ok := msg.(code.ICode); ok {
 				panic(NewValidateError(co))
 			} else if fn, ok := msg.(ValidatorToFunc); ok {
 				boo, v := fn(fl) //自定义函数校验
 				if !boo {
-					this.throw(fl, v)
+					this.valid(rule, fl, v)
 				}
 				return
 			}
@@ -246,7 +217,8 @@ func (this *VerifyRules) throw(fl validator.FieldLevel, v interface{}) {
 	}
 }
 
-func (this *VerifyRules) Throw(rule string) {
+//抛异常
+func (this *RuleGroup) Throw(rule string) {
 	keys := strings.Split(rule, "=")
 	if len(keys) > 1 {
 		rule = keys[0]
@@ -257,7 +229,7 @@ func (this *VerifyRules) Throw(rule string) {
 		} else if fn, ok := msg.(ValidatorToFunc); ok {
 			boo, v := fn(this.fl) //自定义函数校验
 			if !boo {
-				this.throw(this.fl, v)
+				this.valid(rule, this.fl, v)
 			}
 		}
 	}

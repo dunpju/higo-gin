@@ -267,7 +267,7 @@ func (this *Higo) Boot() {
 	//自动注册校验
 	VerifyContainer.Range(func(key, verify interface{}) bool {
 		verify.(*Verify).VerifyRules.Range(func(tag, rules interface{}) bool {
-			RegisterValidation(tag.(string), rules.(*VerifyRules).ToFunc())
+			RegisterValidation(tag.(string), rules.(*RuleGroup).ToFunc())
 			return true
 		})
 		return true

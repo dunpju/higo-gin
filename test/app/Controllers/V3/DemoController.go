@@ -90,7 +90,7 @@ const (
 	MobileEmpty   ErrorCode = iota + 400001 //mobile错误
 	PasswordError                           //password错误
 	UseridsError                            //user_ids错误
-	UserError                               //user错误
+	NameError                               //name错误
 	MinError                                //不能小于4位
 )
 
@@ -99,20 +99,20 @@ func code400001() {
 		Put(MobileEmpty, "mobile错误").
 		Put(PasswordError, "password错误").
 		Put(UseridsError, "user_ids错误").
-		Put(UserError, "user错误").
+		Put(NameError, "name错误").
 		Put(MinError, "不能小于4位")
 }
 
 //测试验证器
 type DutyUser struct {
 	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
-	EducationClassId int64   `json:"education_class_id" binding:"password"`
+	EducationClassId int64   `json:"education_class_id" binding:"required"`
 	UserIds          []int64 `json:"user_ids" binding:"user_ids"`
 	User             User    `json:"user"`
 }
 
 type User struct {
-	Name string `json:"name" binding:"user.name"`
+	Name string `json:"name" binding:"name"`
 }
 
 func NewDutyUser() *DutyUser {
@@ -134,8 +134,11 @@ func (this *DutyUser) RegisterValidator() *higo.Verify {
 		).
 		Tag("user_ids",
 			higo.Rule("required", UseridsError)).
-		Tag("user.name",
-			higo.Rule("required", UserError))
+		Tag("name",
+			higo.RuleFunc("required", func(fl validator.FieldLevel) (b bool, iCode code.ICode) {
+				fmt.Println("DemoController:140", fl.Field().Interface())
+				return true, NameError
+			}))
 }
 
 // 测试校验
