@@ -30,7 +30,7 @@ func New(ctx *gin.Context) *{{.StructName}} {
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
 func (this *{{.StructName}}) RegisterValidator() *higo.Verify {
-	return higo.Verifier().
-		Tag("id",
-			higo.Rule("required", errcode.Id))
+	return higo.Verifier()
+	//	.Tag("id",
+	//		higo.Rule("required", Codes.Success))
 }
