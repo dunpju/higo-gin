@@ -29,10 +29,58 @@ func (this *{{.Name}}) Route(hg *higo.Higo) {
 	hg.Get("/relative5", this.Example5, hg.Flag("{{.Name}}.Example5"), hg.Desc("Example5"))
     //route group example
     hg.AddGroup("/group_prefix", func() {
-    	hg.Get("/relative6", this.Example6, hg.Flag("{{.Name}}.Example6"), hg.Desc("Example6"))
+        hg.Get("/relative6", this.Example6, hg.Flag("{{.Name}}.Example6"), hg.Desc("Example6"))
+    	hg.Get("/list", this.List, hg.Flag("{{.Name}}.List"), hg.Desc("List"))
+    	hg.Post("/add", this.Add, hg.Flag("{{.Name}}.Add"), hg.Desc("Add"))
+    	hg.Put("/edit", this.Edit, hg.Flag("{{.Name}}.Edit"), hg.Desc("Edit"))
+    	hg.Delete("/delete", this.Delete, hg.Flag("{{.Name}}.Delete"), hg.Desc("Delete"))
     })
     */
 }
+
+/**
+func (this *{{.Name}}) List() {
+    //TODO::example code
+	ctx := request.Context()
+	//get parameter
+    name := ctx.Query("name")
+    //responser
+    responser.SuccessJson("success", 10000, name)
+}
+*/
+
+/**
+func (this *{{.Name}}) Add() {
+    //TODO::example code
+	ctx := request.Context()
+	//get parameter
+    name := ctx.Query("name")
+    //responser
+    responser.SuccessJson("success", 10000, name)
+}
+*/
+
+/**
+func (this *{{.Name}}) Edit() {
+    //TODO::example code
+	ctx := request.Context()
+	//get parameter
+    name := ctx.Query("name")
+    //responser
+    responser.SuccessJson("success", 10000, name)
+}
+*/
+
+/**
+func (this *{{.Name}}) Delete() {
+    //TODO::example code
+	ctx := request.Context()
+	//get parameter
+    name := ctx.Query("name")
+    //responser
+    responser.SuccessJson("success", 10000, name)
+}
+*/
 
 /**
 func (this *{{.Name}}) Example1() {

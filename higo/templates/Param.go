@@ -10,6 +10,13 @@ import (
 	"os"
 )
 
+const (
+	List   = "List"
+	Add    = "Add"
+	Edit   = "Edit"
+	Delete = "Delete"
+)
+
 type Param struct {
 	Package    string
 	StructName string
@@ -30,11 +37,13 @@ func (this *Param) Template(tplfile string) *tpls.Tpl {
 }
 
 func (this *Param) Generate() {
-	if fileutil.FileExist(this.FileName) {
-		log.Fatalln(this.FileName + " already existed")
+	outFile := this.OutDir + dirutil.PathSeparator() + this.FileName
+	if fileutil.FileExist(outFile) {
+		log.Println(outFile + " already existed")
+		return
 	}
 	if _, err := os.Stat(this.OutDir); os.IsNotExist(err) {
-		if err = os.Mkdir(this.OutDir, os.ModePerm); err != nil {
+		if err = os.MkdirAll(this.OutDir, os.ModePerm); err != nil {
 			panic(err)
 		}
 	}

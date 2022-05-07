@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dengpju/higo-gin/higo/templates"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/stringutil"
 	"log"
@@ -20,6 +21,8 @@ const (
 	yes        templates.YesNo = "yes"
 	no         templates.YesNo = "no"
 )
+
+var capitalBeganReg = regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 
 type Tool struct {
 	Gen     string
@@ -95,8 +98,42 @@ func (this *Tool) controller() {
 		log.Fatalln(`output directory unable empty 
     eg: -out=app\Controllers`)
 	}
+loopParam:
+	isMatchCapitalBegan := ""
+	controllerTool := templates.NewControllerTool()
+	controllerTool.Name = this.Name
+	controllerTool.OutParamDir = this.Name
+	fmt.Print("Generate Param List/Add/Edit/Delete [yes|no] (default:yes):")
+	n, err := fmt.Scanln(&controllerTool.IsGenerateParam)
+	if nil != err && n > 0 {
+		panic(err)
+	}
+	if (yes != controllerTool.IsGenerateParam && no != controllerTool.IsGenerateParam) && n > 0 {
+		goto loopParam
+	}
+	fmt.Printf("Choice Generate Param: %s\n", controllerTool.IsGenerateParam)
+	if controllerTool.IsGenerateParam.Bool() { // 确认构建param
+		controllerTool.ParamTag = append(controllerTool.ParamTag, templates.List, templates.Add, templates.Edit, templates.Delete)
+		if capitalBeganReg == nil {
+			log.Fatalln("regexp err")
+		}
+		isMatchCapitalBegan = capitalBeganReg.FindString(controllerTool.Name)
+		if isMatchCapitalBegan != "" {
+			controllerTool.Name = stringutil.Ucfirst(controllerTool.Name)
+		}
+		outParamDir := utils.Dir.Dirname(this.Out) + `\` + "params"
+		fmt.Printf("Confirm Output Directory Of Param Default (%s)? Enter/Input: ", outParamDir)
+		controllerTool.OutParamDir = outParamDir
+		n, err = fmt.Scanln(&controllerTool.OutParamDir)
+		if nil != err && n > 0 {
+			panic(err)
+		}
+		fmt.Printf("Confirmed Output Directory Of Param: %s\n", controllerTool.OutParamDir)
+	}
+	fmt.Print("Start Generate ......\n")
 	this.Package = dirutil.Basename(this.Out)
 	templates.NewController(this.Package, this.Name, this.Out).Generate()
+	controllerTool.Generate()
 }
 
 func (this *Tool) enum() {
@@ -115,7 +152,7 @@ func (this *Tool) enum() {
 func (this *Tool) code() {
 	if this.Name == "" {
 		log.Fatalln(`code struct name unable empty
-    eg: -name=CodeErrorCode`)
+    eg: -name=ErrorCode`)
 	}
 	if this.Out == "" {
 		log.Fatalln(`output directory unable empty 
@@ -178,7 +215,6 @@ func (this *Tool) model() {
     eg: -out=app\Models`)
 	}
 loopDao:
-	capitalBeganReg := regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 	isMatchCapitalBegan := ""
 	modelTool := templates.NewModelTool()
 	modelTool.Name = this.Name
@@ -192,7 +228,7 @@ loopDao:
 		goto loopDao
 	}
 	fmt.Printf("Choice Generate Dao: %s\n", modelTool.IsGenerateDao)
-	if modelTool.IsGenerateDao.Bool() { //确认构建dao
+	if modelTool.IsGenerateDao.Bool() { // 确认构建dao
 		if capitalBeganReg == nil {
 			log.Fatalln("regexp err")
 		}
@@ -249,8 +285,7 @@ loopConfirmBeginGenerate:
 	if (yes != modelTool.ConfirmBeginGenerate) && n > 0 {
 		goto loopDao
 	}
-	fmt.Println(modelTool)
-	fmt.Print("Start Generate ......")
+	fmt.Print("Start Generate ......\n")
 	//连接数据库准备构建
 	db := newOrm().DB
 	if this.Name == "all" {

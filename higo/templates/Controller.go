@@ -20,6 +20,26 @@ import (
 	"sync"
 )
 
+type ControllerTool struct {
+	Name                 string   // Controller Struct Name
+	ParamTag             []string // List/Add/Edit/Delete
+	ConfirmBeginGenerate YesNo
+	IsGenerateParam      YesNo
+	OutParamDir          string
+}
+
+func NewControllerTool() *ControllerTool {
+	return &ControllerTool{ConfirmBeginGenerate: "yes", IsGenerateParam: "yes"}
+}
+
+func (this *ControllerTool) Generate() {
+	if this.IsGenerateParam.Bool() {
+		for _, tag := range this.ParamTag {
+			NewParam(this.Name+tag, this.OutParamDir).Generate()
+		}
+	}
+}
+
 type Controller struct {
 	Package   string
 	Name      string
@@ -48,7 +68,8 @@ func (this *Controller) Template(tplfile string) *tpls.Tpl {
 
 func (this *Controller) Generate() {
 	if fileutil.FileExist(this.File) {
-		log.Fatalln(this.File + " already existed")
+		log.Println(this.File + " already existed")
+		return
 	}
 	outFile := fileutil.NewFile(this.File, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0755)
 	if !outFile.Exist() {
