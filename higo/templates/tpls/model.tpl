@@ -31,12 +31,16 @@ func New(attrs ...higo.Property) *{{.StructName}} {
 	return impl
 }
 
+func TableName() string {
+	return "{{.TableName}}"
+}
+
 func (this *{{.StructName}}) New() higo.IClass {
 	return New()
 }
 
 func (this *{{.StructName}}) TableName() string {
-	return "{{.TableName}}"
+	return TableName()
 }
 
 func (this *{{.StructName}}) Alias(alias string) string {
