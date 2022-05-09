@@ -14,6 +14,7 @@ func New(ctx *gin.Context) *{{.StructName}} {
 	param := &{{.StructName}}{}
 	//higo.Validate(param).Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
 	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap() // get from the json
+	//higo.Validate(param).Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
 	return param
 }
 
