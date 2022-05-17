@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	hg *Higo
+	hg                     *Higo
 	SslOut, SslCrt, SslKey string // ssl
 	isLoadEnv              bool
 )
@@ -375,6 +375,14 @@ func (this *Higo) Static(relativePath, root string) *Higo {
 	// 添加路由容器
 	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
 	hg.Engine.Static(relativePath, root)
+	return this
+}
+
+// 静态目录
+func (this *Higo) StaticFS(relativePath string, fs http.FileSystem) *Higo {
+	// 添加路由容器
+	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
+	hg.Engine.StaticFS(relativePath, fs)
 	return this
 }
 
