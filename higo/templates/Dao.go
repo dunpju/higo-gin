@@ -51,7 +51,9 @@ const (
 )
 
 func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
-	packageName := model.HumpUnpreTableName + DaoDirSuffix
+	packageName := dirutil.Basename(modelTool.OutDaoDir)
+	daoStructName := model.HumpUnpreTableName + DaoDirSuffix
+	daoFileName := daoStructName
 	modName := GetModName() + dirutil.PathSeparator()
 	modelImport := `"` + modName + model.OutDir + `"`
 	modelImport = strings.ReplaceAll(modelImport, dirutil.PathSeparator(), "/")
@@ -63,7 +65,7 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 			"modelImport":  modelImport,
 			"entityImport": entityImport,
 		},
-		StructName:            DaoStructName,
+		StructName:            daoStructName,
 		ModelPackageName:      model.PackageName,
 		ModelName:             model.StructName,
 		EntityPackageName:     entity.PackageName,
@@ -80,8 +82,8 @@ func NewDao(modelTool ModelTool, model Model, entity Entity) *Dao {
 		HasDeleteTime:         model.HasDeleteTime,
 		EntityUpdateTimeField: entity.UpdateTimeField,
 		EntityDeleteTimeField: entity.DeleteTimeField,
-		OutDir:                modelTool.OutDaoDir + dirutil.PathSeparator() + packageName,
-		FileName:              DaoFileName,
+		OutDir:                modelTool.OutDaoDir,
+		FileName:              daoFileName,
 	}
 }
 

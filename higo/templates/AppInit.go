@@ -21,7 +21,8 @@ var (
 	moduleOnce  sync.Once
 )
 
-func init() {
+//获取模块名称
+func GetModName() string {
 	moduleOnce.Do(func() {
 		pwd, _ := os.Getwd()
 		gomodfile, err := os.Open(pwd + "/go.mod")
@@ -41,10 +42,6 @@ func init() {
 			}
 		}
 	})
-}
-
-//获取模块名称
-func GetModName() string {
 	return moduleName
 }
 

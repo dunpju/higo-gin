@@ -15,6 +15,8 @@ import (
 const (
 	controller                 = "controller"
 	model                      = "model"
+	dao                        = "dao"
+	entity                     = "entity"
 	enum                       = "enum"
 	codes                      = "code"
 	param                      = "param"
@@ -71,9 +73,12 @@ func (this *Tool) Cmd() {
 			this.model()
 		} else {
 			log.Fatalln(`gen Arguments Error! 
-Explain: Generate Controller Model Enum Code Dao Entity
+Explain: Generate Controller/Model/Enum/Code/Dao/Entity/Param
     --option[controller | model | enum | code | dao | entity | param]
-    eg:-gen=controller`)
+    eg:-gen=controller
+    Tips*: Dao and Entity with Model, It's a composite generate tool; 
+        They using AST parsing source files, the original code will not be affected; 
+        So perform model generate`)
 		}
 		os.Exit(1)
 	}

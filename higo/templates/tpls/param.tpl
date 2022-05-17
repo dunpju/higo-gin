@@ -10,7 +10,7 @@ type {{.StructName}} struct {
 	//Id    uint64 `json:"id" binding:"id"` // get from the json
 }
 
-func New(ctx *gin.Context) *{{.StructName}} {
+func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
 	param := &{{.StructName}}{}
 	//higo.Validate(param).Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
 	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap() // get from the json

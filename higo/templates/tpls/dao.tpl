@@ -15,7 +15,7 @@ type {{.StructName}} struct {
 	entity *{{.EntityPackageName}}.{{.EntityName}}
 }
 
-func New() *{{.StructName}} {
+func New{{.StructName}}() *{{.StructName}} {
 	return &{{.StructName}}{model: {{.ModelPackageName}}.New()}
 }
 
@@ -67,7 +67,7 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
 }
 
 //添加
-func (this *{{.StructName}}) Add() {{.PrimaryIdType}} {
+func (this *{{.StructName}}) Add() int64 {
 	higo.Result(this.model.Mapper(this.model.GetBuilder()).InsertGetId().Error).Unwrap()
 	return this.model.LastInsertId()
 }
@@ -99,7 +99,7 @@ func (this *{{.StructName}}) GetBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.Prim
 }
 
 //id集查询
-func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdType}}, fields ...string) []*{{.ModelPackageName}}.{{.ModelName}} {
+func (this *{{.StructName}}) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdType}}, fields ...string) []*{{.ModelPackageName}}.{{.ModelName}} {
 	if len(fields) == 0 {
 		fields = append(fields, "*")
 	}
@@ -116,7 +116,7 @@ func (this *Dao) GetBy{{.PrimaryId}}s({{.SmallHumpPrimaryId}}s []{{.PrimaryIdTyp
 }
 
 //硬删除
-func (this *Dao) DeleteBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
+func (this *{{.StructName}}) DeleteBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType}}) {
 	higo.Result(this.model.Mapper(sql.Delete(this.model.TableName()).
 		DeleteBuilder().
 		Where("`"+{{.ModelPackageName}}.{{.PrimaryId}}+"` = ?", {{.SmallHumpPrimaryId}}).
@@ -124,7 +124,7 @@ func (this *Dao) DeleteBy{{.PrimaryId}}({{.SmallHumpPrimaryId}} {{.PrimaryIdType
 }
 
 //列表
-func (this *Dao) List(perPage, page uint64, where map[string]interface{}, fields ...string) *higo.Pager {
+func (this *{{.StructName}}) List(perPage, page uint64, where map[string]interface{}, fields ...string) *higo.Pager {
 	models := this.Models()
 	pager := higo.NewPager(perPage, page)
 	query := this.model.Table(this.model.TableName())

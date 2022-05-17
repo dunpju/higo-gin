@@ -26,9 +26,9 @@ type Param struct {
 
 func NewParam(name string, out string) *Param {
 	humpUnpreName := generator.CamelCase(name)
-	pkg := "Param" + humpUnpreName
-	outDir := out + dirutil.PathSeparator() + pkg
-	file := pkg + ".go"
+	pkg := dirutil.Basename(out)
+	outDir := out
+	file := "Param" + humpUnpreName + ".go"
 	return &Param{Package: pkg, StructName: humpUnpreName, OutDir: outDir, FileName: file}
 }
 
@@ -62,5 +62,5 @@ func (this *Param) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("param: " + this.OutDir + " generate success!")
+	fmt.Println("param: " + outfile.Name + " generate success!")
 }
