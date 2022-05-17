@@ -8,6 +8,7 @@ import (
 	"github.com/dengpju/higo-logger/logger"
 	"github.com/dengpju/higo-router/router"
 	"github.com/dengpju/higo-throw/exception"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"github.com/dengpju/higo-utils/utils/runtimeutil"
 	"github.com/dengpju/higo-utils/utils/sliceutil"
@@ -30,6 +31,7 @@ var (
 	hg                     *Higo
 	SslOut, SslCrt, SslKey string // ssl
 	isLoadEnv              bool
+	isLoadAppConfig        bool
 )
 
 type Higo struct {
@@ -59,17 +61,33 @@ func Init(root *sliceutil.SliceString) *Higo {
 	hg.Middleware(NewCors(), NewAuth())
 	// 初始分隔符
 	pathSeparator = dirutil.PathSeparator()
-	AppConfigDir.Clone(root)
-	root.ForEach(func(index int, value interface{}) {
-		AppConfigDir.Append(value)
-	})
-	AppConfigDir.Append("app")
-	AppConfigDir.Append("config")
-	// 是否使用自带ssl测试https
-	hg.isAutoTLS = false
 	// 未加载env
-	if false == isLoadEnv {
+	if !isLoadEnv {
 		hg.LoadEnv(root)
+		isLoadEnv = true
+	}
+	if !isLoadAppConfig {
+		AppConfigDir.Clone(root)
+		root.ForEach(func(index int, value interface{}) {
+			AppConfigDir.Append(value)
+		})
+		appConfig := config.Env("app.APP_CONFIG")
+		if nil == appConfig {
+			AppConfigDir.Append("app")
+			AppConfigDir.Append("config")
+		} else {
+			AppConfigDir.Append(appConfig)
+		}
+
+		isLoadAppConfig = true
+
+		hg.loadConfigur()
+
+		SslOut = hg.GetRoot().Join(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
+		SslCrt = config.App("SSL.CRT").(string)
+		SslKey = config.App("SSL.KEY").(string)
+		// higo bean
+		hg.Beans(NewBean())
 	}
 
 	return hg
@@ -102,7 +120,6 @@ func (this *Higo) GetRoot() *sliceutil.SliceString {
 
 // 加载env
 func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
-
 	dirutil.SetPathSeparator(pathSeparator)
 	// 设置主目录
 	this.setRoot(root)
@@ -111,12 +128,12 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 	// 日志
 	logger.Logrus.Root(this.GetRoot().Join(pathSeparator)).File("higo").Init()
 	// 装载env配置
-	env := this.GetRoot().Join(pathSeparator) + "env"
-	if ! dirutil.DirExist(env) {
-		dirutil.Mkdir(env)
+	envPath := this.GetRoot().Join(pathSeparator) + "env"
+	if ! dirutil.DirExist(envPath) {
+		dirutil.Mkdir(envPath)
 	}
 	envConf := config.New()
-	filepathErr := filepath.Walk(env,
+	filepathErr := filepath.Walk(envPath,
 		func(p string, f os.FileInfo, err error) error {
 			if f == nil {
 				return err
@@ -125,17 +142,21 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				yamlFile, err := ioutil.ReadFile(p)
-				if err != nil {
-					logger.LoggerStack(err, runtimeutil.GoroutineID())
+				fileBase := filepath.Base(p)
+				ok := strings.HasSuffix(envPath+pathSeparator+fileBase, p)
+				if ok {
+					yamlFile, err := ioutil.ReadFile(p)
+					if err != nil {
+						logger.LoggerStack(err, runtimeutil.GoroutineID())
+					}
+					yamlMap := make(map[interface{}]interface{})
+					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
+					envConf.Set(utils.Dir.Basename(p, "yaml"), yamlMap)
+					if yamlFileErr != nil {
+						exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
+					}
+					logger.Logrus.Infoln("Loader env config file:", p)
 				}
-				yamlMap := make(map[interface{}]interface{})
-				yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
-				envConf.Set(dirutil.Basename(p, "yaml"), yamlMap)
-				if yamlFileErr != nil {
-					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
-				}
-				logger.Logrus.Infoln("Loader env file:", filepath.Base(p))
 			}
 			return nil
 		})
@@ -144,16 +165,6 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 	}
 
 	config.Set(config.EnvConf, envConf)
-	this.loadConfigur()
-	SslOut = this.GetRoot().Join(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
-	SslCrt = config.App("SSL.CRT").(string)
-	SslKey = config.App("SSL.KEY").(string)
-
-	// bean
-	this.Beans(NewBean())
-
-	isLoadEnv = true
-
 	return this
 }
 
@@ -182,7 +193,7 @@ func (this *Higo) loadConfigur() *Higo {
 				if yamlFileErr != nil {
 					exception.Throw(exception.Message(yamlFileErr), exception.Code(0))
 				}
-				logger.Logrus.Infoln("Loader config file:", filepath.Base(p))
+				logger.Logrus.Infoln("Loader app config file:", p)
 			}
 			return nil
 		})
