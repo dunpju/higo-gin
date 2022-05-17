@@ -64,7 +64,7 @@ func Init(root *sliceutil.SliceString) *Higo {
 		AppConfigDir.Append(value)
 	})
 	AppConfigDir.Append("app")
-	AppConfigDir.Append("Config")
+	AppConfigDir.Append("config")
 	// 是否使用自带ssl测试https
 	hg.isAutoTLS = false
 	// 未加载env
