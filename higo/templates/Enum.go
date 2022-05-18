@@ -49,7 +49,7 @@ func NewEnum(name string, file string) *Enum {
 		if !outfile.Exist() {
 			log.Fatalln(name + " configure file non-exist")
 		}
-		err := outfile.ForEach(func(line int, b []byte) {
+		err := outfile.ForEach(func(line int, b []byte) bool {
 			s := string(b)
 			s = strings.Replace(s, "\\", "", -1)
 			s = strings.Trim(s, "\n")
@@ -58,6 +58,7 @@ func NewEnum(name string, file string) *Enum {
 			if "" != s {
 				e.Enums = append(e.Enums, newEnum(s, file))
 			}
+			return true
 		})
 		if err != nil {
 			log.Fatalln(err)

@@ -149,6 +149,27 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 					if err != nil {
 						logger.LoggerStack(err, runtimeutil.GoroutineID())
 					}
+					_ = utils.File.Read(p).ForEach(func(line int, b []byte) bool {
+						fmt.Println(line, string(b))
+						var runeArr = []rune(string(b))
+
+						for _, v := range runeArr {
+							fmt.Print(v, string(v))
+							//switch  {
+							//case v >= 'a' && v <= 'z':
+							//	fallthrough
+							//case v >='A' && v <= 'Z':
+							//	count.ChCount++
+							//case v == ' ' || v == '\t':
+							//	count.SpaceCount++
+							//case v >= '0' && v <= '9':
+							//	count.NumCount++
+							//default:
+							//	count.OtherCount++
+							//}
+						}
+						return true
+					})
 					yamlMap := make(map[interface{}]interface{})
 					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
 					envConf.Set(utils.Dir.Basename(p, "yaml"), yamlMap)

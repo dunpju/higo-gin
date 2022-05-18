@@ -14,7 +14,7 @@ require (
 	github.com/dengpju/higo-redis v1.0.5
 	github.com/dengpju/higo-router v1.0.29
 	github.com/dengpju/higo-throw v1.0.15
-	github.com/dengpju/higo-utils v1.0.92
+	github.com/dengpju/higo-utils v1.0.93
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/go-sql-driver/mysql v1.5.0

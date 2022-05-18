@@ -166,7 +166,7 @@ func load(c *Code, file string, args *CodeArguments) {
 	fileName := utils.Dir.Basename(file, ".yaml")
 	yamlFile := utils.File.Read(file)
 	keysort := make([]string, 0)
-	err := yamlFile.ForEach(func(line int, b []byte) {
+	err := yamlFile.ForEach(func(line int, b []byte) bool {
 		ok, err := regexp.Match("^[a-zA-Z]", b)
 		if err != nil {
 			panic(err)
@@ -174,6 +174,7 @@ func load(c *Code, file string, args *CodeArguments) {
 		if ok {
 			keysort = append(keysort, strings.TrimRight(string(b), ":"))
 		}
+		return true
 	})
 	if err != nil {
 		panic(err)
