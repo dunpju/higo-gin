@@ -17,7 +17,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -126,8 +125,13 @@ type yamlRaw struct {
 	child          []*yamlRaw
 }
 
+type yamlGroups struct {
+	group []*yamlGroup
+}
+
 type yamlGroup struct {
-	group [][]*yamlRaw
+	line  int
+	group []*yamlRaw
 }
 
 // 加载env
@@ -161,49 +165,63 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 					if err != nil {
 						logger.LoggerStack(err, runtimeutil.GoroutineID())
 					}
-					group := &yamlGroup{group: make([][]*yamlRaw, 0)}
-					var currentGroup []*yamlRaw
-					_ = utils.File.Read(p).ForEach(func(line int, b []byte) bool {
-						fmt.Println(string(b))
-						var prefixBlankNum []int32
-						var unblankNum []int32
-						var rawKey []int32
+					group := &yamlGroups{}
+					var currentGroup *yamlGroup
+					_ = utils.File.Read(p).ForEach(func(line int, raw []byte) bool {
+						var (
+							prefixBlankNum []int32
+							unblankNum     []int32
+							rawKey         []int32
+							currentRaw     *yamlRaw
+						)
 						rowset := make(map[int32]int32)
-						currentRaw := &yamlRaw{child: make([]*yamlRaw, 0)}
-						for _, v := range []rune(string(b)) {
-							if v == 58 { // 58 -> :
+						for _, b := range []rune(string(raw)) {
+							if b == 58 { // 58 -> :
+								currentRaw = &yamlRaw{}
 								currentRaw.prefixBlankNum = len(prefixBlankNum)
 								currentRaw.key = string(rawKey)
-								fmt.Println(currentRaw)
-								if currentRaw.prefixBlankNum == 0 {
-									currentGroup = make([]*yamlRaw, 0)
-									group.group = append(group.group, currentGroup)
-								}
-								currentGroup = append(currentGroup, currentRaw)
 								break
 							}
-							if _, ok := rowset[32]; ok && len(rowset) == 1 && v == 35 { // 注释行 35 -> #
-								continue
-							}
-							if v == 35 { // 行注释
+							if _, ok := rowset[32]; ok && len(rowset) == 1 && b == 35 { // 注释行 35 -> #
 								break
 							}
-							rowset[v] = v
-							fmt.Print(v)
-							if v == 32 { // 前缀空格  32 -> 空格
+							if b == 35 { // 行开头注释标记
+								break
+							}
+							rowset[b] = b
+							if b == 32 { // 前缀空格  32 -> 空格
 								if len(unblankNum) == 0 {
-									prefixBlankNum = append(prefixBlankNum, v)
+									prefixBlankNum = append(prefixBlankNum, b)
 								}
 							} else {
-								unblankNum = append(unblankNum, v)
-								rawKey = append(rawKey, v)
+								unblankNum = append(unblankNum, b)
+								rawKey = append(rawKey, b)
 							}
 						}
-						fmt.Println(string(rawKey))
+						if currentRaw != nil {
+						newGroup:
+							if currentGroup == nil {
+								currentGroup = &yamlGroup{line: line, group: make([]*yamlRaw, 0)}
+								group.group = append(group.group, currentGroup)
+							}
+							if currentRaw.prefixBlankNum == 0 && currentGroup.line != line { // 开新组
+								if currentRaw.key != "" {
+									currentGroup = nil
+									goto newGroup
+								}
+							}
+							if currentRaw.key != "" {
+								currentGroup.group = append(currentGroup.group, currentRaw)
+							}
+						}
 						return true
 					})
 					fmt.Println(group)
-					log.Fatalln("ddfdd")
+					for _, g := range group.group {
+						for _, gg := range g.group {
+							fmt.Println(gg.key)
+						}
+					}
 					yamlMap := make(map[interface{}]interface{})
 					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
 					envConf.Set(utils.Dir.Basename(p, "yaml"), yamlMap)
