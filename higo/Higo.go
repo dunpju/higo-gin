@@ -17,6 +17,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -122,6 +123,7 @@ type yamlRaw struct {
 	parent         *yamlRaw
 	prefixBlankNum int
 	key            string
+	value          interface{}
 	child          []*yamlRaw
 }
 
@@ -172,21 +174,30 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 							prefixBlankNum []int32
 							unblankNum     []int32
 							rawKey         []int32
+							rawValue       []int32
 							currentRaw     *yamlRaw
 						)
+						currentRaw = &yamlRaw{}
 						rowset := make(map[int32]int32)
-						for _, b := range []rune(string(raw)) {
-							if b == 58 { // 58 -> :
-								currentRaw = &yamlRaw{}
-								currentRaw.prefixBlankNum = len(prefixBlankNum)
-								currentRaw.key = string(rawKey)
-								break
-							}
-							if _, ok := rowset[32]; ok && len(rowset) == 1 && b == 35 { // 注释行 35 -> #
-								break
-							}
+						for i, b := range []rune(string(raw)) {
 							if b == 35 { // 行开头注释标记
+								if i == 0 {
+									currentRaw = nil
+								}
+								if _, ok := rowset[32]; ok && len(rowset) == 1 { // 注释行 35 -> #
+									currentRaw = nil
+								}
 								break
+							}
+							if b == 58 { // 58 -> :
+								if currentRaw.key == "" {
+									currentRaw.prefixBlankNum = len(prefixBlankNum)
+									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(rawKey)), " "), " ")
+									continue
+								}
+							}
+							if currentRaw.key != "" { // 计算value
+								rawValue = append(rawValue, b)
 							}
 							rowset[b] = b
 							if b == 32 { // 前缀空格  32 -> 空格
@@ -199,6 +210,7 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 							}
 						}
 						if currentRaw != nil {
+							currentRaw.value = strings.TrimSuffix(strings.TrimPrefix(string(rawValue), " "), " ")
 						newGroup:
 							if currentGroup == nil {
 								currentGroup = &yamlGroup{line: line, group: make([]*yamlRaw, 0)}
@@ -219,9 +231,10 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 					fmt.Println(group)
 					for _, g := range group.group {
 						for _, gg := range g.group {
-							fmt.Println(gg.key)
+							fmt.Println(gg.key, gg.value)
 						}
 					}
+					log.Fatalln("gggg")
 					yamlMap := make(map[interface{}]interface{})
 					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
 					envConf.Set(utils.Dir.Basename(p, "yaml"), yamlMap)
