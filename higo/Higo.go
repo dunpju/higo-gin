@@ -17,7 +17,6 @@ import (
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -193,6 +192,8 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 								if currentRaw.key == "" {
 									currentRaw.prefixBlankNum = len(prefixBlankNum)
 									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(rawKey)), " "), " ")
+									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(currentRaw.key)), `"`), `"`)
+									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(currentRaw.key)), `'`), `'`)
 									continue
 								}
 							}
@@ -210,7 +211,9 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 							}
 						}
 						if currentRaw != nil {
-							currentRaw.value = strings.TrimSuffix(strings.TrimPrefix(string(rawValue), " "), " ")
+							value := strings.TrimSuffix(strings.TrimPrefix(string(rawValue), " "), " ")
+							value = strings.TrimSuffix(strings.TrimPrefix(value, `"`), `"`)
+							currentRaw.value = strings.TrimSuffix(strings.TrimPrefix(value, `'`), `'`)
 						newGroup:
 							if currentGroup == nil {
 								currentGroup = &yamlGroup{line: line, group: make([]*yamlRaw, 0)}
@@ -231,10 +234,10 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 					fmt.Println(group)
 					for _, g := range group.group {
 						for _, gg := range g.group {
-							fmt.Println(gg.key, gg.value)
+							fmt.Println(gg)
 						}
 					}
-					log.Fatalln("gggg")
+					//log.Fatalln("gggg")
 					yamlMap := make(map[interface{}]interface{})
 					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
 					envConf.Set(utils.Dir.Basename(p, "yaml"), yamlMap)
