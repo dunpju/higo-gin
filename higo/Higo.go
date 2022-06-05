@@ -126,15 +126,6 @@ type yamlRaw struct {
 	child          []*yamlRaw
 }
 
-type yamlGroups struct {
-	group []*yamlGroup
-}
-
-type yamlGroup struct {
-	line  int
-	group []*yamlRaw
-}
-
 // 加载env
 func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 	dirutil.SetPathSeparator(pathSeparator)
@@ -166,78 +157,6 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 					if err != nil {
 						logger.LoggerStack(err, runtimeutil.GoroutineID())
 					}
-					group := &yamlGroups{}
-					var currentGroup *yamlGroup
-					_ = utils.File.Read(p).ForEach(func(line int, raw []byte) bool {
-						var (
-							prefixBlankNum []int32
-							unblankNum     []int32
-							rawKey         []int32
-							rawValue       []int32
-							currentRaw     *yamlRaw
-						)
-						currentRaw = &yamlRaw{}
-						rowset := make(map[int32]int32)
-						for i, b := range []rune(string(raw)) {
-							if b == 35 { // 行开头注释标记
-								if i == 0 {
-									currentRaw = nil
-								}
-								if _, ok := rowset[32]; ok && len(rowset) == 1 { // 注释行 35 -> #
-									currentRaw = nil
-								}
-								break
-							}
-							if b == 58 { // 58 -> :
-								if currentRaw.key == "" {
-									currentRaw.prefixBlankNum = len(prefixBlankNum)
-									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(rawKey)), " "), " ")
-									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(currentRaw.key)), `"`), `"`)
-									currentRaw.key = strings.TrimSuffix(strings.TrimPrefix(string(string(currentRaw.key)), `'`), `'`)
-									continue
-								}
-							}
-							if currentRaw.key != "" { // 计算value
-								rawValue = append(rawValue, b)
-							}
-							rowset[b] = b
-							if b == 32 { // 前缀空格  32 -> 空格
-								if len(unblankNum) == 0 {
-									prefixBlankNum = append(prefixBlankNum, b)
-								}
-							} else {
-								unblankNum = append(unblankNum, b)
-								rawKey = append(rawKey, b)
-							}
-						}
-						if currentRaw != nil {
-							value := strings.TrimSuffix(strings.TrimPrefix(string(rawValue), " "), " ")
-							value = strings.TrimSuffix(strings.TrimPrefix(value, `"`), `"`)
-							currentRaw.value = strings.TrimSuffix(strings.TrimPrefix(value, `'`), `'`)
-						newGroup:
-							if currentGroup == nil {
-								currentGroup = &yamlGroup{line: line, group: make([]*yamlRaw, 0)}
-								group.group = append(group.group, currentGroup)
-							}
-							if currentRaw.prefixBlankNum == 0 && currentGroup.line != line { // 开新组
-								if currentRaw.key != "" {
-									currentGroup = nil
-									goto newGroup
-								}
-							}
-							if currentRaw.key != "" {
-								currentGroup.group = append(currentGroup.group, currentRaw)
-							}
-						}
-						return true
-					})
-					fmt.Println(group)
-					for _, g := range group.group {
-						for _, gg := range g.group {
-							fmt.Println(gg)
-						}
-					}
-					//log.Fatalln("gggg")
 					yamlMap := make(map[interface{}]interface{})
 					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
 					envConf.Set(utils.Dir.Basename(p, "yaml"), yamlMap)
