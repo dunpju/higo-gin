@@ -43,7 +43,9 @@ func (this *EventController) Test2() interface{} {
 	tt := ctx.Query("tt")
 	return tt
 }
+
 var i = 0
+
 func (this *EventController) Test3() {
 	fmt.Println("请求数量")
 	if runtimeutil.GoroutineID()%2 == 0 {

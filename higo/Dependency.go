@@ -2,21 +2,50 @@ package higo
 
 import (
 	"fmt"
+	"github.com/dengpju/higo-gin/higo/templates"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/dengpju/higo-utils/utils/dirutil"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"reflect"
+	"strings"
+	"sync"
 )
 
 var (
-	container Dependency
+	container *Dependency
 )
 
 type DepBuild func() IClass
 
-type Dependency map[string]DepBuild
+type Dependency struct {
+	container *sync.Map
+}
+
+func NewDependency() *Dependency {
+	return &Dependency{container: &sync.Map{}}
+}
+
+func (this *Dependency) set(key string, d DepBuild) {
+	this.container.Store(key, d)
+}
+
+func (this *Dependency) get(key string) (DepBuild, bool) {
+	v, ok := this.container.Load(key)
+	if ok {
+		return v.(DepBuild), true
+	}
+	return nil, false
+}
+
+func (this *Dependency) key(class interface{}) string {
+	v := reflect.ValueOf(class)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	return v.Type().PkgPath() + "/" + v.Type().Name()
+}
 
 func Scan() {
 	scanFiles := dirutil.Dir("./test/app/Controllers").Suffix("go").Scan().Get()
@@ -24,7 +53,7 @@ func Scan() {
 	fmt.Println(container)
 
 	// 通过解析src来创建AST。
-	fset := token.NewFileSet() // 职位相对于fset
+	fset := token.NewFileSet() // 相对于fset
 	f, err := parser.ParseFile(fset, "./test/app/Controllers\\V3\\DemoController.go", nil, 0)
 	if err != nil {
 		panic(err)
@@ -58,18 +87,27 @@ func Scan() {
 // 注册到Di容器
 func AddContainer(builds ...DepBuild) {
 	for _, build := range builds {
-		class := build()
-		v := reflect.ValueOf(class)
-		if _, ok := container[v.Type().String()]; !ok {
-			container[v.Type().String()] = build
+		cl := build()
+		key := container.key(cl)
+		if _, ok := container.get(key); !ok {
+			container.set(key, build)
 		}
 	}
 }
 
 // 获取依赖
 func Di(name string) IClass {
-	class := container[name]()
-	injector.BeanFactory.Apply(class)
-	injector.BeanFactory.Set(class)
-	return class
+	name = strings.Replace(name, templates.GetModName(), "", 1)
+	kk := "/" + strings.TrimLeft(name, "/")
+	k := templates.GetModName() + kk
+	v, ok := container.get(k)
+	if ok {
+		class := v()
+		tmp := class
+		icl := &tmp // 将 tmp 的内存地址赋给指针变量 icl, 实现深拷贝
+		injector.BeanFactory.Apply(icl)
+		injector.BeanFactory.Set(icl)
+		return *icl
+	}
+	return nil
 }

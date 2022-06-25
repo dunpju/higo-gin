@@ -3,6 +3,7 @@ package Beans
 import (
 	"github.com/dengpju/higo-gin/higo"
 	a "github.com/dengpju/higo-gin/test/app/Controllers"
+	V32 "github.com/dengpju/higo-gin/test/app/Controllers/V2/V3"
 	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
 	"github.com/dengpju/higo-gin/test/app/Services"
 	"github.com/gomodule/redigo/redis"
@@ -32,6 +33,10 @@ func (this *MyBean) NewRedisAdapter() *higo.RedisAdapter {
 
 func (this *MyBean) NewRedisController() *V3.RedisController {
 	return V3.NewRedisController()
+}
+
+func (this *MyBean) NewDemoController2() *V32.DemoController {
+	return V32.NewDemoController()
 }
 
 func (this *MyBean) NewDemoController() *V3.DemoController {

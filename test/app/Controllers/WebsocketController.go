@@ -12,6 +12,7 @@ import (
 type WebsocketController struct {
 	//*higo.Orm `inject:"Bean.NewOrm()"`
 	//Redis      *higo.RedisAdapter `inject:"Bean.NewRedisAdapter()"`
+	K string
 }
 
 func NewWebsocketController() *WebsocketController {

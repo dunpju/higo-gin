@@ -6,6 +6,7 @@ import (
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
 	"github.com/dengpju/higo-gin/higo/request"
+	"github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Exception"
 	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
 	"github.com/dengpju/higo-gin/test/app/Services"
@@ -38,19 +39,25 @@ func (this *DemoController) Route(hg *higo.Higo) {
 		//hg.AddGroup("/user", func() {
 		//	hg.Post("/login", this.Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		//})
-		hg.Get("/test_throw1", HttpsTestThrow1, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
-		hg.Get("/test_throw", this.HttpsTestThrow, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
-		hg.Post("/test_get1111", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
-		hg.Post("/test_validator", this.HttpsTestValidate, hg.Flag("HttpsTestValidate"), hg.Desc("V3 测试校验器"), router.IsAuth(false))
+		hg.Get("/test_throw2132", HttpsTestThrow2, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
+		hg.Get("/test_throw21321", this.HttpsTestThrow2, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
+		hg.Post("/test_get21111132", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
+		hg.Post("/test_validator2132", this.HttpsTestValidate, hg.Flag("HttpsTestValidate"), hg.Desc("V3 测试校验器"), router.IsAuth(false))
 	})
 }
 
-func HttpsTestThrow1(ctx *gin.Context)  {
-
+func HttpsTestThrow2(ctx *gin.Context)  {
+	fmt.Println("ggg")
+	fmt.Printf("%p\n", higo.Di("test/app/Controllers/WebsocketController"))
+	w1 := higo.Di("test/app/Controllers/WebsocketController")
+	w1.(*Controllers.WebsocketController).K = "tt"
+	w2 := higo.Di("test/app/Controllers/WebsocketController")
+	w2.(*Controllers.WebsocketController).K = "tt1"
+	fmt.Println(w1, w2)
 }
 
 // 测试异常
-func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
+func (this *DemoController) HttpsTestThrow2(ctx *gin.Context) string {
 	fmt.Println(ctx.Query("id"))
 	fmt.Println(111)
 	fmt.Println(&this)
