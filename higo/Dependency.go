@@ -103,11 +103,9 @@ func Di(name string) IClass {
 	v, ok := container.get(k)
 	if ok {
 		class := v()
-		tmp := class
-		icl := &tmp // 将 tmp 的内存地址赋给指针变量 icl, 实现深拷贝
-		injector.BeanFactory.Apply(icl)
-		injector.BeanFactory.Set(icl)
-		return *icl
+		injector.BeanFactory.Apply(class)
+		injector.BeanFactory.Set(class)
+		return class
 	}
 	return nil
 }

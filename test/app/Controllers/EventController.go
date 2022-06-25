@@ -13,6 +13,7 @@ import (
 )
 
 type EventController struct {
+	T string
 }
 
 func NewEventController() *EventController {
@@ -34,6 +35,8 @@ func (this *EventController) Route(hg *higo.Higo) {
 }
 
 func (this *EventController) Test1() string {
+	this.T = "test1"
+	fmt.Println(this)
 	return "Test1"
 }
 
@@ -41,6 +44,7 @@ func (this *EventController) Test2() interface{} {
 	fmt.Println(runtimeutil.GoroutineID())
 	ctx := request.Context()
 	tt := ctx.Query("tt")
+	fmt.Println(this)
 	return tt
 }
 

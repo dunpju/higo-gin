@@ -49,6 +49,9 @@ func (this *DemoController) Route(hg *higo.Higo) {
 func HttpsTestThrow2(ctx *gin.Context)  {
 	fmt.Println("ggg")
 	fmt.Printf("%p\n", higo.Di("test/app/Controllers/WebsocketController"))
+	e1 := &Controllers.EventController{}
+	e2 := &Controllers.EventController{}
+	fmt.Printf("%p-%p\n", e1, e2)
 	w1 := higo.Di("test/app/Controllers/WebsocketController")
 	w1.(*Controllers.WebsocketController).K = "tt"
 	w2 := higo.Di("test/app/Controllers/WebsocketController")

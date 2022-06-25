@@ -10,7 +10,7 @@ type Dispatch struct {
 	method reflect.Value
 }
 
-func NewDispatch(class IClass, method string) *Dispatch {
+func newDispatch(class IClass, method string) *Dispatch {
 	return &Dispatch{Class: class.New(), Method: method, method: reflect.ValueOf(class).MethodByName(method)}
 }
 
