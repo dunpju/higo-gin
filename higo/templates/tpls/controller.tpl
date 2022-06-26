@@ -7,6 +7,8 @@ import (
 	//"github.com/gin-gonic/gin"
 )
 
+const Self{{.Name}} = "{{.SelfName}}"
+
 type {{.Name}} struct {
 }
 

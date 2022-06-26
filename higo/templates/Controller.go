@@ -44,6 +44,7 @@ type Controller struct {
 	Package   string
 	Name      string
 	OutStruct string
+	SelfName  string
 	File      string
 }
 
@@ -59,7 +60,7 @@ func NewController(pkg string, name string, file string) *Controller {
 	name = name + controller
 	outStruct := file + dirutil.PathSeparator() + strings.Replace(name, controller, "", -1) + controller
 	file = outStruct + ".go"
-	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, File: file}
+	return &Controller{Package: pkg, Name: name, OutStruct: outStruct, SelfName: strings.ReplaceAll(outStruct, "\\", "/"), File: file}
 }
 
 func (this *Controller) Template(tplfile string) *tpls.Tpl {

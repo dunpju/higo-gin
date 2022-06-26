@@ -18,6 +18,8 @@ import (
 	"time"
 )
 
+const SelfDemoController  = ""
+
 type DemoController struct {
 	Age         *anno.Value           `prefix:"user.age"`
 	DemoService *Services.DemoService `inject:"MyBean.DemoService()"`
