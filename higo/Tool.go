@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	class                      = "class"
+	service                    = "service"
 	controller                 = "controller"
 	model                      = "model"
 	dao                        = "dao"
@@ -48,7 +48,7 @@ func NewTool() *Tool {
 func (this *Tool) Cmd() {
 	if len(os.Args) >= 2 {
 		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller Model Enum Code Dao Entity
-    --option[controller | model | enum | code | dao | entity | param | class]
+    --option[controller | model | enum | code | dao | entity | param | service]
     eg:-gen=controller`)
 		flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
     eg:-name=Test`)
@@ -72,12 +72,12 @@ func (this *Tool) Cmd() {
 			this.param()
 		} else if model == this.Gen {
 			this.model()
-		} else if class == this.Gen {
-			this.class()
+		} else if service == this.Gen {
+			this.service()
 		} else {
 			log.Fatalln(`gen Arguments Error! 
-Explain: Generate Controller/Model/Enum/Code/Dao/Entity/Param/Class
-    --option[controller | model | enum | code | dao | entity | param | class]
+Explain: Generate Controller/Model/Enum/Code/Dao/Entity/Param/Service
+    --option[controller | model | enum | code | dao | entity | param | service]
     eg:-gen=controller
     Tips*: Dao and Entity with Model, It's a composite generate tool; 
         They using AST parsing source files, the original code will not be affected; 
@@ -144,9 +144,9 @@ loopParam:
 	controllerTool.Generate()
 }
 
-func (this *Tool) class() {
+func (this *Tool) service() {
 	if this.Name == "" {
-		log.Fatalln(`class name unable empty 
+		log.Fatalln(`service name unable empty 
     eg: -name=TestService`)
 	}
 	if this.Out == "" {
@@ -154,7 +154,7 @@ func (this *Tool) class() {
     eg: -out=app\Services`)
 	}
 	this.Package = dirutil.Basename(this.Out)
-	templates.NewClass(this.Package, this.Name, this.Out).Generate()
+	templates.NewService(this.Package, this.Name, this.Out).Generate()
 }
 
 func (this *Tool) enum() {

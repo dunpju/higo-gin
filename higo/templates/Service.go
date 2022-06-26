@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type Class struct {
+type Service struct {
 	Package   string
 	Name      string
 	OutDir    string
@@ -20,21 +20,21 @@ type Class struct {
 	File      string
 }
 
-func NewClass(pkg string, name string, file string) *Class {
+func NewService(pkg string, name string, file string) *Service {
 	name = stringutil.Ucfirst(name)
 	outStruct := file + dirutil.PathSeparator() + name
-	c := &Class{Package: pkg, Name: name, OutStruct: outStruct, SelfName: strings.ReplaceAll(outStruct, "\\", "/")}
+	c := &Service{Package: pkg, Name: name, OutStruct: outStruct, SelfName: strings.ReplaceAll(outStruct, "\\", "/")}
 	c.OutDir = file
 	file = outStruct + ".go"
 	c.File = file
 	return c
 }
 
-func (this *Class) Template(tplfile string) *tpls.Tpl {
+func (this *Service) Template(tplfile string) *tpls.Tpl {
 	return tpls.New(tplfile)
 }
 
-func (this *Class) Generate() {
+func (this *Service) Generate() {
 	dirutil.Dir(this.OutDir).Create()
 	if fileutil.FileExist(this.File) {
 		log.Println(this.File + " already existed")
@@ -45,7 +45,7 @@ func (this *Class) Generate() {
 		outFile.Create()
 	}
 	defer outFile.Close()
-	tmpl, err := this.Template("class.tpl").Parse()
+	tmpl, err := this.Template("service.tpl").Parse()
 	if err != nil {
 		panic(err)
 	}
@@ -54,5 +54,5 @@ func (this *Class) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("class: " + this.OutStruct + " generate success!")
+	fmt.Println("service: " + this.OutStruct + " generate success!")
 }
