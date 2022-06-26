@@ -14,7 +14,7 @@ func newDispatch(class IClass, method string) *Dispatch {
 	return &Dispatch{Class: class.New(), Method: method, method: reflect.ValueOf(class).MethodByName(method)}
 }
 
-func (this *Dispatch) Call(handler interface{}) interface{} {
+func (this *Dispatch) Convert(handler interface{}) interface{} {
 	if handle := handleConvert(handler); handle != nil {
 		return handle
 	}

@@ -155,7 +155,8 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 				if ok {
 					yamlFile, err := ioutil.ReadFile(p)
 					if err != nil {
-						logger.LoggerStack(err, runtimeutil.GoroutineID())
+						goid, _ := runtimeutil.GoroutineID()
+						logger.LoggerStack(err, goid)
 					}
 					yamlMap := make(map[interface{}]interface{})
 					yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)
@@ -193,7 +194,8 @@ func (this *Higo) loadConfigur() *Higo {
 			if path.Ext(p) == ".yaml" {
 				yamlFile, err := ioutil.ReadFile(p)
 				if err != nil {
-					logger.LoggerStack(err, runtimeutil.GoroutineID())
+					goid, _ := runtimeutil.GoroutineID()
+					logger.LoggerStack(err, goid)
 				}
 				yamlMap := make(map[interface{}]interface{})
 				yamlFileErr := yaml.Unmarshal(yamlFile, yamlMap)

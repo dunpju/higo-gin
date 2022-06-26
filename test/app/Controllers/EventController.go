@@ -52,8 +52,9 @@ var i = 0
 
 func (this *EventController) Test3() {
 	fmt.Println("请求数量")
-	if runtimeutil.GoroutineID()%2 == 0 {
-		fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), "休眠")
+	goid, _ := runtimeutil.GoroutineID()
+	if goid%2 == 0 {
+		fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), goid, "休眠")
 		time.Sleep(2 * time.Second)
 		i++
 		if i == 1 {
@@ -63,9 +64,10 @@ func (this *EventController) Test3() {
 	//fmt.Println(len(higo.Request))
 	ctx := request.Context()
 	tt := ctx.Query("tt")
-	fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), tt)
+
+	fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), goid, tt)
 	go func() {
-		fmt.Printf("线程: %d 子协成: %d 数据:%s\n", runtimeutil.ThreadID(), runtimeutil.GoroutineID(), tt)
+		fmt.Printf("线程: %d 子协成: %d 数据:%s\n", runtimeutil.ThreadID(), goid, tt)
 	}()
 	//exception.Throw(exception.Message(tt), exception.Code(1))
 	responser.SuccessJson("success", 10000, tt)

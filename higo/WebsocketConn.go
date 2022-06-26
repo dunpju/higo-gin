@@ -111,7 +111,8 @@ loop:
 func (this *WebsocketConn) HandlerLoop() {
 	defer func() {
 		if r := recover(); r != nil {
-			logger.LoggerStack(r, runtimeutil.GoroutineID())
+			goid, _ := runtimeutil.GoroutineID()
+			logger.LoggerStack(r, goid)
 			this.writeChan <- WsRespError(WsRecoverHandle(r))
 		}
 	}()

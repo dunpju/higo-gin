@@ -19,8 +19,9 @@ func NewRunLog() *RunLog {
 func (this *RunLog) Middle(hg *higo.Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
 		tt := cxt.Query("tt")
+		goid, _ := runtimeutil.GoroutineID()
 		fmt.Printf("RunLog:%s\n",
-			higo.RouterContainer.Get(cxt.Request.Method, cxt.Request.URL.Path).Desc()+"-"+strconv.FormatUint(runtimeutil.GoroutineID(), 10)+"-"+tt)
+			higo.RouterContainer.Get(cxt.Request.Method, cxt.Request.URL.Path).Desc()+"-"+strconv.FormatUint(goid, 10)+"-"+tt)
 		cxt.Next()
 	}
 }

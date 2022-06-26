@@ -22,7 +22,8 @@ func init() {
 		RecoverHandle = func(cxt *gin.Context, r interface{}) {
 
 			//记录debug调用栈
-			logger.LoggerStack(r, runtimeutil.GoroutineID())
+			goid, _ := runtimeutil.GoroutineID()
+			logger.LoggerStack(r, goid)
 
 			//封装通用json返回
 			if h, ok := r.(gin.H); ok {

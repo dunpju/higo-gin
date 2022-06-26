@@ -69,7 +69,7 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 		diname := structPath + "/" + structName
 		icl := Di(diname)
 		if nil != icl {
-			router.AddRoute(httpMethod, relativePath, newDispatch(icl, method).Call(handler), attributes...)
+			router.AddRoute(httpMethod, relativePath, newDispatch(icl, method).Convert(handler), attributes...)
 		} else {
 			router.AddRoute(httpMethod, relativePath, handler, attributes...)
 		}

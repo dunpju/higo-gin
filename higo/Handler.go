@@ -2,43 +2,54 @@ package higo
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils/runtimeutil"
+	"github.com/dengpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"
 )
 
 var (
-	Request     Req
+	Request     requester
 	onceRequest sync.Once
 )
 
+const goroutineID = "GoroutineID"
+
 func init() {
 	onceRequest.Do(func() {
-		Request = Req{value: &sync.Map{}}
+		Request = requester{value: &sync.Map{}}
 	})
 }
 
-type Req struct {
+type requester struct {
 	value *sync.Map
 }
 
-func (this Req) Context() *gin.Context {
-	goid := runtimeutil.GoroutineID()
+func (this *requester) Context() *gin.Context {
+	goid, err := utils.Runtime.GoroutineID()
+	if err != nil {
+		panic(err)
+	}
 	v, ok := this.value.Load(goid)
 	if ok {
 		return v.(*gin.Context)
 	}
-	panic(fmt.Errorf("goroutine id %d gin context empty", goid))
+	panic(fmt.Errorf("goroutine id %d gin context empty, Cannot penetrate goroutine get gin context", goid))
 }
 
-func (this Req) Set(ctx *gin.Context) {
-	goid := runtimeutil.GoroutineID()
+func (this *requester) Set(ctx *gin.Context) {
+	goid, err := utils.Runtime.GoroutineID()
+	if err != nil {
+		panic(err)
+	}
 	this.value.Store(goid, ctx)
 }
 
-func (this Req) Remove() {
-	goid := runtimeutil.GoroutineID()
+func (this requester) Remove() {
+	goid, err := utils.Runtime.GoroutineID()
+	if err != nil {
+		panic(err)
+	}
 	this.value.Delete(goid)
 }
 
