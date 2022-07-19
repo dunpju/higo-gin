@@ -18,15 +18,24 @@ func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
 	return param
 }
 
+// https://pkg.go.dev/github.com/go-playground/validator
+//
 //The custom tag, binding the tag eg: binding:"custom_tag_name"
 //require import "gitee.com/dengpju/higo-code/code"
 //
 //example code:
 //func (this *{{.StructName}}) RegisterValidator() *higo.Verify {
 //	return higo.RegisterValidator(this).
-//		Tag("custom_tag_name",
+//		Tag("custom_tag_name1",
 //			higo.Rule("required", Codes.Success),
-//			higo.Rule("min=5", Codes.Success))
+//			higo.Rule("min=5", Codes.Success)).
+//		Tag("custom_tag_name2",
+//			higo.Rule("required", func() higo.ValidatorToFunc {
+//              return func(fl validator.FieldLevel) (bool, code.ICode) {
+//                  fmt.Println(fl.Field().Interface())
+//                  return true, MinError
+//              }
+//          }()))
 //  Or
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
