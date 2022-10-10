@@ -8,3 +8,7 @@ import (
 func Context() *gin.Context {
 	return higo.Request.Context()
 }
+
+func Set(context *gin.Context) {
+	higo.Request.Set(context)
+}
