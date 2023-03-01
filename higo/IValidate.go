@@ -199,9 +199,6 @@ func (this *RuleGroup) valid(rule string, fl validator.FieldLevel, v interface{}
 		if len(key) > 1 {
 			rule = key[0]
 		}
-		log.Println(this.tag)
-		log.Println(rule)
-		log.Println(this.rule, fl.GetTag(), v, err.Error())
 		if msg, ok := this.message.Load(rule); ok {
 			if co, ok := msg.(code.ICode); ok {
 				panic(NewValidateError(co))
