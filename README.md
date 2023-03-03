@@ -4,6 +4,25 @@
 ## 安装
 go get -u github.com/dengpju/higo-gin@v1.1.54
 
+## 启动
+```
+func main() {
+	beanConfig := Beans.NewMyBean()
+
+	higo.Init(sliceutil.NewSliceString(".", "test", "")). // 指定root目录
+		Middleware(Middlewares.NewCors(), Middlewares.NewRunLog()). // 注册中间件
+		AddServe(router.NewHttp(), Middlewares.NewHttp()). // 添加http服务、注册服务独立中间件
+		AddServe(router.NewHttps(), beanConfig). // 添加https服务
+		AddServe(router.NewWebsocket()).// 添加websocket服务
+		Beans(beanConfig). // 全局bean
+		Cron("0/3 * * * * *", func() { // 添加定时任务
+		    log.Println("3秒执行一次")
+		}).
+		Boot()
+
+}
+```
+
 ## 功能说明
 控制器、简易依赖注入、中间件、表达式、任务组件、开发者工具等
 
@@ -27,8 +46,6 @@ import (
 	"github.com/dengpju/higo-gin/higo/request"
 	"github.com/dengpju/higo-gin/higo/responser"
 	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-gin/higo/request"
-	"github.com/dengpju/higo-gin/higo/responser"
 	"github.com/gin-gonic/gin"
 )
 
@@ -205,6 +222,35 @@ type DemoController struct {
 ```
 
 ### 中间件
+只要实现IMiddleware接口都被认为是中间件
+###### example
+```
+type Cors struct {}
+
+func NewCors() *Cors {
+	return &Cors{}
+}
+
+func (this *Cors) Middle(hg *higo.Higo) gin.HandlerFunc {
+	return func(cxt *gin.Context) {
+		method := cxt.Request.Method
+		origin := cxt.Request.Header.Get("Origin")
+		if origin != "" {
+			cxt.Header("Access-Control-Allow-Origin", "*")
+			cxt.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+			cxt.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+			cxt.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+			cxt.Header("Access-Control-Allow-Credentials", "true")
+		}
+
+		if method == "OPTIONS" {
+			cxt.AbortWithStatus(http.StatusNoContent)
+		}
+
+		cxt.Next()
+	}
+}
+```
 
 ### 表达式
 
