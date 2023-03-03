@@ -8,7 +8,7 @@ go get -u github.com/dengpju/higo-gin@v1.1.54
 控制器、简易依赖注入、中间件、表达式、任务组件、开发者工具等
 
 ### 控制器
-控制器代码可以通过开发者工具指令直接生成基础代码,并且采用AST自动注册到BeanFactory内。
+控制器代码可以通过开发者工具指令直接生成基础代码,并且采用AST自动注册到Bean实例内。
 
 ###### 构建指令:
 ```
@@ -163,8 +163,46 @@ func (this *AdminController) Example6(ctx *gin.Context) higo.Json {
 
 ```
 
-
 ### 依赖注入
+注入对象,需要先注册到Bean实例内
+
+###### example
+```
+type MyBean struct{ higo.Bean }
+
+func NewMyBean() *MyBean {
+	return &MyBean{}
+}
+
+// 手动添加配置进行注册
+func (this *MyBean) DemoService() *Services.DemoService {
+	return Services.NewDemoService()
+}
+```
+###### 使用
+```
+type DemoController struct {
+    // multiple
+	DemoService1 *Services.DemoService `inject:"MyBean.DemoService()"`
+	// single
+	DemoService2 *Services.DemoService `inject:"-"`
+	Name string
+}
+```
+###### Value注入
+Value注入需要在```env/Config/anno.yaml```文件中添加配置
+```
+"value":
+  user:
+    score: "100"
+    age: "19"
+```
+###### 使用
+```
+type DemoController struct {
+    Age  *anno.Value  `prefix:"user.age"`
+}
+```
 
 ### 中间件
 
