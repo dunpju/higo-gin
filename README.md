@@ -383,7 +383,3 @@ func (this *Edit) RegisterValidator() *higo.Verify {
     return higo.Verifier().Use(&Add{}, &Delete{})
 }
 ```
-使用AST技术实现Code、Controller、Dao、Entity、Model、Enum、Service、Validate等生成器，
-定时器、IOC容器、Bean工厂、限流器(采用LRU算法)、路由收集器(采用前缀树)、Websocket调度器、
-自动校验器、Code容器、Enum容器、基于gorm封装的Orm工具、事件处理机制、协程字节流处理工具、
-动态参数工具(模拟多态)、使用Protobuf实现简单的存储配合coroutine实现快速的CRUD功能;
