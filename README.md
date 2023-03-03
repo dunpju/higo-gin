@@ -340,47 +340,47 @@ func NewParamDemoList(ctx *gin.Context) *DemoList {
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
 func (this *DemoList) RegisterValidator() *higo.Verify {
-	return higo.Verifier().
-	    // 自定义tag
-		Tag("table", higo.Rule("required", func() higo.ValidatorToFunc {
-			return func(fieldLevel validator.FieldLevel) (bool, code.ICode) {
-			    // 手动校验
-				err := EnumTable.Inspect(int(fieldLevel.Field().Interface().(uint64)))
-				if err != nil {
-				    // 未通过
-					return false, errcode.Chain
-				}
-				// 通过
-				return true, nil
-			}
-		}()))
+    return higo.Verifier().
+        // 自定义tag
+        Tag("table", higo.Rule("required", func() higo.ValidatorToFunc {
+            return func(fieldLevel validator.FieldLevel) (bool, code.ICode) {
+                // 手动校验
+                err := EnumTable.Inspect(int(fieldLevel.Field().Interface().(uint64)))
+                if err != nil {
+                    // 未通过
+                    return false, errcode.Chain
+                }
+                // 通过
+                return true, nil
+            }
+        }()))
 }
 ```
 ###### 组合校验规则
 ```
 type Add struct {
-	Name      string  `json:"name" binding:"name"`
-	State     int     `json:"state" binding:"state"`
-	Remark    string  `json:"remark"`
+    Name      string  `json:"name" binding:"name"`
+    State     int     `json:"state" binding:"state"`
+    Remark    string  `json:"remark"`
 }
 
 type Delete struct {
-	Id int64 `json:"id" binding:"id"`
+    Id int64 `json:"id" binding:"id"`
 }
 
 type Edit struct {
-	Add
-	Delete
+    Add
+    Delete
 }
 
 func NewEdit(ctx *gin.Context) *Edit {
-	param := &Edit{}
-	higo.Validate(param).Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
-	return param
+    param := &Edit{}
+    higo.Validate(param).Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
+    return param
 }
 
 func (this *Edit) RegisterValidator() *higo.Verify {
-	return higo.Verifier().Use(&Add{}, &Delete{})
+    return higo.Verifier().Use(&Add{}, &Delete{})
 }
 ```
 使用AST技术实现Code、Controller、Dao、Entity、Model、Enum、Service、Validate等生成器，
