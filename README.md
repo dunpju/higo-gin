@@ -261,11 +261,11 @@ express.Run("MyBean.DemoService()")
 使用定时任务
 ```
 func main() {
-	higo.Init(sliceutil.NewSliceString(".", "test", "")).
-		Cron("0/3 * * * * *", func() {
-		    log.Println("3秒执行一次")
-		}).
-		Boot()
+    higo.Init(sliceutil.NewSliceString(".", "test", "")).
+        Cron("0/3 * * * * *", func() {
+            log.Println("3秒执行一次")
+        }).
+        Boot()
 }
 ```
 
@@ -311,13 +311,13 @@ go run bin\main.go -gen=param -out=app\params -name=DemoList
 ```
 type DemoList struct {
     // binding:"table",table是自定义tag
-	Table uint64 `form:"table" binding:"table"` // get from the form
+    Table uint64 `form:"table" binding:"table"` // get from the form
 }
 
 func NewParamDemoList(ctx *gin.Context) *DemoList {
-	param := &DemoList{}
-	higo.Validate(param).Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
-	return param
+    param := &DemoList{}
+    higo.Validate(param).Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
+    return param
 }
 
 // RegisterValidator The custom tag, binding the tag eg: binding:"custom_tag_name"
