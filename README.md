@@ -4,7 +4,10 @@
 ## 安装
 go get -u github.com/dengpju/higo-gin@v1.1.54
 
-## 启动
+## 功能说明
+控制器、简易依赖注入、中间件、表达式、任务组件、开发者工具等
+
+### 启动
 ```
 func main() {
 	beanConfig := Beans.NewMyBean()
@@ -21,9 +24,195 @@ func main() {
 		Boot()
 }
 ```
+### 目录结构
+工作目录结构(仅参考):
+```
+project
+  |--app
+  |   |--beans
+  |   |--controllers
+  |   |--dao
+  |   |--entity
+  |   |--enums
+  |   |--errcode
+  |   |--exception
+  |   |--middlewares
+  |   |--models
+  |   |--params
+  |   |--services
+  |   |--utils
+  |--bin
+  |   |--yaml
+  |   |   |--20000.yaml
+  |   |--enum_cmd.md
+  |   |--main.go
+  |--env
+  |   |--app.yaml
+  |   |--database.yaml
+  |   |--serve.yaml
+  |--router
+  |    |--http.go
+```
+### 配置
+配置都放在env目录下,在启动服务时会自动加载yaml配置
+###### app.yaml文件
+```
+# app config目录
+APP_CONFIG: /env/config
+```
+###### database.yaml文件
+```
+DB:
+  Default:
+    Driver: "mysql"
+    Host: "127.0.0.1"
+    Port: "3306"
+    Database: "db_name"
+    Username: "root"
+    Password: ""
+    Charset: "utf8mb4"
+    Collation: "utf8mb4_unicode_ci"
+    Prefix: ""
+    LogMode: true
+    MaxIdle: 200
+    MaxOpen: 1
+    MaxLifetime: 10
 
-## 功能说明
-控制器、简易依赖注入、中间件、表达式、任务组件、开发者工具等
+Redis:
+  Default:
+    Host: ""
+    Auth: ""
+    Port: 6379
+    Db: 0
+    Pool:
+      Min_Connections: 1
+      Max_Connections: 10
+      Connect_Timeout: 10.0
+      Wait_Timeout: 3.0
+      Heartbeat: -1
+      Max_Idle: 3
+      Max_Idle_Time: 60
+      Max_Conn_Lifetime: 10
+      Wait: true
+```
+###### serve.yaml文件
+```
+# Http服务器
+HTTP_HOST:
+  Type: http
+  Name: http
+  Addr: 0.0.0.0:1254
+  ReadTimeout: 5
+  WriteTimeout: 10
+
+# Https服务器
+HTTPS_HOST:
+  Type: http
+  Name: https
+  Addr: 0.0.0.0:1255
+  ReadTimeout: 5
+  WriteTimeout: 10
+
+# Websocket服务器
+WEBSOCKET_HOST:
+  Type: websocket
+  Name: websocket
+  Addr: 0.0.0.0:6125
+  ReadTimeout: 5
+  WriteTimeout: 10
+```
+### 路由
+路由可以统一写在router/http.go文件里
+```
+// https api 接口
+type Https struct {
+	*higo.Serve `inject:"Bean.NewServe('env.serve.HTTPS_HOST')"`
+}
+
+func NewHttps() *Https {
+	return &Https{}
+}
+
+func (this *Https) Static(ctx *gin.Context) bool {
+	ok1, err := regexp.MatchString("^/index/", ctx.Request.URL.Path)
+	if nil != err {
+		panic(err)
+	}
+	ok2, err := regexp.MatchString(`.(js|css|woff|ttf|ico|png)$`, ctx.Request.URL.Path)
+	if nil != err {
+		panic(err)
+	}
+	if ok1 || ok2 {
+		return true
+	}
+	return false
+}
+
+// 路由装载器
+func (this *Https) Loader(hg *higo.Higo) {
+	// 静态文件
+	hg.Static("/index/", "dist")
+	hg.Static("/static/", "dist/static")
+	hg.StaticFile("/favicon.ico", "dist/favicon.ico")
+	this.Api(hg)
+}
+
+// api 路由
+func (this *Https) Api(hg *higo.Higo) {
+    hg.AddGroup("/v3", func() {
+        hg.Get("/test1", HttpsTestThrow2)
+    })
+}
+```
+或者写在controller类Route方法里
+```
+func (this *AdminController) Route(hg *higo.Higo) {
+    //route example
+    hg.Get("/relative1", this.Example1, hg.Flag("AdminController.Example1"), hg.Desc("Example1"))
+    hg.Get("/relative2", this.Example2, hg.Flag("AdminController.Example2"), hg.Desc("Example2"))
+    hg.Get("/relative3", this.Example3, hg.Flag("AdminController.Example3"), hg.Desc("Example3"))
+    hg.Get("/relative4", this.Example4, hg.Flag("AdminController.Example4"), hg.Desc("Example4"))
+    hg.Get("/relative5", this.Example5, hg.Flag("AdminController.Example5"), hg.Desc("Example5"))
+    //route group example
+    hg.AddGroup("/group_prefix", func() {
+        hg.Get("/relative6", this.Example6, hg.Flag("AdminController.Example6"), hg.Desc("Example6"))
+        hg.Get("/list", this.List, hg.Flag("AdminController.List"), hg.Desc("List"))
+        hg.Post("/add", this.Add, hg.Flag("AdminController.Add"), hg.Desc("Add"))
+        hg.Put("/edit", this.Edit, hg.Flag("AdminController.Edit"), hg.Desc("Edit"))
+        hg.Delete("/delete", this.Delete, hg.Flag("AdminController.Delete"), hg.Desc("Delete"))
+    })
+}
+```
+### Api鉴权
+鉴权需要中间件和路由配合,默认情况所有Api都是需要鉴权的,在注册路由时可以router.IsAuth(false)取消鉴权```hg.Post("/test1", this.HttpsTestValidate, router.IsAuth(false))```
+###### 中间件Auth.go
+```
+// 鉴权
+type Auth struct{}
+
+// 构造函数
+func NewAuth() *Auth {
+	return &Auth{}
+}
+
+func (this *Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
+    return func(ctx *gin.Context) {
+        if !router.NewHttps().Static(ctx) {
+            if route, ok := hg.GetRoute(ctx.Request.Method, ctx.Request.URL.Path); ok {
+                if route.IsAuth() && !route.IsStatic() {
+                    token := ctx.GetHeader("Authorization")
+                    if "" == token {
+                        exception.Throw(exception.Message(errcode.TokenEmpty.Message()), exception.Code(int(errcode.TokenEmpty)))
+                    }
+                    // token解析
+                }
+            } else {
+                exception.Throw(exception.Message(errcode.NotFound.Message()), exception.Code(int(errcode.NotFound)))
+			}
+		}
+	}
+}
+```
 
 ### 控制器
 控制器代码可以通过开发者工具指令直接生成基础代码,并且采用AST自动注册到Bean实例内。
@@ -40,141 +229,118 @@ go run bin\main.go -gen=controller -out=app\controllers -name=Admin
 package controllers
 
 import (
-	"fmt"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/request"
-	"github.com/dengpju/higo-gin/higo/responser"
-	"github.com/dengpju/higo-router/router"
-	"github.com/gin-gonic/gin"
+    "github.com/dengpju/higo-gin/higo"
+    "github.com/dengpju/higo-gin/higo/request"
+    "github.com/dengpju/higo-gin/higo/responser"
+    "github.com/dengpju/higo-router/router"
+    "github.com/gin-gonic/gin"
 )
 
 type AdminController struct {
 }
 
 func NewAdminController() *AdminController {
-	return &AdminController{}
+    return &AdminController{}
 }
 
 func (this *AdminController) New() higo.IClass {
-	return NewAdminController()
+    return NewAdminController()
 }
 
 func (this *AdminController) Route(hg *higo.Higo) {
-	//route example
-	hg.Get("/relative1", this.Example1, hg.Flag("AdminController.Example1"), hg.Desc("Example1"))
-	hg.Get("/relative2", this.Example2, hg.Flag("AdminController.Example2"), hg.Desc("Example2"))
-	hg.Get("/relative3", this.Example3, hg.Flag("AdminController.Example3"), hg.Desc("Example3"))
-	hg.Get("/relative4", this.Example4, hg.Flag("AdminController.Example4"), hg.Desc("Example4"))
-	hg.Get("/relative5", this.Example5, hg.Flag("AdminController.Example5"), hg.Desc("Example5"))
-	//route group example
-	hg.AddGroup("/group_prefix", func() {
-	    hg.Get("/relative6", this.Example6, hg.Flag("AdminController.Example6"), hg.Desc("Example6"))
-	    hg.Get("/list", this.List, hg.Flag("AdminController.List"), hg.Desc("List"))
-	    hg.Post("/add", this.Add, hg.Flag("AdminController.Add"), hg.Desc("Add"))
-	    hg.Put("/edit", this.Edit, hg.Flag("AdminController.Edit"), hg.Desc("Edit"))
-	    hg.Delete("/delete", this.Delete, hg.Flag("AdminController.Delete"), hg.Desc("Delete"))
-	})
+    //route example
+    hg.Get("/relative1", this.Example1, hg.Flag("AdminController.Example1"), hg.Desc("Example1"))
+    hg.Get("/relative2", this.Example2, hg.Flag("AdminController.Example2"), hg.Desc("Example2"))
+    hg.Get("/relative3", this.Example3, hg.Flag("AdminController.Example3"), hg.Desc("Example3"))
+    hg.Get("/relative4", this.Example4, hg.Flag("AdminController.Example4"), hg.Desc("Example4"))
+    hg.Get("/relative5", this.Example5, hg.Flag("AdminController.Example5"), hg.Desc("Example5"))
+    //route group example
+    hg.AddGroup("/group_prefix", func() {
+        hg.Get("/relative6", this.Example6, hg.Flag("AdminController.Example6"), hg.Desc("Example6"))
+        hg.Get("/list", this.List, hg.Flag("AdminController.List"), hg.Desc("List"))
+        hg.Post("/add", this.Add, hg.Flag("AdminController.Add"), hg.Desc("Add"))
+        hg.Put("/edit", this.Edit, hg.Flag("AdminController.Edit"), hg.Desc("Edit"))
+        hg.Delete("/delete", this.Delete, hg.Flag("AdminController.Delete"), hg.Desc("Delete"))
+    })
 }
 
 func (this *AdminController) List() {
-    //TODO::example code
 	ctx := request.Context()
-	//get parameter
     name := ctx.Query("name")
-    //responser
     responser.SuccessJson("success", 10000, name)
 }
 
 func (this *AdminController) Add() {
-    //TODO::example code
-	ctx := request.Context()
-	//get parameter
+    ctx := request.Context()
     name := ctx.Query("name")
-    //responser
     responser.SuccessJson("success", 10000, name)
 }
 
 func (this *AdminController) Edit() {
-    //TODO::example code
-	ctx := request.Context()
-	//get parameter
+    ctx := request.Context()
     name := ctx.Query("name")
-    //responser
     responser.SuccessJson("success", 10000, name)
 }
 
 func (this *AdminController) Delete() {
-    //TODO::example code
-	ctx := request.Context()
-	//get parameter
+    ctx := request.Context()
     name := ctx.Query("name")
-    //responser
     responser.SuccessJson("success", 10000, name)
 }
 
 func (this *AdminController) Example1() {
-    //TODO::example code
-	ctx := request.Context()
-	//get parameter
+    ctx := request.Context()
     name := ctx.Query("name")
-    //responser
     responser.SuccessJson("success", 10000, name)
 }
 
 //responser string
 func (this *AdminController) Example2() string {
-    //TODO::example code
     ctx := request.Context()
-    //get parameter
     name := ctx.Query("name")
     return name
 }
 
 //responser interface{}
 func (this *AdminController) Example3() interface{} {
-    //TODO::example code
     ctx := request.Context()
-    //get parameter
     name := ctx.Query("name")
     return name
 }
 
 //example Model
 type AdminControllerModel struct {
-	Id   int
-	Name string
+    Id   int
+    Name string
 }
 
 func (this *AdminControllerModel) New() higo.IClass {
-	return &AdminControllerModel{}
+    return &AdminControllerModel{}
 }
 
 func (this *AdminControllerModel) Mutate(attrs ...higo.Property) higo.Model {
-	higo.Propertys(attrs).Apply(this)
-	return this
+    higo.Propertys(attrs).Apply(this)
+    return this
 }
 
 //responser Model
 func (this *AdminController) Example4(ctx *gin.Context) higo.Model {
-    //TODO::example code
-	model := &AdminControllerModel{Id: 1, Name: "foo"}
-	return model
+    model := &AdminControllerModel{Id: 1, Name: "foo"}
+    return model
 }
 
 //responser Models
 func (this *AdminController) Example5(ctx *gin.Context) higo.Models {
-    //TODO::example code
-	var models []*AdminControllerModel
-	models = append(models, &AdminControllerModel{Id: 1, Name: "foo"}, &AdminControllerModel{Id: 2, Name: "bar"})
-	return higo.MakeModels(models)
+    var models []*AdminControllerModel
+    models = append(models, &AdminControllerModel{Id: 1, Name: "foo"}, &AdminControllerModel{Id: 2, Name: "bar"})
+    return higo.MakeModels(models)
 }
 
 //responser Json
 func (this *AdminController) Example6(ctx *gin.Context) higo.Json {
-    //TODO::example code
-	var models []*AdminControllerModel
-	models = append(models, &AdminControllerModel{Id: 1, Name: "foo"}, &AdminControllerModel{Id: 2, Name: "bar"})
-	return models
+    var models []*AdminControllerModel
+    models = append(models, &AdminControllerModel{Id: 1, Name: "foo"}, &AdminControllerModel{Id: 2, Name: "bar"})
+    return models
 }
 ```
 
@@ -186,22 +352,22 @@ func (this *AdminController) Example6(ctx *gin.Context) higo.Json {
 type MyBean struct{ higo.Bean }
 
 func NewMyBean() *MyBean {
-	return &MyBean{}
+    return &MyBean{}
 }
 
 // 手动添加配置进行注册
 func (this *MyBean) DemoService() *Services.DemoService {
-	return Services.NewDemoService()
+    return Services.NewDemoService()
 }
 ```
 ###### 使用
 ```
 type DemoController struct {
     // multiple
-	DemoService1 *Services.DemoService `inject:"MyBean.DemoService()"`
-	// single
-	DemoService2 *Services.DemoService `inject:"-"`
-	Name string
+    DemoService1 *Services.DemoService `inject:"MyBean.DemoService()"`
+    // single
+    DemoService2 *Services.DemoService `inject:"-"`
+    Name string
 }
 ```
 ###### Value注入
@@ -226,27 +392,27 @@ type DemoController struct {
 type Cors struct {}
 
 func NewCors() *Cors {
-	return &Cors{}
+    return &Cors{}
 }
 
 func (this *Cors) Middle(hg *higo.Higo) gin.HandlerFunc {
-	return func(cxt *gin.Context) {
-		method := cxt.Request.Method
-		origin := cxt.Request.Header.Get("Origin")
-		if origin != "" {
-			cxt.Header("Access-Control-Allow-Origin", "*")
-			cxt.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-			cxt.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
-			cxt.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
-			cxt.Header("Access-Control-Allow-Credentials", "true")
-		}
+    return func(cxt *gin.Context) {
+        method := cxt.Request.Method
+        origin := cxt.Request.Header.Get("Origin")
+        if origin != "" {
+            cxt.Header("Access-Control-Allow-Origin", "*")
+            cxt.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+            cxt.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+            cxt.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+            cxt.Header("Access-Control-Allow-Credentials", "true")
+        }
 
-		if method == "OPTIONS" {
-			cxt.AbortWithStatus(http.StatusNoContent)
-		}
+        if method == "OPTIONS" {
+            cxt.AbortWithStatus(http.StatusNoContent)
+        }
 
-		cxt.Next()
-	}
+        cxt.Next()
+    }
 }
 ```
 
