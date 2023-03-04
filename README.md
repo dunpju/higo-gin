@@ -39,7 +39,7 @@ project
 ```
 go get -u github.com/dengpju/higo-gin@v1.1.54
 ```
-##使用
+# 使用
 ### 配置
 配置都放在env目录下,在启动服务时会自动加载yaml配置
 ###### app.yaml文件
