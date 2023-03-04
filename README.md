@@ -36,7 +36,9 @@ project
 ```
 
 ## 安装
+```
 go get -u github.com/dengpju/higo-gin@v1.1.54
+```
 
 ### 配置
 配置都放在env目录下,在启动服务时会自动加载yaml配置
