@@ -7,23 +7,6 @@ go get -u github.com/dengpju/higo-gin@v1.1.54
 ## 功能说明
 控制器、简易依赖注入、中间件、表达式、任务组件、开发者工具等
 
-### 启动
-```
-func main() {
-    beanConfig := Beans.NewMyBean()
-    
-    higo.Init(sliceutil.NewSliceString(".", "test", "")). // 指定root目录
-        Middleware(Middlewares.NewCors(), Middlewares.NewRunLog()). // 注册中间件
-        AddServe(router.NewHttp(), Middlewares.NewHttp()). // 添加http服务、服务中间件
-        AddServe(router.NewHttps(), beanConfig). // 添加https服务、服务bean
-        AddServe(router.NewWebsocket()).// 添加websocket服务
-        Beans(beanConfig). // 全局bean
-        Cron("0/3 * * * * *", func() { // 添加定时任务
-            log.Println("3秒执行一次")
-        }).
-        Boot()
-}
-```
 ### 目录结构
 工作目录结构(仅参考):
 ```
@@ -181,6 +164,23 @@ func (this *AdminController) Route(hg *higo.Higo) {
         hg.Put("/edit", this.Edit, hg.Flag("AdminController.Edit"), hg.Desc("Edit"))
         hg.Delete("/delete", this.Delete, hg.Flag("AdminController.Delete"), hg.Desc("Delete"))
     })
+}
+```
+### 启动
+```
+func main() {
+    beanConfig := Beans.NewMyBean()
+    
+    higo.Init(sliceutil.NewSliceString(".", "test", "")). // 指定root目录
+        Middleware(Middlewares.NewCors(), Middlewares.NewRunLog()). // 注册中间件
+        AddServe(router.NewHttp(), Middlewares.NewHttp()). // 添加http服务、服务中间件
+        AddServe(router.NewHttps(), beanConfig). // 添加https服务、服务bean
+        AddServe(router.NewWebsocket()).// 添加websocket服务
+        Beans(beanConfig). // 全局bean
+        Cron("0/3 * * * * *", func() { // 添加定时任务
+            log.Println("3秒执行一次")
+        }).
+        Boot()
 }
 ```
 ### 鉴权
