@@ -1,14 +1,11 @@
 # higo-gin
 基于gin封装的脚手架
 
-## 安装
-go get -u github.com/dengpju/higo-gin@v1.1.54
-
 ## 功能说明
 控制器、简易依赖注入、中间件、表达式、任务组件、开发者工具等
 
-### 目录结构
-工作目录结构(仅参考):
+## 目录结构
+仅参考:
 ```
 project
   |--app
@@ -37,6 +34,10 @@ project
   |   |--http.go
   |--go.mod
 ```
+
+## 安装
+go get -u github.com/dengpju/higo-gin@v1.1.54
+
 ### 配置
 配置都放在env目录下,在启动服务时会自动加载yaml配置
 ###### app.yaml文件
