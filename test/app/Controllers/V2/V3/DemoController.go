@@ -5,6 +5,7 @@ import (
 	"gitee.com/dengpju/higo-code/code"
 	"github.com/dengpju/higo-annotation/anno"
 	"github.com/dengpju/higo-gin/higo"
+	"github.com/dengpju/higo-gin/higo/ratelimit"
 	"github.com/dengpju/higo-gin/higo/request"
 	"github.com/dengpju/higo-gin/test/app/Controllers"
 	"github.com/dengpju/higo-gin/test/app/Exception"
@@ -18,7 +19,7 @@ import (
 	"time"
 )
 
-const SelfDemoController  = ""
+const SelfDemoController = ""
 
 type DemoController struct {
 	Age         *anno.Value           `prefix:"user.age"`
@@ -41,14 +42,14 @@ func (this *DemoController) Route(hg *higo.Higo) {
 		//hg.AddGroup("/user", func() {
 		//	hg.Post("/login", this.Login, hg.Flag("Login"), hg.Desc("V3 登录"))
 		//})
-		hg.Get("/test_throw2132", HttpsTestThrow2, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
+		hg.Get("/test_throw2132", ratelimit.Limiter(3, 1)(HttpsTestThrow2), hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
 		hg.Get("/test_throw21321", this.HttpsTestThrow2, hg.Flag("TestThrow"), hg.Desc("V3 测试异常111"))
 		hg.Post("/test_get21111132", this.HttpsTestGet, hg.Flag("TestGet"), hg.Desc("V3 测试GET"))
 		hg.Post("/test_validator2132", this.HttpsTestValidate, hg.Flag("HttpsTestValidate"), hg.Desc("V3 测试校验器"), router.IsAuth(false))
 	})
 }
 
-func HttpsTestThrow2(ctx *gin.Context)  {
+func HttpsTestThrow2(ctx *gin.Context) {
 	fmt.Println("ggg")
 	fmt.Printf("%p\n", higo.Di("test/app/Controllers/WebsocketController"))
 	e1 := &Controllers.EventController{}

@@ -18,7 +18,17 @@ func NewBucket(cap, rate int64) *Bucket {
 		panic("error cap")
 	}
 	bucket := &Bucket{cap: cap, tokens: cap, rate: rate}
+	//bucket.start() // 使用了更优雅的方式生成token
 	return bucket
+}
+
+func (this *Bucket) start() {
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			this.addToken()
+		}
+	}()
 }
 
 func (this *Bucket) addToken() {
@@ -35,6 +45,7 @@ func (this *Bucket) IsAccept() bool {
 	this.lock.Lock()
 	defer this.lock.Unlock()
 	now := time.Now().Unix()
+	// 计算是否生成token
 	this.tokens = this.tokens + (now-this.lastTime)*this.rate
 	if this.tokens > this.cap {
 		this.tokens = this.cap
