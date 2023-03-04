@@ -104,6 +104,15 @@ WEBSOCKET_HOST:
   ReadTimeout: 5
   WriteTimeout: 10
 ```
+###### 获取配置
+```
+获取all: config.All()
+获取key: config.Get("key") 或者 config.Get("env.key")
+获取env: config.Env("key")
+获取app.yaml: config.App("key")
+获取anno.yaml: config.Anno("key")
+```
+
 ### 路由
 路由可以统一写在router/http.go文件里
 ```
