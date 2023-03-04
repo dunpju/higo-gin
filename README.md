@@ -10,18 +10,18 @@ go get -u github.com/dengpju/higo-gin@v1.1.54
 ### 启动
 ```
 func main() {
-	beanConfig := Beans.NewMyBean()
-
-	higo.Init(sliceutil.NewSliceString(".", "test", "")). // 指定root目录
-		Middleware(Middlewares.NewCors(), Middlewares.NewRunLog()). // 注册中间件
-		AddServe(router.NewHttp(), Middlewares.NewHttp()). // 添加http服务、服务中间件
-		AddServe(router.NewHttps(), beanConfig). // 添加https服务、服务bean
-		AddServe(router.NewWebsocket()).// 添加websocket服务
-		Beans(beanConfig). // 全局bean
-		Cron("0/3 * * * * *", func() { // 添加定时任务
-		    log.Println("3秒执行一次")
-		}).
-		Boot()
+    beanConfig := Beans.NewMyBean()
+    
+    higo.Init(sliceutil.NewSliceString(".", "test", "")). // 指定root目录
+        Middleware(Middlewares.NewCors(), Middlewares.NewRunLog()). // 注册中间件
+        AddServe(router.NewHttp(), Middlewares.NewHttp()). // 添加http服务、服务中间件
+        AddServe(router.NewHttps(), beanConfig). // 添加https服务、服务bean
+        AddServe(router.NewWebsocket()).// 添加websocket服务
+        Beans(beanConfig). // 全局bean
+        Cron("0/3 * * * * *", func() { // 添加定时任务
+            log.Println("3秒执行一次")
+        }).
+        Boot()
 }
 ```
 ### 目录结构
@@ -126,35 +126,35 @@ WEBSOCKET_HOST:
 ```
 // https api 接口
 type Https struct {
-	*higo.Serve `inject:"Bean.NewServe('env.serve.HTTPS_HOST')"`
+    *higo.Serve `inject:"Bean.NewServe('env.serve.HTTPS_HOST')"`
 }
 
 func NewHttps() *Https {
-	return &Https{}
+    return &Https{}
 }
 
 func (this *Https) Static(ctx *gin.Context) bool {
-	ok1, err := regexp.MatchString("^/index/", ctx.Request.URL.Path)
-	if nil != err {
-		panic(err)
-	}
-	ok2, err := regexp.MatchString(`.(js|css|woff|ttf|ico|png)$`, ctx.Request.URL.Path)
-	if nil != err {
-		panic(err)
-	}
-	if ok1 || ok2 {
-		return true
-	}
-	return false
+    ok1, err := regexp.MatchString("^/index/", ctx.Request.URL.Path)
+    if nil != err {
+        panic(err)
+    }
+    ok2, err := regexp.MatchString(`.(js|css|woff|ttf|ico|png)$`, ctx.Request.URL.Path)
+    if nil != err {
+        panic(err)
+    }
+    if ok1 || ok2 {
+        return true
+    }
+    return false
 }
 
 // 路由装载器
 func (this *Https) Loader(hg *higo.Higo) {
-	// 静态文件
-	hg.Static("/index/", "dist")
-	hg.Static("/static/", "dist/static")
-	hg.StaticFile("/favicon.ico", "dist/favicon.ico")
-	this.Api(hg)
+    // 静态文件
+    hg.Static("/index/", "dist")
+    hg.Static("/static/", "dist/static")
+    hg.StaticFile("/favicon.ico", "dist/favicon.ico")
+    this.Api(hg)
 }
 
 // api 路由
@@ -183,7 +183,7 @@ func (this *AdminController) Route(hg *higo.Higo) {
     })
 }
 ```
-### Api鉴权
+### 鉴权
 鉴权需要中间件和路由配合,默认情况所有Api都是需要鉴权的,在注册路由时可以router.IsAuth(false)取消鉴权```hg.Post("/test1", this.HttpsTestValidate, router.IsAuth(false))```
 ###### 中间件Auth.go
 ```
@@ -192,7 +192,7 @@ type Auth struct{}
 
 // 构造函数
 func NewAuth() *Auth {
-	return &Auth{}
+    return &Auth{}
 }
 
 func (this *Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
@@ -208,9 +208,9 @@ func (this *Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
                 }
             } else {
                 exception.Throw(exception.Message(errcode.NotFound.Message()), exception.Code(int(errcode.NotFound)))
-			}
-		}
-	}
+            }
+        }
+    }
 }
 ```
 
