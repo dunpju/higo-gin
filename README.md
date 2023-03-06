@@ -447,7 +447,7 @@ func main() {
         Boot()
 }
 ```
-### <span id="limiter">限流器</span> [top](#top)
+### <span id="limiter">限流器</span> <font size=2>[top](#top)</font>
 使用令牌桶算法生成token，并实现LRU算法的淘汰机制;
 ###### 使用限流器
 ```
