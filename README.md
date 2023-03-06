@@ -1,7 +1,7 @@
 # higo-gin
 基于gin封装的脚手架
 
-## 功能说明
+## <span id="top">功能说明</span>
 控制器、简易依赖注入、中间件、表达式、任务组件、[限流器](#limiter)、开发者工具等
 
 ## 目录结构
@@ -447,7 +447,7 @@ func main() {
         Boot()
 }
 ```
-### <span id="limiter">限流器</span>
+### <span id="limiter">限流器</span> [top](#top)
 使用令牌桶算法生成token，并实现LRU算法的淘汰机制;
 ###### 使用限流器
 ```
