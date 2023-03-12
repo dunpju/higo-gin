@@ -20,8 +20,9 @@ func (this *RunLog) Middle(hg *higo.Higo) gin.HandlerFunc {
 	return func(cxt *gin.Context) {
 		tt := cxt.Query("tt")
 		goid, _ := runtimeutil.GoroutineID()
-		fmt.Printf("RunLog:%s\n",
-			higo.RouterContainer.Get(cxt.Request.Method, cxt.Request.URL.Path).Desc()+"-"+strconv.FormatUint(goid, 10)+"-"+tt)
+		if route, ok := hg.GetRoute(cxt.Request.Method, cxt.Request.URL.Path); ok {
+			fmt.Printf("RunLog:%s\n", route.Desc()+"-"+strconv.FormatUint(goid, 10)+"-"+tt)
+		}
 		cxt.Next()
 	}
 }

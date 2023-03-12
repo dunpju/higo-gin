@@ -160,7 +160,11 @@ func websocketConnFunc(ctx *gin.Context) string {
 		panic(err)
 	}
 
-	route := router.GetRoutes(WebsocketServe).Route(ctx.Request.Method, ctx.Request.URL.Path).SetHeader(ctx.Request.Header)
+	route, err := router.GetRoutes(WebsocketServe).Route(ctx.Request.Method, ctx.Request.URL.Path)
+	if err != nil {
+		panic(err)
+	}
+	route = route.SetHeader(ctx.Request.Header)
 
 	WsContainer.Store(route, client)
 	return client.RemoteAddr().String()

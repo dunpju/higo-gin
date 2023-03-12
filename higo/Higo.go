@@ -137,7 +137,7 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 	logger.Logrus.Root(this.GetRoot().Join(pathSeparator)).File("higo").Init()
 	// 装载env配置
 	envPath := this.GetRoot().Join(pathSeparator) + "env"
-	if ! dirutil.DirExist(envPath) {
+	if !dirutil.DirExist(envPath) {
 		dirutil.Mkdir(envPath)
 	}
 	envConf := config.New()
@@ -179,7 +179,7 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 
 // 加载配置
 func (this *Higo) loadConfigur() *Higo {
-	if ! dirutil.DirExist(AppConfigDir.Join(dirutil.PathSeparator())) {
+	if !dirutil.DirExist(AppConfigDir.Join(dirutil.PathSeparator())) {
 		dirutil.Mkdir(AppConfigDir.Join(dirutil.PathSeparator()))
 	}
 	conf := config.New()
@@ -256,7 +256,7 @@ func (this *Higo) SetType(serveType string) *Higo {
 func (this *Higo) AddServe(route IRouterLoader, middles ...IMiddleware) *Higo {
 	injector.BeanFactory.Apply(route)
 	injector.BeanFactory.Set(route)
-	if ! onlySupportServe.Exist(route.GetServe().Type) {
+	if !onlySupportServe.Exist(route.GetServe().Type) {
 		panic("Serve Type error! only support:" + onlySupportServe.String() + ", But give " + route.GetServe().Type)
 	}
 	route.GetServe().SetRouter(route).SetMiddle(middles...)
@@ -380,7 +380,7 @@ func (this *Higo) Boot() {
 
 // 获取路由
 func (this *Higo) GetRoute(method, relativePath string) (*router.Route, bool) {
-	return RouterContainer.Get(method, relativePath), true
+	return RouterContainer.Get(this.serve, method, relativePath), true
 }
 
 // 静态文件
@@ -409,11 +409,10 @@ func (this *Higo) StaticFS(relativePath string, fs http.FileSystem) *Higo {
 
 // 装载路由
 func (this *Higo) loadRoute() *Higo {
-	router.GetRoutes(this.serve).ForEach(func(index int, route *router.Route) {
+	router.GetRoutes(this.serve).ForEach(func(route *router.Route) {
 		// 判断空标记
 		IsEmptyFlag(route)
-		// 添加路由容器
-		RouterContainer.Add(route.Unique(), route)
+
 		if route.Prefix() != "" {
 			this.group = this.Engine.Group(route.Prefix())
 			this.GroupHandle(route)
