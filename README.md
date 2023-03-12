@@ -1,8 +1,8 @@
 # higo-gin
 基于gin封装的脚手架
 
-## 功能说明
-控制器、简易依赖注入、中间件、表达式、任务组件、限流器、开发者工具等
+## <span id="top">功能说明</span>
+[控制器](#controller)、[简易依赖注入](#inject)、[中间件](#middleware)、[表达式](#express)、[任务组件](#task)、[限流器](#limiter)、[开发者工具](#devtool)等
 
 ## 目录结构
 仅参考:
@@ -227,7 +227,7 @@ func (this *Auth) Middle(hg *higo.Higo) gin.HandlerFunc {
 }
 ```
 
-### 控制器
+### <span id="controller">控制器</span> <font size=1>[top](#top)</font>
 控制器代码可以通过开发者工具指令直接生成基础代码,并且采用AST自动注册到Bean实例内。
 
 ###### 构建指令:
@@ -357,7 +357,7 @@ func (this *AdminController) Example6(ctx *gin.Context) higo.Json {
 }
 ```
 
-### 依赖注入
+### <span id="inject">依赖注入</span> <font size=1>[top](#top)</font>
 注入对象,需要先注册到Bean实例内
 
 ###### example
@@ -398,7 +398,7 @@ type DemoController struct {
 }
 ```
 
-### 中间件
+### <span id="middleware">中间件</span> <font size=1>[top](#top)</font>
 只要实现IMiddleware接口都被认为是中间件
 ###### example
 ```
@@ -429,14 +429,14 @@ func (this *Cors) Middle(hg *higo.Higo) gin.HandlerFunc {
 }
 ```
 
-### 表达式
+### <span id="express">表达式</span> <font size=1>[top](#top)</font>
 表达式封装了独立的包```github.com/dengpju/higo-express/express```
 ```
 // 执行表达式
 express.Run("MyBean.DemoService()")
 ```
 
-### 任务组件
+### <span id="task">任务组件</span> <font size=1>[top](#top)</font>
 使用定时任务
 ```
 func main() {
@@ -447,14 +447,14 @@ func main() {
         Boot()
 }
 ```
-### 限流器
+### <span id="limiter">限流器</span> <font size=1>[top](#top)</font>
 使用令牌桶算法生成token，并实现LRU算法的淘汰机制;
 ###### 使用限流器
 ```
 hg.Get("/test1", ratelimit.Limiter(3, 1)(Test))
 说明：ratelimit.Limiter(3, 1)表示令牌桶容量为3,每秒产生1个令牌
 ```
-### 开发者工具
+### <span id="devtool">开发者工具</span> <font size=1>[top](#top)</font>
 ###### 构建Controller
 ```
 go run bin\main.go -gen=controller -out=app\controllers -name=controller_name
