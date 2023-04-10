@@ -2,7 +2,6 @@ package {{.PackageName}}
 
 import (
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/errcodg"
 	"github.com/dengpju/higo-gin/higo/exceptions/DaoException"
 	"github.com/dengpju/higo-gin/higo/sql"
 	{{- range $impo := .Imports}}
@@ -35,7 +34,7 @@ func (this *{{.StructName}}) SetData(entity *{{.EntityPackageName}}.{{.EntityNam
     this.entity = entity
 	if ! entity.PriEmpty() || entity.IsEdit() { //编辑
 		if !this.GetBy{{.PrimaryId}}(entity.{{.PrimaryId}}).Exist() {
-			DaoException.Throw(errcodg.NotExistError.Message(), int(errcodg.NotExistError))
+			DaoException.Throw("不存在", 0)
 		}
 
 		{{- if .HasUpdateTime}}
@@ -75,7 +74,7 @@ func (this *{{.StructName}}) Add() int64 {
 //更新
 func (this *{{.StructName}}) Update() bool {
     if this.entity.PriEmpty() {
-		DaoException.Throw("{{.PrimaryId}}"+errcodg.PrimaryIdError.Message(), int(errcodg.PrimaryIdError))
+		DaoException.Throw("主键{{.PrimaryId}}为空", 0)
 	}
 	higo.Result(this.model.Mapper(this.model.GetBuilder()).Exec().Error).Unwrap()
 	return true
