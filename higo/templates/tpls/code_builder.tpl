@@ -1,6 +1,9 @@
 package {{.Package}}
 
-import "gitee.com/dengpju/higo-code/code"
+import (
+	"gitee.com/dengpju/higo-code/code"
+	. "github.com/dengpju/higo-gin/higo/errcode"
+)
 
 const (
 	{{- range $i,$v := .KeyValueDocs}}
