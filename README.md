@@ -357,6 +357,71 @@ func (this *AdminController) Example6(ctx *gin.Context) higo.Json {
 }
 ```
 
+###### <span id="Websocket">Websocket</span> <font size=1>[top](#top)</font>
+```
+type WebsocketController struct {
+}
+
+func NewWebsocketController() *WebsocketController {
+	return &WebsocketController{}
+}
+
+func (this *WebsocketController) New() higo.IClass {
+	return NewWebsocketController()
+}
+
+func (this *WebsocketController) Route(hg *higo.Higo) {
+	hg.Ws("/conn", this.Conn, hg.Desc("conn"))
+	hg.Ws("/echo", this.Echo, hg.Flag("WebsocketController.Echo"), hg.Desc("Echo"))
+	hg.Ws("/send_all", this.SendAll, hg.Flag("WebsocketController.SendAll"), hg.Desc("SendAll"))
+}
+
+// webSocket请求
+func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
+	loginEntity := Entity.NewLoginEntity()
+	err := ctx.ShouldBind(loginEntity)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Conn", loginEntity)
+
+	return higo.WsRespStruct(loginEntity)
+}
+
+func (this *WebsocketController) Echo(ctx *gin.Context) higo.WsWriteMessage {
+	return higo.WsRespString("echo")
+}
+
+func (this *WebsocketController) SendAll(ctx *gin.Context) string {
+	higo.WsContainer.SendAll(ctx.Query("msg"))
+	return "ok"
+}
+```
+
+###### <span id="redis">Redis</span> <font size=1>[top](#top)</font>
+redis工具基于github.com/gomodule/redigo/redis封装<br>
+启动时开启redis连接池
+```
+func main() {
+    higo.Init(sliceutil.NewSliceString(".", "test", "")).
+        IsRedisPool(). // 开启redis连接池
+        Boot()
+}
+```
+使用
+```
+import (
+    "fmt"
+    "github.com/dengpju/higo-gin/higo"
+)
+
+func Test() {
+    higo.Redis.Set("name", rand.Intn(1000))
+    v := higo.Redis.Get("name")
+    fmt.Println(v)
+}
+```
+
 ### <span id="inject">依赖注入</span> <font size=1>[top](#top)</font>
 注入对象,需要先注册到Bean实例内
 
@@ -447,6 +512,7 @@ func main() {
         Boot()
 }
 ```
+
 ### <span id="limiter">限流器</span> <font size=1>[top](#top)</font>
 使用令牌桶算法生成token，并实现LRU算法的淘汰机制;
 ###### 使用限流器
@@ -454,27 +520,32 @@ func main() {
 hg.Get("/test1", ratelimit.Limiter(3, 1)(Test))
 说明：ratelimit.Limiter(3, 1)表示令牌桶容量为3,每秒产生1个令牌
 ```
+
 ### <span id="devtool">开发者工具</span> <font size=1>[top](#top)</font>
 ###### 构建Controller
 ```
 go run bin\main.go -gen=controller -out=app\controllers -name=controller_name
 ```
+
 ###### 构建Model
 ```
 go run bin\main.go -gen=model -out=app\models -name=table_name
 table_name如果是all,就构建所有表;
 构建model时会自动构建Dao层、Entity层
 ```
+
 ###### 构建Enum
 ```
 go run bin\main.go -gen=enum -out=app\enums -name="-e=flag_state -f=状态:enable-1-启用,disabled-2-禁用"
 或者将指令写入文件,例如将上面指令写入enum_cmd.md文件,然后执行
 go run bin\main.go -gen=enum -out=app\enums -name=bin\enum_cmd.md
 ```
+
 ###### 构建Service
 ```
 go run bin\main.go -gen=service -out=app\service -name=TestService
 ```
+
 ###### 构建Code
 bin\yaml\20000.yaml配置
 ```
@@ -488,6 +559,7 @@ nonexistence:
 ```
 go run bin\main.go -gen=code -name=ErrorCode -out=app\errcode -path=bin\yaml -auto=yes -force=yes
 ```
+
 ###### 构建Param
 ```
 go run bin\main.go -gen=param -out=app\params -name=DemoList
@@ -541,6 +613,7 @@ func (this *DemoList) RegisterValidator() *higo.Verify {
         }()))
 }
 ```
+
 ###### 组合校验规则
 ```
 type Add struct {
