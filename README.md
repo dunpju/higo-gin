@@ -419,6 +419,8 @@ func Test() {
     higo.Redis.Set("name", rand.Intn(1000))
     v := higo.Redis.Get("name")
     fmt.Println(v)
+    // 获取github.com/gomodule/redigo/redis连接
+    higo.Redis.Conn()            
 }
 ```
 

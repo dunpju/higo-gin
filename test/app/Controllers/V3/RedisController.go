@@ -43,6 +43,7 @@ func (this *RedisController) Test(ctx *gin.Context) string {
 	higo.Redis.Set("name", rand.Intn(1000))
 	v := higo.Redis.Get("name")
 	fmt.Println(v)
+	higo.Redis.Conn()
 	return v
 }
 
