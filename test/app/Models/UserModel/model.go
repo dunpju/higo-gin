@@ -3,7 +3,7 @@ package UserModel
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/errcodg"
+	"github.com/dengpju/higo-gin/test/app/errcode"
 	"github.com/dengpju/higo-ioc/injector"
 	"github.com/jinzhu/gorm"
 	"strings"
@@ -55,7 +55,7 @@ func (this *Impl) Mutate(attrs ...higo.Property) higo.Model {
 //  return higo.Verifier() // Manual call Register Validate: higo.Validate(verifier)
 //}
 func (this *Impl) RegisterValidator() *higo.Verify {
-	return higo.RegisterValidator(this).Tag("custom_tag_name", higo.Rule("required", errcodg.EnumError), higo.Rule("min=5", errcodg.EnumError))
+	return higo.RegisterValidator(this).Tag("custom_tag_name", higo.Rule("required", errcode.EnumError), higo.Rule("min=5", errcode.EnumError))
 }
 
 func (this *Impl) Exist() bool {
