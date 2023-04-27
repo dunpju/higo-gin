@@ -1,0 +1,3 @@
+# app config目录
+APP_CONFIG: ./../app/Beans
+

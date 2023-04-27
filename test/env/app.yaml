@@ -1,0 +1,13 @@
+# app config目录
+APP_CONFIG: ./app/Config
+Redis:
+   Default:
+       Host: "192.168.8.99"
+       Pool:
+           Min_Connections: 1
+           Max_Connections: 10
+   Default1:
+       Host: "192.168.8.99"
+       Pool:
+           Min_Connections: 1
+

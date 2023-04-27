@@ -1,0 +1,6 @@
+server_error:
+  code: 500
+  message: "服务器开小差了111111111~~"
+SERVER_ERROR:
+  code: 500
+  message: "服务器开小差了111111111~~"

@@ -1,0 +1,34 @@
+
+# 数据库
+DB:
+  Default:
+    Driver: "mysql"
+    Host: "192.168.8.99"
+    Port: "3306"
+    Database: "test"
+    Username: "root"
+    Password: "1qaz2wsx"
+    Charset: "utf8mb4"
+    Collation: "utf8mb4_unicode_ci"
+    Prefix: "ts_"
+    LogMode: true
+    MaxIdle: 5
+    MaxOpen: 10
+    MaxLifetime: 30
+
+Redis:
+  Default:
+    Host: "192.168.8.99"
+    Auth: "1qaz2wsx"
+    Port: 6379
+    Db: 0
+    Pool:
+      Min_Connections: 1
+      Max_Connections: 10
+      Connect_Timeout: 10.0
+      Wait_Timeout: 3.0
+      Heartbeat: -1
+      Max_Idle: 3
+      Max_Idle_Time: 60
+      Max_Conn_Lifetime: 10
+      Wait: true

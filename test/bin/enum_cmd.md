@@ -1,0 +1,33 @@
+php yii enum -e=EnableOrDisabled -f=启用禁用:enable-1-启用,disabled-2-禁用
+php yii enum -e=is_super -f=是否超级管理员:yes-1-是,no-2-否
+php yii enum -e=semester -f=学期:up-1-上学期,down-2-下学期
+php yii enum -e=is_finish -f=是否完成:yes-1-是,no-2-否
+php yii enum -e=state -f=状态:issue-1-发布,draft-2-草稿
+php yii enum -e=is_recheck -f=是否复核:yes-1-是,no-2-否
+php yii enum -e=is_share -f=是否分享:yes-1-是,no-2-否
+php yii enum -e=delete_audit_state -f=删除审核状态:not_delete-0-未发起删除,waiting-1-待审核,pass-2-审核通过,not_pass-3-审核未通过
+php yii enum -e=is_abnormal -f=分数异常:normal-0-正常,inc-1-上升,dec-2-下降
+php yii enum -e=notice_type -f=消息类型:system-1-系统通知,comment-2-评论,fans-3-粉丝,praise-4-点赞,assessment_corvidae-5-评价待完善,share_remind-6-分享提醒,section-7-环节设置
+php yii enum -e=privilege_flag_type -f=权限标签类型:action-1-功能,menu-2-菜单
+php yii enum -e=resource_type -f=资源类型:audio-1-音频,video-2-视频,image-3-图片
+php yii enum -e=verify_state -f=审核状态:waiting-1-待审核,pass-2-通过,refuse-3-拒绝
+php yii enum -e=collect_type -f=收藏类型:comment-1-评价
+php yii enum -e=is_read -f=是否阅读:yes-1-是,no-2-否
+php yii enum -e=version_state -f=版本状态:issue-1-发布,waiting-2-待发布
+php yii enum -e=version_is_used -f=是否正在使用:yes-1-是,no-2-否
+php yii enum -e=gender -f=是否正在使用:unknown-0-未知,male-1-男,female-2-女
+php yii enum -e=grade_name -f=幼儿园年级:KD-\"KD\"-婴班,KC-\"KC\"-小班,KB-\"KB\"-中班,KA-\"KA\"-大班
+php yii enum -e=auth_type -f=权限类型:action-1-功能,data-2-数据
+php yii enum -e=comment_type -f=评论类型:child-1-儿童评价\(tl_assessment\),calendar_template-2-一日模板\(tl_calendar_template\)
+php yii enum -e=weixin_isrisky -f=微信检测结果:unknown-1-未发起检测,nought-0-暂未检测到风险,has-1-风险
+php yii enum -e=student_state -f=状态:in_school-0-在读,finish_school-1-毕业,transfer_school-2-转学,stop_school-3-休学,quit_school-4-退学,expel_school-5-开除,abroad-6-出国,other-7-其他
+php yii enum -e=last_login_mode -f=最后登录方式:mini-1-小程序,pc-2-pc端后台,pc_enterprise_wechat-3-pc端企业微信扫码
+php yii enum -e=pre_audit_state -f=预审审核状态:unknown-0-未发起审核,waiting-1-预审待审,pass-2-预审通过,refuse-3-预审拒绝
+php yii enum -e=end_audit_state -f=预审审核状态:unknown-0-未发起审核,waiting-1-终审待审\(预审通过自动进入此状态\),pass-2-终审通过,refuse-3-终审拒绝
+php yii enum -e=section_type -f=环节类型:morning_meeting-1-晨会,small_group-2-小组,large_group-3-大组,outdoors-4-户外,plan-5-计划,review-6-回顾,clean_up-7-清理,transition-8-过渡
+php yii enum -e=apply_scope -f=应用范围:self_class-1-本班级,self_grade-2-本年级,self_regin-3-本园所
+php yii enum -e=education_class_state -f=状态:unknown-0-未开始,ing-1-进行中,archive-2-已归档
+php yii enum -e=resource_material_type -f=资源材料类型:word-1-word,pdf-2-pdf
+php yii enum -e=search_type -f=搜索类型:anecdote-1-轶事记录,domain_norm-2-领域指标,child_name-3-幼儿,label-4-标签
+
+
