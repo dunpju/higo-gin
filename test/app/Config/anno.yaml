@@ -1,0 +1,6 @@
+
+# 注解配置
+value:
+  user:
+    score: "100"
+    age: "19"

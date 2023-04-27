@@ -1,0 +1,32 @@
+# 应用名称
+APP_NAME: higo
+
+# 版本
+VERSION: 0.0.1
+
+# 运行模式debug/release
+MODE: debug
+
+# 项目根目录
+ROOT: .
+
+# Bean目录
+BEAN_ROOT: ./../app/Beans
+
+# ssl证书输出目录(默认拼接跟目录) eg: ssl/higo.crt.pem
+SSL:
+  # 输出目录
+  OUT: ssl
+  # crt 文件名
+  CRT: higo.crt.pem
+  # key 文件名
+  KEY: higo.key.pem
+
+# 日志目录
+LOG_DIR: ./netmond/log
+
+# 用户配置
+CONFIG:
+  user:
+    score: 100
+    age: 19

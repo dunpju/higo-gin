@@ -1,0 +1,14 @@
+
+
+# 不需要鉴权的接口标记
+NotAuth:
+  Login: true
+  TestThrow: true
+  TestGet: true
+  test_get_redis: true
+  get_test_redis: true
+  WebsocketController.Conn: true
+  WebsocketController.SendAll: true
+  WebsocketController.Echo: true
+  EventController.Test: true
+  github.com/dengpju/higo-gin/test/app/Controllers.(*WebsocketController).Conn-fm: true
