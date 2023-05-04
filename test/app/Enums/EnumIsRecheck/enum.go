@@ -1,6 +1,6 @@
 package EnumIsRecheck
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e IsRecheck
 
@@ -25,11 +25,11 @@ func (this IsRecheck) Message() string {
 
 const (
 	Yes IsRecheck = 1 //是
-	No IsRecheck = 2 //否
+	No  IsRecheck = 2 //否
 )
 
 func (this IsRecheck) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Yes, "是").
-	    Put(No, "否")
+		Put(Yes, "是").
+		Put(No, "否")
 }

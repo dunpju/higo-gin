@@ -2,10 +2,10 @@ package higo
 
 import (
 	"gitee.com/dengpju/higo-code/code"
-	"github.com/dengpju/higo-logger/logger"
-	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils/maputil"
-	"github.com/dengpju/higo-utils/utils/runtimeutil"
+	"github.com/dunpju/higo-logger/logger"
+	"github.com/dunpju/higo-throw/exception"
+	"github.com/dunpju/higo-utils/utils/maputil"
+	"github.com/dunpju/higo-utils/utils/runtimeutil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"

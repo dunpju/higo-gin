@@ -1,6 +1,6 @@
 package EnumState
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e State
 
@@ -30,6 +30,6 @@ const (
 
 func (this State) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Issue, "发布").
-	    Put(Draft, "草稿")
+		Put(Issue, "发布").
+		Put(Draft, "草稿")
 }

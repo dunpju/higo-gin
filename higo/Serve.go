@@ -1,7 +1,7 @@
 package higo
 
 import (
-	"github.com/dengpju/higo-config/config"
+	"github.com/dunpju/higo-config/config"
 )
 
 type Serve struct {

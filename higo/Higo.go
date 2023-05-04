@@ -2,17 +2,17 @@ package higo
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-annotation/anno"
-	"github.com/dengpju/higo-config/config"
-	"github.com/dengpju/higo-ioc/injector"
-	"github.com/dengpju/higo-logger/logger"
-	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/exception"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/dirutil"
-	"github.com/dengpju/higo-utils/utils/runtimeutil"
-	"github.com/dengpju/higo-utils/utils/sliceutil"
-	"github.com/dengpju/higo-utils/utils/tlsutil"
+	"github.com/dunpju/higo-annotation/anno"
+	"github.com/dunpju/higo-config/config"
+	"github.com/dunpju/higo-ioc/injector"
+	"github.com/dunpju/higo-logger/logger"
+	"github.com/dunpju/higo-router/router"
+	"github.com/dunpju/higo-throw/exception"
+	"github.com/dunpju/higo-utils/utils"
+	"github.com/dunpju/higo-utils/utils/dirutil"
+	"github.com/dunpju/higo-utils/utils/runtimeutil"
+	"github.com/dunpju/higo-utils/utils/sliceutil"
+	"github.com/dunpju/higo-utils/utils/tlsutil"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -68,15 +68,16 @@ func Init(root *sliceutil.SliceString) *Higo {
 	}
 	if !isLoadAppConfig {
 		AppConfigDir.Clone(root)
-		root.ForEach(func(index int, value interface{}) {
-			AppConfigDir.Append(value)
+		root.ForEach(func(index int, value interface{}) bool {
+			AppConfigDir.Append(value.(string))
+			return true
 		})
 		appConfig := config.Env("app.APP_CONFIG")
 		if nil == appConfig {
 			AppConfigDir.Append("app")
 			AppConfigDir.Append("config")
 		} else {
-			AppConfigDir.Append(appConfig)
+			AppConfigDir.Append(appConfig.(string))
 		}
 
 		isLoadAppConfig = true
@@ -215,25 +216,25 @@ func (this *Higo) loadConfigur() *Higo {
 	return this
 }
 
-//全局中间件
+// 全局中间件
 func (this *Higo) Middleware(middlewares ...IMiddleware) *Higo {
 	this.middle = append(this.middle, middlewares...)
 	return this
 }
 
-//设置鉴权中间件
+// 设置鉴权中间件
 func (this *Higo) AuthHandlerFunc(middle IMiddleware) *Higo {
 	MiddleAuthFunc = middle.Middle
 	return this
 }
 
-//设置跨域中间件
+// 设置跨域中间件
 func (this *Higo) CorsHandlerFunc(middle IMiddleware) *Higo {
 	MiddleCorsFunc = middle.Middle
 	return this
 }
 
-//设置服务名称
+// 设置服务名称
 func (this *Higo) SetName(serve string) *Higo {
 	this.serve = serve
 	return this
@@ -281,7 +282,7 @@ func (this *Higo) InitGroupIsAuth(b bool) *Higo {
 	return this
 }
 
-//启动
+// 启动
 func (this *Higo) Boot() {
 	//执行tool命令
 	NewTool().Cmd()
@@ -423,7 +424,7 @@ func (this *Higo) loadRoute() *Higo {
 	return this
 }
 
-//register to di container
+// register to di container
 func Register(classs ...IClass) {
 	for _, class := range classs {
 		AddContainer(class.New)
@@ -507,7 +508,7 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 	return this
 }
 
-//中间件顺序倒序包裹，越往后添加的中间件越贴近需要执行的逻辑
+// 中间件顺序倒序包裹，越往后添加的中间件越贴近需要执行的逻辑
 func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc {
 	handles := handleSlice(route)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
@@ -518,7 +519,7 @@ func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc
 	return handles
 }
 
-//handle切片
+// handle切片
 func handleSlice(route *router.Route) []gin.HandlerFunc {
 	handles := make([]gin.HandlerFunc, 0)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {

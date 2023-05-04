@@ -1,6 +1,6 @@
 package EnumVerifyState
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e VerifyState
 
@@ -25,13 +25,13 @@ func (this VerifyState) Message() string {
 
 const (
 	Waiting VerifyState = 1 //待审核
-	Pass VerifyState = 2 //通过
-	Refuse VerifyState = 3 //拒绝
+	Pass    VerifyState = 2 //通过
+	Refuse  VerifyState = 3 //拒绝
 )
 
 func (this VerifyState) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Waiting, "待审核").
-	    Put(Pass, "通过").
-	    Put(Refuse, "拒绝")
+		Put(Waiting, "待审核").
+		Put(Pass, "通过").
+		Put(Refuse, "拒绝")
 }

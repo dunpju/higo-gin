@@ -1,9 +1,9 @@
 package Middlewares
 
 import (
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Consts"
-	"github.com/dengpju/higo-throw/exception"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/test/app/Consts"
+	"github.com/dunpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 )
 

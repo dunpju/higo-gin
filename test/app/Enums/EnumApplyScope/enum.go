@@ -1,6 +1,6 @@
 package EnumApplyScope
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e ApplyScope
 
@@ -31,7 +31,7 @@ const (
 
 func (this ApplyScope) Register() enum.Message {
 	return make(enum.Message).
-	    Put(SelfClass, "本班级").
-	    Put(SelfGrade, "本年级").
-	    Put(SelfRegin, "本园所")
+		Put(SelfClass, "本班级").
+		Put(SelfGrade, "本年级").
+		Put(SelfRegin, "本园所")
 }

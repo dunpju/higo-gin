@@ -1,11 +1,11 @@
 package Beans
 
 import (
-	"github.com/dengpju/higo-gin/higo"
-	a "github.com/dengpju/higo-gin/test/app/Controllers"
-	V32 "github.com/dengpju/higo-gin/test/app/Controllers/V2/V3"
-	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
-	"github.com/dengpju/higo-gin/test/app/Services"
+	"github.com/dunpju/higo-gin/higo"
+	a "github.com/dunpju/higo-gin/test/app/Controllers"
+	V32 "github.com/dunpju/higo-gin/test/app/Controllers/V2/V3"
+	"github.com/dunpju/higo-gin/test/app/Controllers/V3"
+	"github.com/dunpju/higo-gin/test/app/Services"
 	"github.com/gomodule/redigo/redis"
 )
 

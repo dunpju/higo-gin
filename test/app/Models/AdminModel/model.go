@@ -3,8 +3,8 @@ package AdminModel
 import (
 	//"gitee.com/dengpju/higo-code/code"
 	"github.com/Masterminds/squirrel"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-ioc/injector"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-ioc/injector"
 	"github.com/jinzhu/gorm"
 	"strings"
 	"time"

@@ -1,6 +1,6 @@
 package EnumVersionIsUsed
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e VersionIsUsed
 
@@ -25,11 +25,11 @@ func (this VersionIsUsed) Message() string {
 
 const (
 	Yes VersionIsUsed = 1 //是
-	No VersionIsUsed = 2 //否
+	No  VersionIsUsed = 2 //否
 )
 
 func (this VersionIsUsed) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Yes, "是").
-	    Put(No, "否")
+		Put(Yes, "是").
+		Put(No, "否")
 }

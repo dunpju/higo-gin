@@ -1,6 +1,6 @@
 package EnumEnableOrDisabled
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e EnableOrDisabled
 
@@ -24,12 +24,12 @@ func (this EnableOrDisabled) Message() string {
 }
 
 const (
-	Enable EnableOrDisabled = 1 //启用
+	Enable   EnableOrDisabled = 1 //启用
 	Disabled EnableOrDisabled = 2 //禁用
 )
 
 func (this EnableOrDisabled) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Enable, "启用").
-	    Put(Disabled, "禁用")
+		Put(Enable, "启用").
+		Put(Disabled, "禁用")
 }

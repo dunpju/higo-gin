@@ -1,6 +1,6 @@
 package EnumIsRead
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e IsRead
 
@@ -25,11 +25,11 @@ func (this IsRead) Message() string {
 
 const (
 	Yes IsRead = 1 //是
-	No IsRead = 2 //否
+	No  IsRead = 2 //否
 )
 
 func (this IsRead) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Yes, "是").
-	    Put(No, "否")
+		Put(Yes, "是").
+		Put(No, "否")
 }

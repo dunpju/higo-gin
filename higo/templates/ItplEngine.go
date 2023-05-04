@@ -1,6 +1,6 @@
 package templates
 
-import "github.com/dengpju/higo-gin/higo/templates/tpls"
+import "github.com/dunpju/higo-gin/higo/templates/tpls"
 
 const (
 	controller  = "Controller"

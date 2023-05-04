@@ -2,10 +2,10 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo/templates/tpls"
-	"github.com/dengpju/higo-utils/utils"
-	"github.com/dengpju/higo-utils/utils/fileutil"
-	"github.com/dengpju/higo-utils/utils/stringutil"
+	"github.com/dunpju/higo-gin/higo/templates/tpls"
+	"github.com/dunpju/higo-utils/utils"
+	"github.com/dunpju/higo-utils/utils/fileutil"
+	"github.com/dunpju/higo-utils/utils/stringutil"
 	"gopkg.in/yaml.v2"
 	"log"
 	"os"

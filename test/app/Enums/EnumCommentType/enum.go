@@ -1,6 +1,6 @@
 package EnumCommentType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e CommentType
 
@@ -24,12 +24,12 @@ func (this CommentType) Message() string {
 }
 
 const (
-	Child CommentType = 1 //儿童评价(tl_assessment)
+	Child            CommentType = 1 //儿童评价(tl_assessment)
 	CalendarTemplate CommentType = 2 //一日模板(tl_calendar_template)
 )
 
 func (this CommentType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Child, "儿童评价(tl_assessment)").
-	    Put(CalendarTemplate, "一日模板(tl_calendar_template)")
+		Put(Child, "儿童评价(tl_assessment)").
+		Put(CalendarTemplate, "一日模板(tl_calendar_template)")
 }

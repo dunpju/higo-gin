@@ -1,9 +1,9 @@
 package {{.Package}}
 
 import (
-	"github.com/dengpju/higo-gin/higo"
-	//"github.com/dengpju/higo-gin/higo/request"
-	//"github.com/dengpju/higo-gin/higo/responser"
+	"github.com/dunpju/higo-gin/higo"
+	//"github.com/dunpju/higo-gin/higo/request"
+	//"github.com/dunpju/higo-gin/higo/responser"
 	//"github.com/gin-gonic/gin"
 )
 

@@ -1,13 +1,13 @@
 package NewsDao
 
 import (
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/exceptions/DaoException"
-	"github.com/dengpju/higo-gin/higo/sql"
-	"github.com/dengpju/higo-gin/test/app/Entity/NewsEntity"
-	"github.com/dengpju/higo-gin/test/app/Models/NewsModel"
-	"github.com/dengpju/higo-gin/test/app/errcode"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo/exceptions/DaoException"
+	"github.com/dunpju/higo-gin/higo/sql"
+	"github.com/dunpju/higo-gin/test/app/Entity/NewsEntity"
+	"github.com/dunpju/higo-gin/test/app/Models/NewsModel"
+	"github.com/dunpju/higo-gin/test/app/errcode"
+	"github.com/dunpju/higo-utils/utils"
 	"strings"
 )
 
@@ -47,9 +47,9 @@ func (this *Dao) SetData(entity *NewsEntity.Impl) {
 		}
 	} else { //新增
 		this.model.Insert(this.model.TableName()).
-			Set(NewsModel.NewsId, entity.NewsId). //主键
-			Set(NewsModel.Title, entity.Title). //标题
-			Set(NewsModel.Clicknum, entity.Clicknum). //点击量
+			Set(NewsModel.NewsId, entity.NewsId).        //主键
+			Set(NewsModel.Title, entity.Title).          //标题
+			Set(NewsModel.Clicknum, entity.Clicknum).    //点击量
 			Set(NewsModel.CreateTime, entity.CreateTime) //创建时间
 	}
 	this.model.Build()

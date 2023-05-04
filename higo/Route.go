@@ -1,8 +1,8 @@
 package higo
 
 import (
-	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/exception"
+	"github.com/dunpju/higo-router/router"
+	"github.com/dunpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"

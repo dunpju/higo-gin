@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Controllers"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/test/app/Controllers"
 )
 
 // https api 接口

@@ -1,6 +1,6 @@
 package EnumIsSuper
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e IsSuper
 
@@ -25,11 +25,11 @@ func (this IsSuper) Message() string {
 
 const (
 	Yes IsSuper = 1 //是
-	No IsSuper = 2 //否
+	No  IsSuper = 2 //否
 )
 
 func (this IsSuper) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Yes, "是").
-	    Put(No, "否")
+		Put(Yes, "是").
+		Put(No, "否")
 }

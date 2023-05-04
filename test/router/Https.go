@@ -2,11 +2,11 @@ package router
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Controllers"
-	"github.com/dengpju/higo-gin/test/app/Controllers/V2"
-	"github.com/dengpju/higo-gin/test/app/Controllers/V3"
-	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/test/app/Controllers"
+	"github.com/dunpju/higo-gin/test/app/Controllers/V2"
+	"github.com/dunpju/higo-gin/test/app/Controllers/V3"
+	"github.com/dunpju/higo-utils/utils/dirutil"
 )
 
 // https api 接口

@@ -1,6 +1,6 @@
 package EnumPrivilegeFlagType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e PrivilegeFlagType
 
@@ -25,11 +25,11 @@ func (this PrivilegeFlagType) Message() string {
 
 const (
 	Action PrivilegeFlagType = 1 //功能
-	Menu PrivilegeFlagType = 2 //菜单
+	Menu   PrivilegeFlagType = 2 //菜单
 )
 
 func (this PrivilegeFlagType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Action, "功能").
-	    Put(Menu, "菜单")
+		Put(Action, "功能").
+		Put(Menu, "菜单")
 }

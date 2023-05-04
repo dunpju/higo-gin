@@ -1,6 +1,6 @@
 package EnumWeixinIsrisky
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e WeixinIsrisky
 
@@ -25,13 +25,13 @@ func (this WeixinIsrisky) Message() string {
 
 const (
 	Unknown WeixinIsrisky = 1 //未发起检测
-	Nought WeixinIsrisky = 0 //暂未检测到风险
-	Has WeixinIsrisky = 1 //风险
+	Nought  WeixinIsrisky = 0 //暂未检测到风险
+	Has     WeixinIsrisky = 1 //风险
 )
 
 func (this WeixinIsrisky) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Unknown, "未发起检测").
-	    Put(Nought, "暂未检测到风险").
-	    Put(Has, "风险")
+		Put(Unknown, "未发起检测").
+		Put(Nought, "暂未检测到风险").
+		Put(Has, "风险")
 }

@@ -2,8 +2,8 @@ package Middlewares
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-utils/utils/runtimeutil"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-utils/utils/runtimeutil"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )

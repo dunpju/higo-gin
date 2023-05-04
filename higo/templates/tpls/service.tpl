@@ -1,7 +1,7 @@
 package {{.Package}}
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 )
 
 const Self{{.Name}} = "{{.SelfName}}"

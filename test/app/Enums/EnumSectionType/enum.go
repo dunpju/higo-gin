@@ -1,6 +1,6 @@
 package EnumSectionType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e SectionType
 
@@ -25,23 +25,23 @@ func (this SectionType) Message() string {
 
 const (
 	MorningMeeting SectionType = 1 //晨会
-	SmallGroup SectionType = 2 //小组
-	LargeGroup SectionType = 3 //大组
-	Outdoors SectionType = 4 //户外
-	Plan SectionType = 5 //计划
-	Review SectionType = 6 //回顾
-	CleanUp SectionType = 7 //清理
-	Transition SectionType = 8 //过渡
+	SmallGroup     SectionType = 2 //小组
+	LargeGroup     SectionType = 3 //大组
+	Outdoors       SectionType = 4 //户外
+	Plan           SectionType = 5 //计划
+	Review         SectionType = 6 //回顾
+	CleanUp        SectionType = 7 //清理
+	Transition     SectionType = 8 //过渡
 )
 
 func (this SectionType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(MorningMeeting, "晨会").
-	    Put(SmallGroup, "小组").
-	    Put(LargeGroup, "大组").
-	    Put(Outdoors, "户外").
-	    Put(Plan, "计划").
-	    Put(Review, "回顾").
-	    Put(CleanUp, "清理").
-	    Put(Transition, "过渡")
+		Put(MorningMeeting, "晨会").
+		Put(SmallGroup, "小组").
+		Put(LargeGroup, "大组").
+		Put(Outdoors, "户外").
+		Put(Plan, "计划").
+		Put(Review, "回顾").
+		Put(CleanUp, "清理").
+		Put(Transition, "过渡")
 }

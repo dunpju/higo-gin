@@ -3,14 +3,14 @@ package V3
 import (
 	"fmt"
 	"gitee.com/dengpju/higo-code/code"
-	"github.com/dengpju/higo-annotation/anno"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/request"
-	"github.com/dengpju/higo-gin/test/app/Exception"
-	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
-	"github.com/dengpju/higo-gin/test/app/Services"
-	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/exception"
+	"github.com/dunpju/higo-annotation/anno"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo/request"
+	"github.com/dunpju/higo-gin/test/app/Exception"
+	"github.com/dunpju/higo-gin/test/app/Models/UserModel"
+	"github.com/dunpju/higo-gin/test/app/Services"
+	"github.com/dunpju/higo-router/router"
+	"github.com/dunpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"log"
@@ -45,7 +45,7 @@ func (this *DemoController) Route(hg *higo.Higo) {
 	})
 }
 
-func HttpsTestThrow1(ctx *gin.Context)  {
+func HttpsTestThrow1(ctx *gin.Context) {
 
 }
 
@@ -79,7 +79,7 @@ func (this *DemoController) HttpsTestThrow(ctx *gin.Context) string {
 	return "v3 https_test_throw"
 }
 
-//错误码
+// 错误码
 type ErrorCode int64
 
 func (this ErrorCode) Message(variables ...interface{}) string {
@@ -108,7 +108,7 @@ func code400001() {
 		Put(MinError, "不能小于4位")
 }
 
-//测试验证器
+// 测试验证器
 type DutyUser struct {
 	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
 	EducationClassId int64   `json:"education_class_id" binding:"required"`
@@ -200,7 +200,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	return user
 }
 
-//测试发布
+// 测试发布
 func (this *DemoController) TestPub(ctx *gin.Context) string {
 	return "测试发布"
 }

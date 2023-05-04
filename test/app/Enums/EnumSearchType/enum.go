@@ -1,6 +1,6 @@
 package EnumSearchType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e SearchType
 
@@ -24,16 +24,16 @@ func (this SearchType) Message() string {
 }
 
 const (
-	Anecdote SearchType = 1 //轶事记录
+	Anecdote   SearchType = 1 //轶事记录
 	DomainNorm SearchType = 2 //领域指标
-	ChildName SearchType = 3 //幼儿
-	Label SearchType = 4 //标签
+	ChildName  SearchType = 3 //幼儿
+	Label      SearchType = 4 //标签
 )
 
 func (this SearchType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Anecdote, "轶事记录").
-	    Put(DomainNorm, "领域指标").
-	    Put(ChildName, "幼儿").
-	    Put(Label, "标签")
+		Put(Anecdote, "轶事记录").
+		Put(DomainNorm, "领域指标").
+		Put(ChildName, "幼儿").
+		Put(Label, "标签")
 }

@@ -1,7 +1,7 @@
 package ParamXxxxEdit
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 	"github.com/gin-gonic/gin"
 )
 

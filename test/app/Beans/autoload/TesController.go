@@ -2,7 +2,7 @@ package autoload
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 )
 
 type TestController struct {

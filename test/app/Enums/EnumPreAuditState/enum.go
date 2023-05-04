@@ -1,6 +1,6 @@
 package EnumPreAuditState
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e PreAuditState
 
@@ -26,14 +26,14 @@ func (this PreAuditState) Message() string {
 const (
 	Unknown PreAuditState = 0 //未发起审核
 	Waiting PreAuditState = 1 //预审待审
-	Pass PreAuditState = 2 //预审通过
-	Refuse PreAuditState = 3 //预审拒绝
+	Pass    PreAuditState = 2 //预审通过
+	Refuse  PreAuditState = 3 //预审拒绝
 )
 
 func (this PreAuditState) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Unknown, "未发起审核").
-	    Put(Waiting, "预审待审").
-	    Put(Pass, "预审通过").
-	    Put(Refuse, "预审拒绝")
+		Put(Unknown, "未发起审核").
+		Put(Waiting, "预审待审").
+		Put(Pass, "预审通过").
+		Put(Refuse, "预审拒绝")
 }

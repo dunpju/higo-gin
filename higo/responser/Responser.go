@@ -1,6 +1,6 @@
 package responser
 
-import "github.com/dengpju/higo-gin/higo"
+import "github.com/dunpju/higo-gin/higo"
 
 func Success(data interface{}) {
 	ctx := higo.Request.Context()

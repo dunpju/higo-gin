@@ -1,6 +1,6 @@
 package EnumAuthType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e AuthType
 
@@ -25,11 +25,11 @@ func (this AuthType) Message() string {
 
 const (
 	Action AuthType = 1 //功能
-	Data AuthType = 2 //数据
+	Data   AuthType = 2 //数据
 )
 
 func (this AuthType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Action, "功能").
-	    Put(Data, "数据")
+		Put(Action, "功能").
+		Put(Data, "数据")
 }

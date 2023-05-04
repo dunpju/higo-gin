@@ -1,10 +1,10 @@
 package higo
 
 import (
-	"github.com/dengpju/higo-config/config"
-	"github.com/dengpju/higo-gin/test/app/Consts"
-	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-throw/exception"
+	"github.com/dunpju/higo-config/config"
+	"github.com/dunpju/higo-gin/test/app/Consts"
+	"github.com/dunpju/higo-router/router"
+	"github.com/dunpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
 )
 

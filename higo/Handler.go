@@ -2,7 +2,7 @@ package higo
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dunpju/higo-utils/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync"

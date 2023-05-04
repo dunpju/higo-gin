@@ -1,7 +1,7 @@
 package AdminEntity
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 	"time"
 )
 

@@ -3,8 +3,8 @@ package UserModel
 import (
 	"fmt"
 	"github.com/Masterminds/squirrel"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/sql"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo/sql"
 	"log"
 )
 

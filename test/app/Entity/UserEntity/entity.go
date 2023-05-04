@@ -1,16 +1,16 @@
 package UserEntity
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 )
 
 type Impl struct {
 	isEdit      bool
 	currentFlag higo.Flag
-	Id    int    `gorm:"column:id" json:"id" comment:""`
-	Uname    string    `gorm:"column:uname" json:"uname" comment:""`
-	UTel    string    `gorm:"column:u_tel" json:"u_tel" comment:""`
-	Score    int    `gorm:"column:score" json:"score" comment:""`
+	Id          int    `gorm:"column:id" json:"id" comment:""`
+	Uname       string `gorm:"column:uname" json:"uname" comment:""`
+	UTel        string `gorm:"column:u_tel" json:"u_tel" comment:""`
+	Score       int    `gorm:"column:score" json:"score" comment:""`
 }
 
 func New() *Impl {

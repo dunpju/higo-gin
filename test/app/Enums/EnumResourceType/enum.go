@@ -1,6 +1,6 @@
 package EnumResourceType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e ResourceType
 
@@ -31,7 +31,7 @@ const (
 
 func (this ResourceType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Audio, "音频").
-	    Put(Video, "视频").
-	    Put(Image, "图片")
+		Put(Audio, "音频").
+		Put(Video, "视频").
+		Put(Image, "图片")
 }

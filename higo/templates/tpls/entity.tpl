@@ -1,7 +1,7 @@
 package {{.PackageName}}
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 	{{- range $impo := .Imports}}
     {{$impo}}
     {{- end}}

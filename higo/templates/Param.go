@@ -2,9 +2,9 @@ package templates
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo/templates/tpls"
-	"github.com/dengpju/higo-utils/utils/dirutil"
-	"github.com/dengpju/higo-utils/utils/fileutil"
+	"github.com/dunpju/higo-gin/higo/templates/tpls"
+	"github.com/dunpju/higo-utils/utils/dirutil"
+	"github.com/dunpju/higo-utils/utils/fileutil"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"log"
 	"os"

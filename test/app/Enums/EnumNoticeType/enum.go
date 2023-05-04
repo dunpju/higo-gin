@@ -1,6 +1,6 @@
 package EnumNoticeType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e NoticeType
 
@@ -24,22 +24,22 @@ func (this NoticeType) Message() string {
 }
 
 const (
-	System NoticeType = 1 //系统通知
-	Comment NoticeType = 2 //评论
-	Fans NoticeType = 3 //粉丝
-	Praise NoticeType = 4 //点赞
+	System             NoticeType = 1 //系统通知
+	Comment            NoticeType = 2 //评论
+	Fans               NoticeType = 3 //粉丝
+	Praise             NoticeType = 4 //点赞
 	AssessmentCorvidae NoticeType = 5 //评价待完善
-	ShareRemind NoticeType = 6 //分享提醒
-	Section NoticeType = 7 //环节设置
+	ShareRemind        NoticeType = 6 //分享提醒
+	Section            NoticeType = 7 //环节设置
 )
 
 func (this NoticeType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(System, "系统通知").
-	    Put(Comment, "评论").
-	    Put(Fans, "粉丝").
-	    Put(Praise, "点赞").
-	    Put(AssessmentCorvidae, "评价待完善").
-	    Put(ShareRemind, "分享提醒").
-	    Put(Section, "环节设置")
+		Put(System, "系统通知").
+		Put(Comment, "评论").
+		Put(Fans, "粉丝").
+		Put(Praise, "点赞").
+		Put(AssessmentCorvidae, "评价待完善").
+		Put(ShareRemind, "分享提醒").
+		Put(Section, "环节设置")
 }

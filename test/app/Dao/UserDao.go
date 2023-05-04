@@ -1,12 +1,12 @@
 package Dao
 
 import (
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/higo/errcode"
-	"github.com/dengpju/higo-gin/higo/exceptions/DaoException"
-	"github.com/dengpju/higo-gin/higo/sql"
-	"github.com/dengpju/higo-gin/test/app/Entity/UserEntity"
-	"github.com/dengpju/higo-gin/test/app/Models/UserModel"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo/errcode"
+	"github.com/dunpju/higo-gin/higo/exceptions/DaoException"
+	"github.com/dunpju/higo-gin/higo/sql"
+	"github.com/dunpju/higo-gin/test/app/Entity/UserEntity"
+	"github.com/dunpju/higo-gin/test/app/Models/UserModel"
 )
 
 type UserDao struct {

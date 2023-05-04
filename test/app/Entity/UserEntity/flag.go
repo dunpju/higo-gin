@@ -1,6 +1,6 @@
 package UserEntity
 
-import "github.com/dengpju/higo-gin/higo"
+import "github.com/dunpju/higo-gin/higo"
 
 const (
 	FlagDelete higo.Flag = iota + 1

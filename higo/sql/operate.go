@@ -2,7 +2,7 @@ package sql
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-utils/utils/stringutil"
+	"github.com/dunpju/higo-utils/utils/stringutil"
 	"strings"
 )
 

@@ -2,9 +2,9 @@ package higo
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo/templates"
-	"github.com/dengpju/higo-ioc/injector"
-	"github.com/dengpju/higo-utils/utils/dirutil"
+	"github.com/dunpju/higo-gin/higo/templates"
+	"github.com/dunpju/higo-ioc/injector"
+	"github.com/dunpju/higo-utils/utils/dirutil"
 	"go/ast"
 	"go/parser"
 	"go/token"

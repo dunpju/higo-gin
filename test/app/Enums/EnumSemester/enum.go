@@ -1,6 +1,6 @@
 package EnumSemester
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e Semester
 
@@ -24,12 +24,12 @@ func (this Semester) Message() string {
 }
 
 const (
-	Up Semester = 1 //上学期
+	Up   Semester = 1 //上学期
 	Down Semester = 2 //下学期
 )
 
 func (this Semester) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Up, "上学期").
-	    Put(Down, "下学期")
+		Put(Up, "上学期").
+		Put(Down, "下学期")
 }

@@ -1,6 +1,6 @@
 package EnumVersionState
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e VersionState
 
@@ -24,12 +24,12 @@ func (this VersionState) Message() string {
 }
 
 const (
-	Issue VersionState = 1 //发布
+	Issue   VersionState = 1 //发布
 	Waiting VersionState = 2 //待发布
 )
 
 func (this VersionState) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Issue, "发布").
-	    Put(Waiting, "待发布")
+		Put(Issue, "发布").
+		Put(Waiting, "待发布")
 }

@@ -1,6 +1,6 @@
 package EnumGender
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e Gender
 
@@ -25,13 +25,13 @@ func (this Gender) Message() string {
 
 const (
 	Unknown Gender = 0 //未知
-	Male Gender = 1 //男
-	Female Gender = 2 //女
+	Male    Gender = 1 //男
+	Female  Gender = 2 //女
 )
 
 func (this Gender) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Unknown, "未知").
-	    Put(Male, "男").
-	    Put(Female, "女")
+		Put(Unknown, "未知").
+		Put(Male, "男").
+		Put(Female, "女")
 }

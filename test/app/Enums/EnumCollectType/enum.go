@@ -1,6 +1,6 @@
 package EnumCollectType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e CollectType
 
@@ -29,5 +29,5 @@ const (
 
 func (this CollectType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Comment, "评价")
+		Put(Comment, "评价")
 }

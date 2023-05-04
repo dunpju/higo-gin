@@ -1,6 +1,6 @@
 package EnumIsAbnormal
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e IsAbnormal
 
@@ -25,13 +25,13 @@ func (this IsAbnormal) Message() string {
 
 const (
 	Normal IsAbnormal = 0 //正常
-	Inc IsAbnormal = 1 //上升
-	Dec IsAbnormal = 2 //下降
+	Inc    IsAbnormal = 1 //上升
+	Dec    IsAbnormal = 2 //下降
 )
 
 func (this IsAbnormal) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Normal, "正常").
-	    Put(Inc, "上升").
-	    Put(Dec, "下降")
+		Put(Normal, "正常").
+		Put(Inc, "上升").
+		Put(Dec, "下降")
 }

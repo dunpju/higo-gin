@@ -2,7 +2,7 @@ package V3
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 	"github.com/gin-gonic/gin"
 	"math/rand"
 	"time"

@@ -1,7 +1,7 @@
 package tpls
 
 import (
-	"github.com/dengpju/higo-utils/utils"
+	"github.com/dunpju/higo-utils/utils"
 	"io/ioutil"
 	"os"
 	"path"

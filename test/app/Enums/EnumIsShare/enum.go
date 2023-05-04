@@ -1,6 +1,6 @@
 package EnumIsShare
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e IsShare
 
@@ -25,11 +25,11 @@ func (this IsShare) Message() string {
 
 const (
 	Yes IsShare = 1 //是
-	No IsShare = 2 //否
+	No  IsShare = 2 //否
 )
 
 func (this IsShare) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Yes, "是").
-	    Put(No, "否")
+		Put(Yes, "是").
+		Put(No, "否")
 }

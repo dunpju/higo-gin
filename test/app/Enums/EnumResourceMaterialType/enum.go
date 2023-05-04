@@ -1,6 +1,6 @@
 package EnumResourceMaterialType
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e ResourceMaterialType
 
@@ -25,11 +25,11 @@ func (this ResourceMaterialType) Message() string {
 
 const (
 	Word ResourceMaterialType = 1 //word
-	Pdf ResourceMaterialType = 2 //pdf
+	Pdf  ResourceMaterialType = 2 //pdf
 )
 
 func (this ResourceMaterialType) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Word, "word").
-	    Put(Pdf, "pdf")
+		Put(Word, "word").
+		Put(Pdf, "pdf")
 }

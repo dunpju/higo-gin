@@ -2,9 +2,9 @@ package UserModel
 
 import (
 	"github.com/Masterminds/squirrel"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/errcode"
-	"github.com/dengpju/higo-ioc/injector"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/test/app/errcode"
+	"github.com/dunpju/higo-ioc/injector"
 	"github.com/jinzhu/gorm"
 	"strings"
 )

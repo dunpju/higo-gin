@@ -1,9 +1,9 @@
 package higo
 
 import (
-	"github.com/dengpju/higo-config/config"
-	"github.com/dengpju/higo-router/router"
-	"github.com/dengpju/higo-utils/utils/sliceutil"
+	"github.com/dunpju/higo-config/config"
+	"github.com/dunpju/higo-router/router"
+	"github.com/dunpju/higo-utils/utils/sliceutil"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/robfig/cron/v3"

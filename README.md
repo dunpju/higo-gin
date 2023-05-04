@@ -242,10 +242,10 @@ go run bin\main.go -gen=controller -out=app\controllers -name=Admin
 package controllers
 
 import (
-    "github.com/dengpju/higo-gin/higo"
-    "github.com/dengpju/higo-gin/higo/request"
-    "github.com/dengpju/higo-gin/higo/responser"
-    "github.com/dengpju/higo-router/router"
+    "github.com/dunpju/higo-gin/higo"
+    "github.com/dunpju/higo-gin/higo/request"
+    "github.com/dunpju/higo-gin/higo/responser"
+    "github.com/dunpju/higo-router/router"
     "github.com/gin-gonic/gin"
 )
 
@@ -412,7 +412,7 @@ func main() {
 ```
 import (
     "fmt"
-    "github.com/dengpju/higo-gin/higo"
+    "github.com/dunpju/higo-gin/higo"
 )
 
 func Test() {
@@ -497,7 +497,7 @@ func (this *Cors) Middle(hg *higo.Higo) gin.HandlerFunc {
 ```
 
 ### <span id="express">表达式</span> <font size=1>[top](#top)</font>
-表达式封装了独立的包```github.com/dengpju/higo-express/express```
+表达式封装了独立的包```github.com/dunpju/higo-express/express```
 ```
 // 执行表达式
 express.Run("MyBean.DemoService()")

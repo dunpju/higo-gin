@@ -2,7 +2,7 @@ package errcode
 
 import (
 	"gitee.com/dengpju/higo-code/code"
-	"github.com/dengpju/higo-gin/higo/errcode"
+	"github.com/dunpju/higo-gin/higo/errcode"
 )
 
 func init() {

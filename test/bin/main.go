@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/dengpju/higo-gin/higo"
-	"github.com/dengpju/higo-gin/test/app/Beans"
-	"github.com/dengpju/higo-gin/test/app/Middlewares"
-	"github.com/dengpju/higo-gin/test/router"
-	"github.com/dengpju/higo-utils/utils/randomutil"
-	"github.com/dengpju/higo-utils/utils/sliceutil"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/test/app/Beans"
+	"github.com/dunpju/higo-gin/test/app/Middlewares"
+	"github.com/dunpju/higo-gin/test/router"
+	"github.com/dunpju/higo-utils/utils/randomutil"
+	"github.com/dunpju/higo-utils/utils/sliceutil"
 	term "github.com/nsf/termbox-go"
 	"os/exec"
 )

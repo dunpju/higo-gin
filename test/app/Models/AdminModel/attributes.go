@@ -1,14 +1,14 @@
 package AdminModel
 
 import (
-	"github.com/dengpju/higo-gin/higo"
+	"github.com/dunpju/higo-gin/higo"
 	"time"
 )
 
 const (
-	AdminId    = "admin_id"
-	AdminName  = "admin_name"
-	UserId     = "user_id"
+	AdminId   = "admin_id"
+	AdminName = "admin_name"
+	UserId    = "user_id"
 )
 
 func WithAdminId(v int64) higo.Property {

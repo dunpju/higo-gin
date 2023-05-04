@@ -1,6 +1,6 @@
 package EnumIsFinish
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e IsFinish
 
@@ -25,11 +25,11 @@ func (this IsFinish) Message() string {
 
 const (
 	Yes IsFinish = 1 //是
-	No IsFinish = 2 //否
+	No  IsFinish = 2 //否
 )
 
 func (this IsFinish) Register() enum.Message {
 	return make(enum.Message).
-	    Put(Yes, "是").
-	    Put(No, "否")
+		Put(Yes, "是").
+		Put(No, "否")
 }

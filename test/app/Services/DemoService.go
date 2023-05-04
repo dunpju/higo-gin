@@ -1,8 +1,9 @@
 package Services
 
-import "github.com/dengpju/higo-gin/higo/event"
+import "github.com/dunpju/higo-gin/higo/event"
 
-const GetDemoList  = "GetList"
+const GetDemoList = "GetList"
+
 var Bus *event.EventBus
 var DemoListCh event.EventDataChannel
 

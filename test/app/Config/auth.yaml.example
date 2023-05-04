@@ -10,4 +10,4 @@ NotAuth:
   WebsocketController.Conn: true
   WebsocketController.SendAll: true
   WebsocketController.Echo: true
-  github.com/dengpju/higo-gin/test/app/Controllers.(*WebsocketController).Conn-fm: true
+  github.com/dunpju/higo-gin/test/app/Controllers.(*WebsocketController).Conn-fm: true

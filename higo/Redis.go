@@ -1,8 +1,8 @@
 package higo
 
 import (
-	"github.com/dengpju/higo-config/config"
-	hiredis "github.com/dengpju/higo-redis/redis"
+	"github.com/dunpju/higo-config/config"
+	hiredis "github.com/dunpju/higo-redis/redis"
 	"github.com/gomodule/redigo/redis"
 	"sync"
 )

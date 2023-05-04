@@ -1,6 +1,6 @@
 package EnumGradeName
 
-import "github.com/dengpju/higo-enum/enum"
+import "github.com/dunpju/higo-enum/enum"
 
 var e GradeName
 
@@ -32,8 +32,8 @@ const (
 
 func (this GradeName) Register() enum.Message {
 	return make(enum.Message).
-	    Put(KD, "婴班").
-	    Put(KC, "小班").
-	    Put(KB, "中班").
-	    Put(KA, "大班")
+		Put(KD, "婴班").
+		Put(KC, "小班").
+		Put(KB, "中班").
+		Put(KA, "大班")
 }
