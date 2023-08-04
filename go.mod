@@ -10,7 +10,7 @@ require (
 	github.com/dunpju/higo-config v1.0.1
 	github.com/dunpju/higo-enum v1.0.5
 	github.com/dunpju/higo-ioc v1.0.3
-	github.com/dunpju/higo-logger v1.0.9
+	github.com/dunpju/higo-logger v1.0.11
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.31
 	github.com/dunpju/higo-throw v1.0.16
