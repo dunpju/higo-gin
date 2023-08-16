@@ -46,22 +46,22 @@ func NewTool() *Tool {
 }
 
 func (this *Tool) Cmd() {
-	if len(os.Args) >= 2 {
-		flag.StringVar(&this.Gen, "gen", "", `explain: Generate Controller Model Enum Code Dao Entity
+	flag.StringVar(&this.Gen, "gen", "nil", `explain: Generate Controller Model Enum Code Dao Entity
     --option[controller | model | enum | code | dao | entity | param | service]
     eg:-gen=controller`)
-		flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
+	flag.StringVar(&this.Name, "name", "", `explain: Generate Name 
     eg:-name=Test`)
-		flag.StringVar(&this.Out, "out", "", `explain: Generate file output directory 
+	flag.StringVar(&this.Out, "out", "", `explain: Generate file output directory 
     eg:-out=app\Controllers`)
-		flag.StringVar(&this.Auto, "auto", "no", `explain: Code Autoloading yes/no`)
-		flag.StringVar(&this.Force, "force", "no", `explain: Forced updating yes/no`)
-		flag.StringVar(&this.Path, "path", "", `explain: A configuration file of code path`)
-		flag.StringVar(&this.Const, "const", "", `explain: Code const`)
-		flag.StringVar(&this.Code, "code", "", `explain: Code number`)
-		flag.StringVar(&this.Message, "message", "", `explain: Code message`)
-		flag.StringVar(&this.Iota, "iota", "no", `explain: Code iota yes/no`)
-		flag.Parse()
+	flag.StringVar(&this.Auto, "auto", "no", `explain: Code Autoloading yes/no`)
+	flag.StringVar(&this.Force, "force", "no", `explain: Forced updating yes/no`)
+	flag.StringVar(&this.Path, "path", "", `explain: A configuration file of code path`)
+	flag.StringVar(&this.Const, "const", "", `explain: Code const`)
+	flag.StringVar(&this.Code, "code", "", `explain: Code number`)
+	flag.StringVar(&this.Message, "message", "", `explain: Code message`)
+	flag.StringVar(&this.Iota, "iota", "no", `explain: Code iota yes/no`)
+	flag.Parse()
+	if this.Gen != "" && this.Gen != "nil" {
 		if controller == this.Gen {
 			this.controller()
 		} else if enum == this.Gen {
