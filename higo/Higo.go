@@ -46,7 +46,7 @@ type Higo struct {
 	serve       string // serve name
 }
 
-// 初始化
+// Init 初始化
 func Init(root *sliceutil.SliceString) *Higo {
 	hg = &Higo{
 		Engine: gin.New(),
@@ -82,7 +82,7 @@ func Init(root *sliceutil.SliceString) *Higo {
 
 		isLoadAppConfig = true
 
-		hg.loadConfigur()
+		hg.loadConfigure()
 
 		SslOut = hg.GetRoot().Join(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
 		SslCrt = config.App("SSL.CRT").(string)
@@ -114,7 +114,7 @@ func (this *Higo) setRoot(r *sliceutil.SliceString) *Higo {
 	return this
 }
 
-// 获取主目录
+// GetRoot 获取主目录
 func (this *Higo) GetRoot() *sliceutil.SliceString {
 	return Root()
 }
@@ -127,7 +127,7 @@ type yamlRaw struct {
 	child          []*yamlRaw
 }
 
-// 加载env
+// LoadEnv 加载env
 func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 	dirutil.SetPathSeparator(pathSeparator)
 	// 设置主目录
@@ -179,7 +179,7 @@ func (this *Higo) LoadEnv(root *sliceutil.SliceString) *Higo {
 }
 
 // 加载配置
-func (this *Higo) loadConfigur() *Higo {
+func (this *Higo) loadConfigure() *Higo {
 	if !dirutil.DirExist(AppConfigDir.Join(dirutil.PathSeparator())) {
 		dirutil.Mkdir(AppConfigDir.Join(dirutil.PathSeparator()))
 	}
@@ -216,31 +216,31 @@ func (this *Higo) loadConfigur() *Higo {
 	return this
 }
 
-// 全局中间件
+// Middleware 全局中间件
 func (this *Higo) Middleware(middlewares ...IMiddleware) *Higo {
 	this.middle = append(this.middle, middlewares...)
 	return this
 }
 
-// 设置鉴权中间件
+// AuthHandlerFunc 设置鉴权中间件
 func (this *Higo) AuthHandlerFunc(middle IMiddleware) *Higo {
 	MiddleAuthFunc = middle.Middle
 	return this
 }
 
-// 设置跨域中间件
+// CorsHandlerFunc 设置跨域中间件
 func (this *Higo) CorsHandlerFunc(middle IMiddleware) *Higo {
 	MiddleCorsFunc = middle.Middle
 	return this
 }
 
-// 设置服务名称
+// SetName 设置服务名称
 func (this *Higo) SetName(serve string) *Higo {
 	this.serve = serve
 	return this
 }
 
-// 获取serve name
+// Serve 获取serve name
 func (this *Higo) Serve() string {
 	return this.serve
 }
@@ -265,13 +265,13 @@ func (this *Higo) AddServe(route IRouterLoader, middles ...IMiddleware) *Higo {
 	return this
 }
 
-// 是否自动生成ssl证书
+// IsAutoTLS 是否自动生成ssl证书
 func (this *Higo) IsAutoTLS(isAuto bool) *Higo {
 	this.isAutoTLS = isAuto
 	return this
 }
 
-// 使用redis连接池
+// IsRedisPool 使用redis连接池
 func (this *Higo) IsRedisPool() *Higo {
 	this.isRedisPool = true
 	return this
@@ -282,7 +282,7 @@ func (this *Higo) InitGroupIsAuth(b bool) *Higo {
 	return this
 }
 
-// 启动
+// Boot 启动
 func (this *Higo) Boot() {
 	//执行tool命令
 	NewTool().Cmd()
@@ -343,6 +343,7 @@ func (this *Higo) Boot() {
 		ser.Router.Loader(hg)
 		//装载路由
 		hg.loadRoute()
+		eventPoint(hg, AfterLoadRoute)
 
 		serve := &http.Server{
 			Addr:         addr,
@@ -379,12 +380,17 @@ func (this *Higo) Boot() {
 	}
 }
 
-// 获取路由
+func (this *Higo) Event(eventType EventType, handle EventHandle) *Higo {
+	addEvent(eventType, handle)
+	return this
+}
+
+// GetRoute 获取路由
 func (this *Higo) GetRoute(method, relativePath string) (*router.Route, bool) {
 	return RouterContainer.Get(this.serve, method, relativePath), true
 }
 
-// 静态文件
+// StaticFile 静态文件
 func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	// 添加路由容器
 	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
@@ -392,7 +398,7 @@ func (this *Higo) StaticFile(relativePath, filepath string) *Higo {
 	return this
 }
 
-// 静态目录
+// Static 静态目录
 func (this *Higo) Static(relativePath, root string) *Higo {
 	// 添加路由容器
 	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
@@ -400,7 +406,7 @@ func (this *Higo) Static(relativePath, root string) *Higo {
 	return this
 }
 
-// 静态目录
+// StaticFS 静态目录
 func (this *Higo) StaticFS(relativePath string, fs http.FileSystem) *Higo {
 	// 添加路由容器
 	router.AddRoute(router.GET, relativePath, "", router.IsStatic(true), router.SetServe(this.serve))
@@ -424,7 +430,7 @@ func (this *Higo) loadRoute() *Higo {
 	return this
 }
 
-// register to di container
+// Register register to di container
 func Register(classs ...IClass) {
 	for _, class := range classs {
 		AddContainer(class.New)
@@ -490,7 +496,7 @@ func (this *Higo) Route(controllers ...IController) *Higo {
 	return this
 }
 
-// 路由组Handle
+// GroupHandle 路由组Handle
 func (this *Higo) GroupHandle(route *router.Route) *Higo {
 	if handle := Convert(route.Handle()); handle != nil {
 		handles := appendHandle(handle, route)
@@ -499,7 +505,7 @@ func (this *Higo) GroupHandle(route *router.Route) *Higo {
 	return this
 }
 
-// 路由Handle
+// Handle 路由Handle
 func (this *Higo) Handle(route *router.Route) *Higo {
 	if handle := Convert(route.Handle()); handle != nil {
 		handles := appendHandle(handle, route)
@@ -542,7 +548,7 @@ func handleSlice(route *router.Route) []gin.HandlerFunc {
 	return handles
 }
 
-// 添加Bean
+// Beans 添加Bean
 func (this *Higo) Beans(configs ...injector.IBean) *Higo {
 	for _, conf := range configs {
 		injector.BeanFactory.Config(conf)
@@ -551,7 +557,7 @@ func (this *Higo) Beans(configs ...injector.IBean) *Higo {
 	return this
 }
 
-// 定时任务
+// Cron 定时任务
 func (this *Higo) Cron(expr string, fn func()) *Higo {
 	_, err := CronTask().AddFunc(expr, fn)
 	if err != nil {

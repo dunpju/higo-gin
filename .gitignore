@@ -1,1 +1,4 @@
 /.idea
+/go.sum
+/test/ssl/*.pem
+/test/runtime/logs/*.log

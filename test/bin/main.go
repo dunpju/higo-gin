@@ -38,6 +38,9 @@ func main() {
 		//Cron("0/3 * * * * *", func() {
 		//	log.Println("3秒执行一次")
 		//}).
+		Event(higo.AfterLoadRoute, func(hg *higo.Higo) {
+			fmt.Println("测试事件")
+		}).
 		Boot()
 
 }
