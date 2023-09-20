@@ -11,6 +11,7 @@ require (
 	github.com/dunpju/higo-enum v1.0.5
 	github.com/dunpju/higo-ioc v1.0.3
 	github.com/dunpju/higo-logger v1.0.11
+	github.com/dunpju/higo-orm v1.0.5
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.31
 	github.com/dunpju/higo-throw v1.0.16
@@ -57,4 +58,6 @@ require (
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gorm.io/driver/mysql v1.5.1 // indirect
+	gorm.io/gorm v1.25.2 // indirect
 )

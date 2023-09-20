@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/dunpju/higo-config/config"
 	"github.com/dunpju/higo-gin/higo"
 	"github.com/dunpju/higo-gin/test/app/Beans"
 	"github.com/dunpju/higo-gin/test/app/Middlewares"
 	"github.com/dunpju/higo-gin/test/router"
+	"github.com/dunpju/higo-orm/him"
 	"github.com/dunpju/higo-utils/utils/randomutil"
 	"github.com/dunpju/higo-utils/utils/sliceutil"
 	term "github.com/nsf/termbox-go"
@@ -40,6 +42,27 @@ func main() {
 		//}).
 		Event(higo.AfterLoadRoute, func(hg *higo.Higo) {
 			fmt.Println("测试事件")
+			confDefault := config.Db("DB.Default").(*config.Configure)
+
+			_, err := him.DbConfig(him.DefaultConnect).
+				SetHost(confDefault.Get("Host").(string)).
+				SetPort(confDefault.Get("Port").(string)).
+				SetDatabase(confDefault.Get("Database").(string)).
+				SetUsername(confDefault.Get("Username").(string)).
+				SetPassword(confDefault.Get("Password").(string)).
+				SetCharset(confDefault.Get("Charset").(string)).
+				SetDriver(confDefault.Get("Driver").(string)).
+				SetPrefix(confDefault.Get("Prefix").(string)).
+				SetMaxIdle(confDefault.Get("MaxIdle").(int)).
+				SetMaxOpen(confDefault.Get("MaxOpen").(int)).
+				SetMaxLifetime(confDefault.Get("MaxLifetime").(int)).
+				SetLogMode("Info").
+				SetSlowThreshold(1).
+				SetColorful(true).
+				Init()
+			if err != nil {
+				panic(err)
+			}
 		}).
 		Boot()
 
