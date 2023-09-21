@@ -325,6 +325,7 @@ func (this *Higo) Boot() {
 	for _, ser := range serves {
 		//初始化
 		hg := Init(this.GetRoot()).
+			_init().
 			//设置服务类型
 			SetType(ser.Type).
 			//设置服务名称
