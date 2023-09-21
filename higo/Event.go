@@ -13,8 +13,12 @@ var (
 )
 
 const (
+	// AfterLoadConfigure After Load Configure
+	AfterLoadConfigure EventType = iota + 1
 	// BeforeStart Before server start
-	BeforeStart EventType = iota + 1
+	BeforeStart
+	// BeforeLoadRoute Before Load Route
+	BeforeLoadRoute
 	// AfterLoadRoute After Load Route
 	AfterLoadRoute
 )

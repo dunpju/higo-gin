@@ -59,7 +59,7 @@ func newGorm() *gorm.DB {
 			Driver:   confDefault.Get("Driver").(string),
 			Prefix:   confDefault.Get("Prefix").(string),
 		}
-		logMode = confDefault.Get("LogMode").(bool)
+		logMode = true
 		maxIdle = confDefault.Get("MaxIdle").(int)
 		maxOpen = confDefault.Get("MaxOpen").(int)
 		maxLifetime = confDefault.Get("MaxLifetime").(int)

@@ -44,6 +44,17 @@ type Higo struct {
 	middle      []IMiddleware
 	serveType   string // serve type
 	serve       string // serve name
+	serves      []serve
+	root        *sliceutil.SliceString
+}
+
+type serve struct {
+	router  IRouterLoader
+	middles []IMiddleware
+}
+
+func _newServe(router IRouterLoader, middles []IMiddleware) serve {
+	return serve{router: router, middles: middles}
 }
 
 // Init 初始化
@@ -51,24 +62,29 @@ func Init(root *sliceutil.SliceString) *Higo {
 	hg = &Higo{
 		Engine: gin.New(),
 		middle: make([]IMiddleware, 0),
+		serves: make([]serve, 0),
 		serve:  router.DefaultServe,
 		bits:   1024,
+		root:   root,
 	}
+	return hg
+}
 
+func (this *Higo) _init() *Higo {
 	// 全局异常
-	hg.Engine.Use(NewRecover().Exception(hg))
+	this.Engine.Use(NewRecover().Exception(this))
 	// 设置跨域、鉴权
-	hg.Middleware(NewCors(), NewAuth())
+	this.Middleware(NewCors(), NewAuth())
 	// 初始分隔符
 	pathSeparator = dirutil.PathSeparator()
 	// 未加载env
 	if !isLoadEnv {
-		hg.LoadEnv(root)
+		this.LoadEnv(this.root)
 		isLoadEnv = true
 	}
 	if !isLoadAppConfig {
-		AppConfigDir.Clone(root)
-		root.ForEach(func(index int, value interface{}) bool {
+		AppConfigDir.Clone(this.root)
+		this.root.ForEach(func(index int, value interface{}) bool {
 			AppConfigDir.Append(value.(string))
 			return true
 		})
@@ -82,16 +98,16 @@ func Init(root *sliceutil.SliceString) *Higo {
 
 		isLoadAppConfig = true
 
-		hg.loadConfigure()
+		this.loadConfigure()
+		eventPoint(this, AfterLoadConfigure)
 
-		SslOut = hg.GetRoot().Join(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
+		SslOut = this.GetRoot().Join(pathSeparator) + config.App("SSL.OUT").(string) + pathSeparator
 		SslCrt = config.App("SSL.CRT").(string)
 		SslKey = config.App("SSL.KEY").(string)
 		// higo bean
-		hg.Beans(NewBean())
+		this.Beans(NewBean())
 	}
-
-	return hg
+	return this
 }
 
 func (this *Higo) SetPathSeparator(sep string) *Higo {
@@ -255,6 +271,11 @@ func (this *Higo) SetType(serveType string) *Higo {
 }
 
 func (this *Higo) AddServe(route IRouterLoader, middles ...IMiddleware) *Higo {
+	this.serves = append(this.serves, _newServe(route, middles))
+	return this
+}
+
+func (this *Higo) registerServe(route IRouterLoader, middles ...IMiddleware) *Higo {
 	injector.BeanFactory.Apply(route)
 	injector.BeanFactory.Set(route)
 	if !onlySupportServe.Exist(route.GetServe().Type) {
@@ -284,6 +305,12 @@ func (this *Higo) InitGroupIsAuth(b bool) *Higo {
 
 // Boot 启动
 func (this *Higo) Boot() {
+	// 初始化
+	this._init()
+	// 注册服务
+	for _, s := range this.serves {
+		this.registerServe(s.router, s.middles...)
+	}
 	//执行tool命令
 	NewTool().Cmd()
 	//自动注册校验
@@ -340,6 +367,7 @@ func (this *Higo) Boot() {
 				hg.Beans(bean)
 			}
 		}
+		eventPoint(hg, BeforeLoadRoute)
 		ser.Router.Loader(hg)
 		//装载路由
 		hg.loadRoute()
