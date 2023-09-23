@@ -19,10 +19,6 @@ func (this *MyBean) DemoService() *Services.DemoService {
 	return Services.NewDemoService()
 }
 
-func (this *MyBean) NewOrm() *higo.Orm {
-	return higo.NewOrm()
-}
-
 func (this *MyBean) NewRedisPool() *redis.Pool {
 	return higo.RedisPool
 }

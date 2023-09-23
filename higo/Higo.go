@@ -24,7 +24,6 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
-	"time"
 )
 
 var (
@@ -357,8 +356,6 @@ func (this *Higo) Boot() {
 
 		configs := config.Get(ser.Config).(*config.Configure)
 		addr := configs.Get("Addr").(string)
-		readTimeout := configs.Get("ReadTimeout").(int)
-		writeTimeout := configs.Get("WriteTimeout").(int)
 
 		//添加服务
 		router.AddServe(hg.serve)
@@ -374,29 +371,22 @@ func (this *Higo) Boot() {
 		hg.loadRoute()
 		eventPoint(hg, AfterLoadRoute)
 
-		serve := &http.Server{
-			Addr:         addr,
-			Handler:      hg,
-			ReadTimeout:  time.Duration(readTimeout) * time.Second,
-			WriteTimeout: time.Duration(writeTimeout) * time.Second,
-		}
-
 		if ser.Type == HttpServe {
 			this.errgroup.Go(func() error {
 				logger.Logrus.Infoln("HTTP Server listening at " + addr + " Starting Success!")
-				return serve.ListenAndServe()
+				return hg.Run(addr)
 			})
 		}
 		if ser.Type == HttpsServe {
 			this.errgroup.Go(func() error {
 				logger.Logrus.Infoln("HTTPS Server listening at " + addr + " Starting Success!")
-				return serve.ListenAndServeTLS(SslOut+SslCrt, SslOut+SslKey)
+				return hg.RunTLS(addr, SslOut+SslCrt, SslOut+SslKey)
 			})
 		}
 		if ser.Type == WebsocketServe {
 			this.errgroup.Go(func() error {
 				logger.Logrus.Infoln("WEBSOCKET Server listening at " + addr + " Starting Success!")
-				return serve.ListenAndServe()
+				return hg.Run(addr)
 			})
 		}
 	}
