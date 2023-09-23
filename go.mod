@@ -11,23 +11,22 @@ require (
 	github.com/dunpju/higo-enum v1.0.5
 	github.com/dunpju/higo-ioc v1.0.3
 	github.com/dunpju/higo-logger v1.0.11
-	github.com/dunpju/higo-orm v1.0.5
+	github.com/dunpju/higo-orm v1.0.14
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.31
 	github.com/dunpju/higo-throw v1.0.16
 	github.com/dunpju/higo-utils v1.0.95
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
-	github.com/go-sql-driver/mysql v1.7.1
 	github.com/golang/protobuf v1.5.2
 	github.com/gomodule/redigo v1.8.3
 	github.com/gorilla/websocket v1.4.2
-	github.com/jinzhu/gorm v1.9.16
 	github.com/nsf/termbox-go v1.1.1
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 	github.com/robfig/cron/v3 v3.0.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.2.8
+	gorm.io/gorm v1.25.2
 )
 
 require (
@@ -37,6 +36,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
@@ -59,5 +59,4 @@ require (
 	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gorm.io/driver/mysql v1.5.1 // indirect
-	gorm.io/gorm v1.25.2 // indirect
 )

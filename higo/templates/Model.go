@@ -8,10 +8,10 @@ import (
 	"github.com/dunpju/higo-utils/utils/fileutil"
 	"github.com/dunpju/higo-utils/utils/stringutil"
 	"github.com/golang/protobuf/protoc-gen-go/generator"
-	"github.com/jinzhu/gorm"
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"gorm.io/gorm"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -265,7 +265,7 @@ func (this *Model) Generate() {
 	fmt.Println("model: " + this.OutDir + " generate success!")
 }
 
-//获取数据库表
+// 获取数据库表
 func GetDbTables(db *gorm.DB, database string, tableNames ...string) []Table {
 	var (
 		tables []Table
@@ -282,7 +282,7 @@ func GetDbTables(db *gorm.DB, database string, tableNames ...string) []Table {
 	return tables
 }
 
-//获取表所有字段信息
+// 获取表所有字段信息
 func (this *Model) GetTableFields(tableName string) []TableField {
 	db := this.DB
 	var fields []TableField
@@ -316,7 +316,7 @@ type TableField struct {
 	Comment    string `gorm:"column:Comment"`
 }
 
-//获取字段类型
+// 获取字段类型
 func getFiledType(field TableField) string {
 	if field.Null == "YES" {
 		return "interface{}"

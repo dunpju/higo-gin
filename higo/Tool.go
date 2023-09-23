@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dunpju/higo-gin/higo/templates"
+	"github.com/dunpju/higo-orm/him"
 	"github.com/dunpju/higo-utils/utils"
 	"github.com/dunpju/higo-utils/utils/dirutil"
 	"github.com/dunpju/higo-utils/utils/stringutil"
@@ -39,6 +40,7 @@ type Tool struct {
 	Code    string
 	Message string
 	Iota    string
+	Connect string
 }
 
 func NewTool() *Tool {
@@ -60,6 +62,7 @@ func (this *Tool) Cmd() {
 	flag.StringVar(&this.Code, "code", "", `explain: Code number`)
 	flag.StringVar(&this.Message, "message", "", `explain: Code message`)
 	flag.StringVar(&this.Iota, "iota", "no", `explain: Code iota yes/no`)
+	flag.StringVar(&this.Connect, "connect", "", `explain: Default`)
 	flag.Parse()
 	if this.Gen != "" && this.Gen != "nil" {
 		if controller == this.Gen {
@@ -227,6 +230,10 @@ func (this *Tool) param() {
 }
 
 func (this *Tool) model() {
+	if this.Connect == "" {
+		log.Fatalln(`data source connect name unable empty 
+    eg: -connect=Default`)
+	}
 	if this.Name == "" {
 		log.Fatalln(`table name unable empty 
     eg: -name=ts_user`)
@@ -308,17 +315,22 @@ loopConfirmBeginGenerate:
 	}
 	fmt.Print("Start Generate ......\n")
 	//连接数据库准备构建
-	db := newOrm().DB
+	conn, err := him.GetConnect(this.Connect)
+	if err != nil {
+		panic(err)
+	}
+
+	db := conn.DB().GormDB()
 	if this.Name == "all" {
-		tables := templates.GetDbTables(db, GetDbConfig().Database)
+		tables := templates.GetDbTables(db, conn.Dbc().Database())
 		for _, table := range tables {
-			genModel := templates.NewModel(db, table.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+			genModel := templates.NewModel(db, table.Name, this.Out, conn.Dbc().Database(), conn.Dbc().Prefix())
 			genModel.Generate()
 			daoEntity(*modelTool, *genModel)
 			fmt.Println("==================================================================================")
 		}
 	} else {
-		genModel := templates.NewModel(db, this.Name, this.Out, GetDbConfig().Database, GetDbConfig().Prefix)
+		genModel := templates.NewModel(db, this.Name, this.Out, conn.Dbc().Database(), conn.Dbc().Prefix())
 		genModel.Generate()
 		daoEntity(*modelTool, *genModel)
 	}

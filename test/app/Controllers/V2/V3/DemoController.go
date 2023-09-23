@@ -201,7 +201,6 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	user.UserById(3, "*")
 	fmt.Println(user)
 	*/
-	user.Add("werwerwerg123456", "15987", 20)
 	//this.Table("ts_user").
 	//	Where("id=?", 3).
 	//	Find(user)
