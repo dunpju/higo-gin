@@ -47,7 +47,7 @@ func NewTool() *Tool {
 	return &Tool{}
 }
 
-func (this *Tool) Cmd() {
+func (this *Tool) Parse() *ToolParse {
 	flag.StringVar(&this.Gen, "gen", "nil", `explain: Generate Controller Model Enum Code Dao Entity
     --option[controller | model | enum | code | dao | entity | param | service]
     eg:-gen=controller`)
@@ -64,6 +64,22 @@ func (this *Tool) Cmd() {
 	flag.StringVar(&this.Iota, "iota", "no", `explain: Code iota yes/no`)
 	flag.StringVar(&this.Connect, "connect", "", `explain: Default`)
 	flag.Parse()
+	return newToolParse(this)
+}
+
+type ToolParse struct {
+	tool *Tool
+}
+
+func newToolParse(tool *Tool) *ToolParse {
+	return &ToolParse{tool: tool}
+}
+
+func (t *ToolParse) Cmd() {
+	t.tool.Cmd()
+}
+
+func (this *Tool) Cmd() {
 	if this.Gen != "" && this.Gen != "nil" {
 		if controller == this.Gen {
 			this.controller()

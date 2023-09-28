@@ -310,8 +310,7 @@ func (this *Higo) Boot() {
 	for _, s := range this.serves {
 		this.registerServe(s.router, s.middles...)
 	}
-	//执行tool命令
-	NewTool().Cmd()
+
 	//自动注册校验
 	VerifyContainer.Range(func(key, verify interface{}) bool {
 		verify.(*Verify).VerifyRules.Range(func(tag, rules interface{}) bool {
