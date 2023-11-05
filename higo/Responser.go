@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"github.com/dunpju/higo-orm/arm"
 	"github.com/gin-gonic/gin"
 	"reflect"
 	"sync"
@@ -105,7 +106,7 @@ func (this JsonResponder) Handle(method reflect.Value) interface{} {
 	}
 }
 
-type ModelResponder func(*gin.Context) Model
+type ModelResponder func(*gin.Context) arm.IModel
 
 func (this ModelResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -113,12 +114,12 @@ func (this ModelResponder) RespondTo() gin.HandlerFunc {
 	}
 }
 func (this ModelResponder) Handle(method reflect.Value) interface{} {
-	return func(ctx *gin.Context) Model {
-		return methodCall(ctx, method).(Model)
+	return func(ctx *gin.Context) arm.IModel {
+		return methodCall(ctx, method).(arm.IModel)
 	}
 }
 
-type ModelsResponder func(*gin.Context) Models
+type ModelsResponder func(*gin.Context) arm.Models
 
 func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -130,8 +131,8 @@ func (this ModelsResponder) RespondTo() gin.HandlerFunc {
 	}
 }
 func (this ModelsResponder) Handle(method reflect.Value) interface{} {
-	return func(ctx *gin.Context) Models {
-		return methodCall(ctx, method).(Models)
+	return func(ctx *gin.Context) arm.Models {
+		return methodCall(ctx, method).(arm.Models)
 	}
 }
 
