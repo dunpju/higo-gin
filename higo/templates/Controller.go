@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/dunpju/higo-gin/higo/templates/tpls"
+	"github.com/dunpju/higo-orm/gen"
 	"github.com/dunpju/higo-utils/utils/dirutil"
 	"github.com/dunpju/higo-utils/utils/fileutil"
 	"github.com/dunpju/higo-utils/utils/stringutil"
@@ -23,8 +24,8 @@ import (
 type ControllerTool struct {
 	Name                 string   // Controller Struct Name
 	ParamTag             []string // List/Add/Edit/Delete
-	ConfirmBeginGenerate YesNo
-	IsGenerateParam      YesNo
+	ConfirmBeginGenerate gen.YesNo
+	IsGenerateParam      gen.YesNo
 	OutParamDir          string
 }
 

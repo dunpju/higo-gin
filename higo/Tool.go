@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dunpju/higo-gin/higo/templates"
-	"github.com/dunpju/higo-orm/him"
+	"github.com/dunpju/higo-orm/gen"
 	"github.com/dunpju/higo-utils/utils"
 	"github.com/dunpju/higo-utils/utils/dirutil"
 	"github.com/dunpju/higo-utils/utils/stringutil"
@@ -14,16 +14,12 @@ import (
 )
 
 const (
-	service                    = "service"
-	controller                 = "controller"
-	model                      = "model"
-	dao                        = "dao"
-	entity                     = "entity"
-	enum                       = "enum"
-	codes                      = "code"
-	param                      = "param"
-	yes        templates.YesNo = "yes"
-	no         templates.YesNo = "no"
+	service    = "service"
+	controller = "controller"
+	model      = "model"
+	enum       = "enum"
+	codes      = "code"
+	param      = "param"
 )
 
 var capitalBeganReg = regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
@@ -106,16 +102,6 @@ Explain: Generate Controller/Model/Enum/Code/Dao/Entity/Param/Service
 	}
 }
 
-func daoEntity(modelTool templates.ModelTool, genModel templates.Model) {
-	if modelTool.IsGenerateDao.Bool() {
-		entity := templates.NewEntity(modelTool, genModel)
-		entity.Generate()
-		templates.NewDao(modelTool, genModel, *entity).Generate()
-	} else if modelTool.IsGenerateEntity.Bool() {
-		templates.NewEntity(modelTool, genModel).Generate()
-	}
-}
-
 func (this *Tool) controller() {
 	if this.Name == "" {
 		log.Fatalln(`controller name unable empty 
@@ -135,7 +121,7 @@ loopParam:
 	if nil != err && n > 0 {
 		panic(err)
 	}
-	if (yes != controllerTool.IsGenerateParam && no != controllerTool.IsGenerateParam) && n > 0 {
+	if (gen.Yes != controllerTool.IsGenerateParam && gen.No != controllerTool.IsGenerateParam) && n > 0 {
 		goto loopParam
 	}
 	fmt.Printf("Choice Generate Param: %s\n", controllerTool.IsGenerateParam)
@@ -257,97 +243,5 @@ func (this *Tool) model() {
 	if this.Out == "" {
 		log.Fatalln(`output directory unable empty 
     eg: -out=app\Models`)
-	}
-loopDao:
-	isMatchCapitalBegan := ""
-	modelTool := templates.NewModelTool()
-	modelTool.Name = this.Name
-	modelTool.Out = this.Out
-	fmt.Print("Generate Dao [yes|no] (default:yes):")
-	n, err := fmt.Scanln(&modelTool.IsGenerateDao)
-	if nil != err && n > 0 {
-		panic(err)
-	}
-	if (yes != modelTool.IsGenerateDao && no != modelTool.IsGenerateDao) && n > 0 {
-		goto loopDao
-	}
-	fmt.Printf("Choice Generate Dao: %s\n", modelTool.IsGenerateDao)
-	if modelTool.IsGenerateDao.Bool() { // 确认构建dao
-		if capitalBeganReg == nil {
-			log.Fatalln("regexp err")
-		}
-		daoDir := "dao"
-		isMatchCapitalBegan = capitalBeganReg.FindString(dirutil.Basename(this.Out))
-		if isMatchCapitalBegan != "" {
-			daoDir = stringutil.Ucfirst(daoDir)
-		}
-		outDaoDir := dirutil.Dirname(this.Out) + `\` + daoDir
-		fmt.Printf("Confirm Output Directory Of Dao Default (%s)? Enter/Input: ", outDaoDir)
-		modelTool.OutDaoDir = outDaoDir
-		n, err = fmt.Scanln(&modelTool.OutDaoDir)
-		if nil != err && n > 0 {
-			panic(err)
-		}
-		fmt.Printf("Confirmed Output Directory Of Dao: %s\n", modelTool.OutDaoDir)
-		//确认构建dao，默认必须构建entity
-		modelTool.IsGenerateEntity = yes
-		goto loopChoiceGenerateEntity
-	}
-loopEntity:
-	fmt.Print("Generate Entity [yes|no] (default:yes):")
-	n, err = fmt.Scanln(&modelTool.IsGenerateEntity)
-	if nil != err && n > 0 {
-		panic(err)
-	}
-	if (yes != modelTool.IsGenerateEntity && no != modelTool.IsGenerateEntity) && n > 0 {
-		goto loopEntity
-	}
-loopChoiceGenerateEntity:
-	fmt.Printf("Choice Generate Entity: %s\n", modelTool.IsGenerateEntity)
-	if modelTool.IsGenerateEntity.Bool() { //确认构建entity
-		entityDir := "entity"
-		isMatchCapitalBegan = capitalBeganReg.FindString(dirutil.Basename(this.Out))
-		if isMatchCapitalBegan != "" {
-			entityDir = stringutil.Ucfirst(entityDir)
-		}
-		outEntityDir := dirutil.Dirname(this.Out) + `\` + entityDir
-		fmt.Printf("Confirm Output Directory Of Entity Default (%s)? Enter/Input: ", outEntityDir)
-		modelTool.OutEntityDir = outEntityDir
-		n, err = fmt.Scanln(&modelTool.OutEntityDir)
-		if nil != err && n > 0 {
-			panic(err)
-		}
-		fmt.Printf("Confirmed Output Directory Of Entity: %s\n", modelTool.OutEntityDir)
-	}
-	//确认开始构建
-loopConfirmBeginGenerate:
-	fmt.Print("Start Generate [yes|no] (default:yes):")
-	n, err = fmt.Scanln(&modelTool.ConfirmBeginGenerate)
-	if (yes != modelTool.ConfirmBeginGenerate && no != modelTool.ConfirmBeginGenerate) && n > 0 {
-		goto loopConfirmBeginGenerate
-	}
-	if (yes != modelTool.ConfirmBeginGenerate) && n > 0 {
-		goto loopDao
-	}
-	fmt.Print("Start Generate ......\n")
-	//连接数据库准备构建
-	conn, err := him.GetConnect(this.Connect)
-	if err != nil {
-		panic(err)
-	}
-
-	db := conn.DB().GormDB()
-	if this.Name == "all" {
-		tables := templates.GetDbTables(db, conn.Dbc().Database())
-		for _, table := range tables {
-			genModel := templates.NewModel(db, table.Name, this.Out, conn.Dbc().Database(), conn.Dbc().Prefix())
-			genModel.Generate()
-			daoEntity(*modelTool, *genModel)
-			fmt.Println("==================================================================================")
-		}
-	} else {
-		genModel := templates.NewModel(db, this.Name, this.Out, conn.Dbc().Database(), conn.Dbc().Prefix())
-		genModel.Generate()
-		daoEntity(*modelTool, *genModel)
 	}
 }
