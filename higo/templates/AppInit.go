@@ -1,44 +1,30 @@
 package templates
 
 import (
-	"bufio"
 	"bytes"
 	"go/format"
 	"go/token"
-	"io"
-	"os"
-	"strings"
+	"runtime/debug"
 	"sync"
 )
 
 const (
-	module = "module "
+	module   = "module "
 	funcDecl = "func (this *%s) %s() *%s%s"
 )
 
 var (
-	moduleName  = ""
-	moduleOnce  sync.Once
+	moduleName = ""
+	moduleOnce sync.Once
 )
 
-//获取模块名称
+// GetModName 获取模块名称
 func GetModName() string {
 	moduleOnce.Do(func() {
-		pwd, _ := os.Getwd()
-		gomodfile, err := os.Open(pwd + "/go.mod")
-		if err != nil {
-			panic(err)
-		}
-		defer gomodfile.Close()
-		gomodbr := bufio.NewReader(gomodfile)
-		for {
-			a, _, c := gomodbr.ReadLine()
-			if c == io.EOF {
-				break
-			}
-			if strings.Contains(string(a), module) {
-				moduleName = strings.TrimLeft(string(a), module)
-				break
+		info, _ := debug.ReadBuildInfo()
+		for _, dep := range info.Deps {
+			if dep.Version == "(devel)" {
+				moduleName = dep.Path
 			}
 		}
 	})

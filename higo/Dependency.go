@@ -95,7 +95,7 @@ func AddContainer(builds ...DepBuild) {
 	}
 }
 
-// 获取依赖
+// Di 获取依赖
 func Di(name string) IClass {
 	name = strings.Replace(name, templates.GetModName(), "", 1)
 	kk := "/" + strings.TrimLeft(name, "/")

@@ -12,6 +12,7 @@ import (
 	"github.com/dunpju/higo-router/router"
 	"github.com/dunpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"log"
 	"time"
 )

@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-//路由容器
+// 路由容器
 var RouterContainer *RouterCollect
 
 type RouterCollect struct {
@@ -21,7 +21,7 @@ func NewRouterCollect() *RouterCollect {
 	return &RouterCollect{}
 }
 
-// 获取路由
+// Get 获取路由
 func (this RouterCollect) Get(serve, method, relativePath string) *router.Route {
 	node, err := router.GetRoutes(serve).Search(method, relativePath)
 	if err != nil {
@@ -30,7 +30,7 @@ func (this RouterCollect) Get(serve, method, relativePath string) *router.Route 
 	return node.Route
 }
 
-//添加路由
+// AddRoute 添加路由
 func (this *Higo) AddRoute(httpMethod string, relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
 	funcForPCName := runtime.FuncForPC(reflect.ValueOf(handler).Pointer()).Name()
 	structFuncRegexp := regexp.MustCompile(`\.\(.*\)\..*-fm$`)
@@ -59,13 +59,13 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 	return this
 }
 
-//添加路由组
+// AddGroup 添加路由组
 func (this *Higo) AddGroup(prefix string, callable func(), attributes ...*router.RouteAttribute) *Higo {
 	router.AddGroup(prefix, callable, attributes...)
 	return this
 }
 
-//websocket路由
+// Ws websocket路由
 func (this *Higo) Ws(relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
 	this.AddRoute(router.WEBSOCKET, relativePath, handler, attributes...)
 	return this
@@ -113,12 +113,12 @@ func (this *Higo) IsStatic(value bool) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteIsStatic, value)
 }
 
-//描述
+// Desc 描述
 func (this *Higo) Desc(value string) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteDesc, value)
 }
 
-//单路由中间件
+// Middle 单路由中间件
 func (this *Higo) Middle(handlers ...gin.HandlerFunc) *router.RouteAttribute {
 	values := make([]interface{}, 0)
 	for _, handler := range handlers {
@@ -127,7 +127,7 @@ func (this *Higo) Middle(handlers ...gin.HandlerFunc) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteMiddleware, values...)
 }
 
-//组中间件
+// GroupMiddle 组中间件
 func (this *Higo) GroupMiddle(handlers ...gin.HandlerFunc) *router.RouteAttribute {
 	values := make([]interface{}, 0)
 	for _, handler := range handlers {
