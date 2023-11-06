@@ -364,30 +364,32 @@ func (this *Higo) Boot() {
 				hg.Beans(bean)
 			}
 		}
-		eventPoint(hg, BeforeLoadRoute)
-		ser.Router.Loader(hg)
-		//装载路由
-		hg.loadRoute()
-		eventPoint(hg, AfterLoadRoute)
-
-		if ser.Type == HttpServe {
-			this.errgroup.Go(func() error {
-				logger.Logrus.Infoln("HTTP Server listening at " + addr + " Starting Success!")
-				return hg.Run(addr)
-			})
-		}
-		if ser.Type == HttpsServe {
-			this.errgroup.Go(func() error {
-				logger.Logrus.Infoln("HTTPS Server listening at " + addr + " Starting Success!")
-				return hg.RunTLS(addr, SslOut+SslCrt, SslOut+SslKey)
-			})
-		}
-		if ser.Type == WebsocketServe {
-			this.errgroup.Go(func() error {
-				logger.Logrus.Infoln("WEBSOCKET Server listening at " + addr + " Starting Success!")
-				return hg.Run(addr)
-			})
-		}
+		this.run(func() {
+			eventPoint(hg, BeforeLoadRoute)
+			ser.Router.Loader(hg)
+			hg.loadRoute()
+			eventPoint(hg, AfterLoadRoute)
+		})
+		this.run(func() {
+			if ser.Type == HttpServe {
+				this.errgroup.Go(func() error {
+					logger.Logrus.Infoln("HTTP Server listening at " + addr + " Starting Success!")
+					return hg.Run(addr)
+				})
+			}
+			if ser.Type == HttpsServe {
+				this.errgroup.Go(func() error {
+					logger.Logrus.Infoln("HTTPS Server listening at " + addr + " Starting Success!")
+					return hg.RunTLS(addr, SslOut+SslCrt, SslOut+SslKey)
+				})
+			}
+			if ser.Type == WebsocketServe {
+				this.errgroup.Go(func() error {
+					logger.Logrus.Infoln("WEBSOCKET Server listening at " + addr + " Starting Success!")
+					return hg.Run(addr)
+				})
+			}
+		})
 	}
 
 	//启动定时任务
@@ -395,6 +397,14 @@ func (this *Higo) Boot() {
 
 	if err := this.errgroup.Wait(); err != nil {
 		logger.Logrus.Fatal(err)
+	}
+}
+
+func (this *Higo) run(fn func()) {
+	if len(os.Args) <= 1 {
+		fn()
+	} else {
+		fmt.Println(os.Args)
 	}
 }
 
