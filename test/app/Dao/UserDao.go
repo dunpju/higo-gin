@@ -1,115 +1,105 @@
 package Dao
 
 import (
-	"github.com/dunpju/higo-gin/higo"
-	"github.com/dunpju/higo-gin/higo/errcode"
 	"github.com/dunpju/higo-gin/higo/exceptions/DaoException"
-	"github.com/dunpju/higo-gin/higo/sql"
 	"github.com/dunpju/higo-gin/test/app/Entity/UserEntity"
-	"github.com/dunpju/higo-gin/test/app/Models/UserModel"
+	"github.com/dunpju/higo-gin/test/app/Models/User"
+	"github.com/dunpju/higo-orm/arm"
+	"github.com/dunpju/higo-orm/him"
+	"gorm.io/gorm"
 )
 
 type UserDao struct {
-	model  *UserModel.Impl
-	entity *UserEntity.Impl
+	*arm.BaseDao
+	model *User.Model
 }
 
 func NewUserDao() *UserDao {
-	return &UserDao{model: UserModel.New()}
+	dao := &UserDao{model: User.New()}
+	dao.BaseDao = arm.NewBaseDao(dao)
+	return dao
 }
 
-func (this *UserDao) Orm() *higo.Orm {
-	return this.model.Orm
+func (this *UserDao) SetModel(model arm.IModel) {
+	this.model = model.(*User.Model)
 }
 
-func (this *UserDao) Model() *UserModel.Impl {
-	return UserModel.New()
+func (this *UserDao) GetModel() arm.IModel {
+	return this.model
 }
 
-func (this *UserDao) Models() []*UserModel.Impl {
-	return make([]*UserModel.Impl, 0)
+func (this *UserDao) Model() *User.Model {
+	return User.New()
 }
 
-func (this *UserDao) SetData(entity *UserEntity.Impl) {
-	this.entity = entity
-	if !entity.PriEmpty() || entity.IsEdit() { //编辑
-		if !this.GetById(entity.Id).Exist() {
-			DaoException.Throw(errcode.NotExistError.Message(), int(errcode.NotExistError))
+func (this *UserDao) Models() []*User.Model {
+	return make([]*User.Model, 0)
+}
+
+func (this *UserDao) TX(tx *gorm.DB) *UserDao {
+	this.model.TX(tx)
+	return this
+}
+
+func (this *UserDao) SetData(entity *UserEntity.Entity) arm.IDao {
+	return this.model.Builder(this, func() {
+		if !entity.PrimaryEmpty() || entity.IsEdit() { //编辑
+			if !this.GetById(entity.Id).Exist() {
+				DaoException.Throw("不存在", 0)
+			}
+			this.model.Where(User.Id, "=", entity.Id)
+			if entity.Equals(UserEntity.FlagDelete) {
+				// todo::填充修改字段
+			} else if entity.Equals(UserEntity.FlagUpdate) {
+				// todo::填充修改字段
+			}
+		} else { //新增
+
 		}
-		_ = this.model.Update(this.model.TableName()).Where("`"+UserModel.Id+"`", entity.Id)
-		if UserEntity.FlagDelete == entity.Flag() {
-
-		} else {
-
-		}
-	} else { //新增
-		this.model.Insert(this.model.TableName()).
-			Set("`"+UserModel.Id+"`", entity.Id).       //
-			Set("`"+UserModel.Uname+"`", entity.Uname). //
-			Set("`"+UserModel.UTel+"`", entity.UTel).   //
-			Set("`"+UserModel.Score+"`", entity.Score)  //
-	}
-	this.model.Build()
+	})
 }
 
-//添加
-func (this *UserDao) Add() int64 {
-	higo.Result(this.model.Mapper(this.model.GetBuilder()).InsertGetId().Error).Unwrap()
-	return this.model.LastInsertId()
+// Add 添加
+func (this *UserDao) Add() (gormDB *gorm.DB, lastInsertId int64) {
+	gormDB, lastInsertId = this.model.Insert().LastInsertId()
+	this.CheckError(gormDB)
+	return
 }
 
-//更新
-func (this *UserDao) Update() bool {
-	if this.entity.PriEmpty() {
-		DaoException.Throw("Id"+errcode.PrimaryIdError.Message(), int(errcode.PrimaryIdError))
-	}
-	higo.Result(this.model.Mapper(this.model.GetBuilder()).Exec().Error).Unwrap()
-	return true
+// Update 更新
+func (this *UserDao) Update() *gorm.DB {
+	gormDB, _ := this.model.Update().Exec()
+	this.CheckError(gormDB)
+	return gormDB
 }
 
-//id查询
-func (this *UserDao) GetById(id int, fields ...string) *UserModel.Impl {
-	if len(fields) == 0 {
-		fields = append(fields, "*")
-	}
+// GetBySchoolId schoolId查询
+func (this *UserDao) GetById(id int) *User.Model {
 	model := this.Model()
-	model.Mapper(sql.Select(fields...).
-		From(this.model.TableName()).
-		Where("`"+UserModel.Id+"` = ?", id).
-		ToSql()).Query().Scan(&model)
-	model.CheckError()
+	gormDB := this.model.Select().Where(User.Id, "=", id).First(&model)
+	this.CheckError(gormDB)
 	return model
 }
 
-//id集查询
-func (this *UserDao) GetByIds(ids []int, fields ...string) []*UserModel.Impl {
-	if len(fields) == 0 {
-		fields = append(fields, "*")
-	}
+// GetBySchoolIds schoolId集查询
+func (this *UserDao) GetBySchoolIds(schoolIds []int64) []*User.Model {
 	models := this.Models()
-	this.model.Mapper(sql.Select(fields...).
-		From(this.model.TableName()).
-		Where("`"+UserModel.Id+"` IN (?)", ids).
-		ToSql()).Query().Scan(&models)
-	this.model.CheckError()
+	gormDB := this.model.Select().WhereIn(User.Id, schoolIds).Get(&models)
+	this.CheckError(gormDB)
 	return models
 }
 
-//硬删除
-func (this *UserDao) DeleteById(id int) {
-	higo.Result(this.model.Mapper(sql.Delete(this.model.TableName()).
-		DeleteBuilder().
-		Where("`"+UserModel.Id+"` = ?", id).
-		ToSql()).Exec().Error).Unwrap()
+// DeleteBySchoolId 硬删除
+func (this *UserDao) DeleteById(id int64) *gorm.DB {
+	gormDB, _ := this.model.Delete().Where(User.Id, "=", id).Exec()
+	this.CheckError(gormDB)
+	return gormDB
 }
 
-//列表
-func (this *UserDao) List(perPage, page uint64, where map[string]interface{}, fields ...string) *higo.Pager {
+// Paginate 列表
+func (this *UserDao) Paginate(perPage, page uint64) him.Paginate {
 	models := this.Models()
-	pager := higo.NewPager(perPage, page)
-	query := this.model.Table(this.model.TableName())
-	query.Paginate(pager).Find(&models)
-	query.CheckError()
-	pager.Items = models
-	return pager
+	gormDB, paginate := this.model.Select().Paginate(page, perPage, &models)
+	this.CheckError(gormDB)
+	return paginate
 }

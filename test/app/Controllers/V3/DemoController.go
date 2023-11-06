@@ -7,8 +7,9 @@ import (
 	"github.com/dunpju/higo-gin/higo"
 	"github.com/dunpju/higo-gin/higo/request"
 	"github.com/dunpju/higo-gin/test/app/Exception"
-	"github.com/dunpju/higo-gin/test/app/Models/UserModel"
+	"github.com/dunpju/higo-gin/test/app/Models/User"
 	"github.com/dunpju/higo-gin/test/app/Services"
+	"github.com/dunpju/higo-orm/arm"
 	"github.com/dunpju/higo-router/router"
 	"github.com/dunpju/higo-throw/exception"
 	"github.com/gin-gonic/gin"
@@ -113,10 +114,10 @@ type DutyUser struct {
 	DutyUserId       int64   `json:"duty_user_id" binding:"mobile"`
 	EducationClassId int64   `json:"education_class_id" binding:"required"`
 	UserIds          []int64 `json:"user_ids" binding:"user_ids"`
-	User             User    `json:"user"`
+	User             User1   `json:"user"`
 }
 
-type User struct {
+type User1 struct {
 	Name string `json:"name" binding:"name"`
 }
 
@@ -162,7 +163,7 @@ func (this *DemoController) HttpsTestValidate() {
 }
 
 // 测试get请求
-func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
+func (this *DemoController) HttpsTestGet(ctx *gin.Context) arm.IModel {
 	param := NewDutyUser()
 	fmt.Println(higo.VerifyContainer)
 	//校验数据
@@ -176,7 +177,7 @@ func (this *DemoController) HttpsTestGet(ctx *gin.Context) higo.Model {
 	fmt.Println(this)
 	fmt.Printf("%p\n", this)
 	*/
-	user := UserModel.New(UserModel.WithId(101))
+	user := User.New(User.WithId(101))
 	/**
 	user.Uname = this.Age.String()
 	fmt.Println(user)

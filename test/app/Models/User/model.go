@@ -1,16 +1,23 @@
-package NewsModel
+package User
 
 import (
 	"github.com/dunpju/higo-orm/arm"
 	"github.com/dunpju/higo-orm/him"
 )
 
+const (
+	Id    arm.Fields = "id"
+	Uname arm.Fields = "uname"
+	UTel  arm.Fields = "u_tel"
+	Score arm.Fields = "score"
+)
+
 type Model struct {
 	*arm.Model
-	NewsId     int         `gorm:"column:news_id" json:"news_id" comment:"主键"`
-	Title      string      `gorm:"column:title" json:"title" comment:"标题"`
-	Clicknum   int         `gorm:"column:clicknum" json:"clicknum" comment:"点击量"`
-	CreateTime interface{} `gorm:"column:create_time" json:"create_time" comment:"创建时间"`
+	Id    int    `gorm:"column:id" json:"id" comment:""`
+	Uname string `gorm:"column:uname" json:"uname" comment:""`
+	UTel  string `gorm:"column:u_tel" json:"u_tel" comment:""`
+	Score int    `gorm:"column:score" json:"score" comment:""`
 }
 
 func New(properties ...him.IProperty) *Model {
@@ -18,7 +25,7 @@ func New(properties ...him.IProperty) *Model {
 }
 
 func TableName() *arm.TableName {
-	return arm.NewTableName("ts_news")
+	return arm.NewTableName("ts_user")
 }
 
 func (this *Model) New(properties ...him.IProperty) *Model {
@@ -47,5 +54,12 @@ func (this *Model) Apply(model *arm.Model) {
 }
 
 func (this *Model) Exist() bool {
-	return this.NewsId > 0
+	return this.Id > 0
+}
+
+// WithId
+func WithId(id int) him.IProperty {
+	return him.SetProperty(func(obj any) {
+		obj.(*Model).Id = id
+	})
 }
