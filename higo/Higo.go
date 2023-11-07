@@ -404,7 +404,17 @@ func (this *Higo) run(fn func()) {
 	if len(os.Args) <= 1 {
 		fn()
 	} else {
-		fmt.Println(os.Args)
+		match, err := regexp.Match(`^[(gen)|(-g)]`, []byte(os.Args[1]))
+		if err != nil {
+			fmt.Println(err)
+		}
+		if match {
+			if err := Generator.Execute(); err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			os.Exit(1)
+		}
 	}
 }
 
