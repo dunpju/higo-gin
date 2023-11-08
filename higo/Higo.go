@@ -364,13 +364,12 @@ func (this *Higo) Boot() {
 				hg.Beans(bean)
 			}
 		}
+		
 		this.run(func() {
 			eventPoint(hg, BeforeLoadRoute)
 			ser.Router.Loader(hg)
 			hg.loadRoute()
 			eventPoint(hg, AfterLoadRoute)
-		})
-		this.run(func() {
 			if ser.Type == HttpServe {
 				this.errgroup.Go(func() error {
 					logger.Logrus.Infoln("HTTP Server listening at " + addr + " Starting Success!")
@@ -409,7 +408,7 @@ func (this *Higo) run(fn func()) {
 			fmt.Println(err)
 		}
 		if match {
-			if err := Generator.Execute(); err != nil {
+			if err := rootCommand.Execute(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}

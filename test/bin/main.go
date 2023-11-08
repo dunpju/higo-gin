@@ -29,7 +29,7 @@ func main() {
 
 	//higo.WsPitpatSleep = time.Second * 5
 
-	higo.Init(sliceutil.NewSliceString(".", "test", "")).
+	higo.Init(sliceutil.NewSliceString(".", "")).
 		Middleware(Middlewares.NewRunLog()).
 		AddServe(router.NewHttp(), Middlewares.NewHttp()).
 		AddServe(router.NewHttps(), beanConfig).
@@ -40,7 +40,7 @@ func main() {
 		//Cron("0/3 * * * * *", func() {
 		//	log.Println("3秒执行一次")
 		//}).
-		Event(higo.AfterLoadRoute, func(hg *higo.Higo) {
+		Event(higo.AfterLoadConfigure, func(hg *higo.Higo) {
 			fmt.Println("测试事件")
 			confDefault := config.Db("DB.Default").(*config.Configure)
 

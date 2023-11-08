@@ -11,7 +11,7 @@ require (
 	github.com/dunpju/higo-enum v1.0.5
 	github.com/dunpju/higo-ioc v1.0.3
 	github.com/dunpju/higo-logger v1.0.11
-	github.com/dunpju/higo-orm v1.0.18
+	github.com/dunpju/higo-orm v1.0.20
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.31
 	github.com/dunpju/higo-throw v1.0.16
@@ -24,8 +24,10 @@ require (
 	github.com/nsf/termbox-go v1.1.1
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 	github.com/robfig/cron/v3 v3.0.0
+	github.com/spf13/cobra v1.2.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/gorm v1.25.2
 )
 
 require (
@@ -52,11 +54,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect
-	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 	gorm.io/driver/mysql v1.5.1 // indirect
-	gorm.io/gorm v1.25.2 // indirect
 )
