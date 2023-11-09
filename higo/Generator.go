@@ -14,8 +14,12 @@ import (
 func init() {
 	gen.InitModel()
 	InitController()
+	InitParam()
+	InitCode()
 	genCommand.AddCommand(gen.ModelCommand)
 	genCommand.AddCommand(ControllerCommand)
+	genCommand.AddCommand(ParamCommand)
+	genCommand.AddCommand(CodeCommand)
 	rootCommand.AddCommand(genCommand)
 }
 
@@ -63,7 +67,7 @@ var ControllerCommand = &cobra.Command{
 	Use:     "controller",
 	Short:   "Controller构建工具",
 	Long:    "Controller构建工具",
-	Example: "controller --name=Test --out=app\\controllers",
+	Example: "controller --name=Test --out=app\\Controllers",
 	Run: func(cmd *cobra.Command, args []string) {
 	loopParam:
 		isMatchCapitalBegan := ""
@@ -101,5 +105,51 @@ var ControllerCommand = &cobra.Command{
 		pkg := dirutil.Basename(out)
 		templates.NewController(pkg, name, out).Generate()
 		controllerTool.Generate()
+	},
+}
+
+func InitParam() {
+	ParamCommand.Flags().StringVarP(&name, "name", "n", "", "参数结构体名称")
+	err := ParamCommand.MarkFlagRequired("name")
+	if err != nil {
+		panic(err)
+	}
+	ParamCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\params")
+	err = ParamCommand.MarkFlagRequired("out")
+	if err != nil {
+		panic(err)
+	}
+}
+
+var ParamCommand = &cobra.Command{
+	Use:     "param",
+	Short:   "Param构建工具",
+	Long:    "Param构建工具",
+	Example: "param --name=list --out=app\\Params",
+	Run: func(cmd *cobra.Command, args []string) {
+		templates.NewParam(name, out).Generate()
+	},
+}
+
+func InitCode() {
+	ParamCommand.Flags().StringVarP(&name, "name", "n", "", "Code结构体名称,如:ErrorCode")
+	err := ParamCommand.MarkFlagRequired("name")
+	if err != nil {
+		panic(err)
+	}
+	ParamCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\controllers")
+	err = ParamCommand.MarkFlagRequired("out")
+	if err != nil {
+		panic(err)
+	}
+}
+
+var CodeCommand = &cobra.Command{
+	Use:     "code",
+	Short:   "Code构建工具",
+	Long:    "Code构建工具",
+	Example: "code --name=ErrorCode --out=app\\Codes",
+	Run: func(cmd *cobra.Command, args []string) {
+		templates.NewParam(name, out).Generate()
 	},
 }
