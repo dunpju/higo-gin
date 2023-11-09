@@ -9,6 +9,8 @@ import (
 	"github.com/dunpju/higo-utils/utils/stringutil"
 	"github.com/spf13/cobra"
 	"log"
+	"os"
+	"regexp"
 )
 
 func init() {
@@ -24,8 +26,10 @@ func init() {
 }
 
 var (
-	name string
-	out  string
+	name     string
+	out      string
+	yamlPath string
+	isYaml   bool
 )
 
 var rootCommand = &cobra.Command{
@@ -132,24 +136,72 @@ var ParamCommand = &cobra.Command{
 }
 
 func InitCode() {
-	ParamCommand.Flags().StringVarP(&name, "name", "n", "", "Code结构体名称,如:ErrorCode")
-	err := ParamCommand.MarkFlagRequired("name")
+	CodeCommand.Flags().StringVarP(&name, "name", "n", "", "Code结构体名称,如:ErrorCode")
+	err := CodeCommand.MarkFlagRequired("name")
 	if err != nil {
 		panic(err)
 	}
-	ParamCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\controllers")
-	err = ParamCommand.MarkFlagRequired("out")
+	CodeCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\Codes")
+	err = CodeCommand.MarkFlagRequired("out")
 	if err != nil {
 		panic(err)
 	}
+	CodeCommand.Flags().StringVarP(&yamlPath, "path", "p", "", "yaml配置文件路径,如:bin\\200.yaml或bin\\yaml目录")
+	err = CodeCommand.MarkFlagRequired("out")
+	if err != nil {
+		panic(err)
+	}
+	CodeCommand.Flags().BoolVarP(&isYaml, "yaml", "y", false, "生成yaml模板文件,如:true")
 }
 
 var CodeCommand = &cobra.Command{
 	Use:     "code",
 	Short:   "Code构建工具",
 	Long:    "Code构建工具",
-	Example: "code --name=ErrorCode --out=app\\Codes",
+	Example: "code --name=ErrorCode --out=app\\Codes --path=bin\\200.yaml文件,或bin\\yaml目录",
 	Run: func(cmd *cobra.Command, args []string) {
-		templates.NewParam(name, out).Generate()
+		match, err := regexp.Match(`\.yaml`, []byte(yamlPath))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		if !match {
+			yamlPath += ".yaml"
+		}
+		if isYaml {
+			yamlTpl := utils.Dir.Basename(yamlPath, ".yaml")
+			match, err := regexp.Match(`\d+`, []byte(yamlTpl))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			if !match {
+				fmt.Println(fmt.Errorf("生成yaml文件,path必须指定数字文件名,如200.yaml"))
+				os.Exit(1)
+			}
+			if _, err := os.Stat(yamlPath); os.IsNotExist(err) {
+				utils.Dir.Mkdir(yamlPath, os.ModePerm)
+			}
+			f, err := os.Create(yamlPath)
+			if err != nil {
+				panic(err)
+			}
+			defer f.Close()
+			fileContext := "tpl_code_模板code请修改:\n"
+			fileContext += "  message: \"模板消息请修改\"\n"
+			fileContext += "  iota: \"yes\"\n"
+			_, err = f.Write([]byte(fileContext))
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			codeArguments := &templates.CodeArguments{
+				Package: dirutil.Basename(out),
+				Name:    name,
+				Out:     out,
+				Path:    yamlPath,
+			}
+			templates.NewCode(codeArguments).Generate()
+		}
 	},
 }

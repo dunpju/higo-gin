@@ -208,7 +208,7 @@ func (this *Higo) loadConfigure() *Higo {
 				return nil
 			}
 			if path.Ext(p) == ".yaml" {
-				yamlFile, err := ioutil.ReadFile(p)
+				yamlFile, err := os.ReadFile(p)
 				if err != nil {
 					goid, _ := runtimeutil.GoroutineID()
 					logger.LoggerStack(err, goid)
@@ -364,7 +364,7 @@ func (this *Higo) Boot() {
 				hg.Beans(bean)
 			}
 		}
-		
+
 		this.run(func() {
 			eventPoint(hg, BeforeLoadRoute)
 			ser.Router.Loader(hg)
