@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dunpju/higo-gin/higo/templates/tpls"
 	"github.com/dunpju/higo-orm/gen"
+	"github.com/dunpju/higo-utils/utils"
 	"github.com/dunpju/higo-utils/utils/dirutil"
 	"github.com/dunpju/higo-utils/utils/fileutil"
 	"github.com/dunpju/higo-utils/utils/stringutil"
@@ -12,10 +13,9 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -88,9 +88,7 @@ func (this *Controller) Generate() {
 		panic(err)
 	}
 	//bean route
-	_, mainfile, _, _ := runtime.Caller(4)
-	app := strings.Trim(mainfile, "main.go") + ".." + dirutil.PathSeparator() + "app"
-	beansGofile := app + dirutil.PathSeparator() + "Beans" + dirutil.PathSeparator() + "Bean.go"
+	beansGofile := utils.Dir.Dirname(this.File) + dirutil.PathSeparator() + ".." + dirutil.PathSeparator() + "Beans" + dirutil.PathSeparator() + "Bean.go"
 	utifile := fileutil.File{Name: beansGofile}
 	if !utifile.Exist() {
 		log.Fatalln("Bean.go file non-existent, bean route cannot auto-load")
@@ -99,7 +97,7 @@ func (this *Controller) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	src, err := ioutil.ReadAll(beansFile)
+	src, err := io.ReadAll(beansFile)
 	if err != nil {
 		panic(err)
 	}
@@ -108,7 +106,18 @@ func (this *Controller) Generate() {
 	if err != nil {
 		panic(err)
 	}
-	newPkgPath := GetModName() + "/" + strings.ReplaceAll(dirutil.Dirname(this.File), "\\", "/")
+
+	goMod := utils.Mod.GetModInfo()
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	childPath := utils.Mod.GetGoModChildPath(pwd)
+	var childPathStr string
+	if len(childPath) > 0 {
+		childPathStr = fmt.Sprintf("/%s/", strings.Join(childPath, "/"))
+	}
+	newPkgPath := goMod.Module.Path + fmt.Sprintf("%s%s", childPathStr, strings.ReplaceAll(utils.Dir.Dirname(this.File), "\\", "/"))
 	funcName := strings.ReplaceAll(newPkgPath, "/", "_")
 	funcName = strings.ReplaceAll(funcName, ".", "8")
 	funcName = "New_gen_" + strings.ReplaceAll(funcName, "-", "9") + "_" + this.Name

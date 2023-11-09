@@ -15,7 +15,7 @@ require (
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.31
 	github.com/dunpju/higo-throw v1.0.16
-	github.com/dunpju/higo-utils v1.0.95
+	github.com/dunpju/higo-utils v1.0.99
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/golang/protobuf v1.5.2
