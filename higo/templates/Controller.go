@@ -30,7 +30,7 @@ type ControllerTool struct {
 }
 
 func NewControllerTool() *ControllerTool {
-	return &ControllerTool{ConfirmBeginGenerate: "yes", IsGenerateParam: "yes"}
+	return &ControllerTool{ConfirmBeginGenerate: gen.Yes, IsGenerateParam: gen.Yes}
 }
 
 func (this *ControllerTool) Generate() {
