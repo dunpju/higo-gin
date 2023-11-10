@@ -103,7 +103,7 @@ func Error(ctx *gin.Context, v interface{}) {
 	panic(nil)
 }
 
-//结果接收者
+// Receiver 结果接收者
 func Receiver(values ...interface{}) *ErrorResult {
 	return Result(values...)
 }

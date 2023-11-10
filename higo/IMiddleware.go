@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 中间件接口(实现该接口都认为是中间件)
+// IMiddleware 中间件接口(实现该接口都认为是中间件)
 type IMiddleware interface {
 	Middle(hg *Higo) gin.HandlerFunc
 }

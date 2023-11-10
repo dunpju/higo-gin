@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	//Recover处理函数(可自定义替换)
+	// WsRecoverHandle Recover处理函数(可自定义替换)
 	WsRecoverHandle WsRecoverFunc
 	wsRecoverOnce   sync.Once
 )
@@ -152,7 +152,7 @@ func WsConn(ctx *gin.Context) *WebsocketConn {
 	}
 }
 
-//webSocket请求连接
+// webSocket请求连接
 func websocketConnFunc(ctx *gin.Context) string {
 	//升级get请求为webSocket协议
 	client, err := Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)

@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	//Recover处理函数(可自定义替换)
+	// RecoverHandle Recover处理函数(可自定义替换)
 	RecoverHandle RecoverFunc
 	recoverOnce   sync.Once
 )

@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// 路由容器
+// RouterContainer 路由容器
 var RouterContainer *RouterCollect
 
 type RouterCollect struct {

@@ -2,9 +2,9 @@ package templates
 
 import (
 	"bytes"
+	"github.com/dunpju/higo-utils/utils"
 	"go/format"
 	"go/token"
-	"runtime/debug"
 	"sync"
 )
 
@@ -21,12 +21,11 @@ var (
 // GetModName 获取模块名称
 func GetModName() string {
 	moduleOnce.Do(func() {
-		info, _ := debug.ReadBuildInfo()
-		for _, dep := range info.Deps {
-			if dep.Version == "(devel)" {
-				moduleName = dep.Path
-			}
+		getModule, err := utils.Mod.GetModule()
+		if err != nil {
+			panic(err)
 		}
+		moduleName = getModule
 	})
 	return moduleName
 }

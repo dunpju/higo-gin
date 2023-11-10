@@ -32,7 +32,7 @@ func getResponderList() []IResponder {
 	return responderList
 }
 
-// 转换
+// Convert 转换
 func Convert(handler interface{}) gin.HandlerFunc {
 	if handle := handleConvert(handler); handle != nil {
 		return handle.(func(*gin.Context))

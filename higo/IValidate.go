@@ -26,12 +26,12 @@ func init() {
 	}
 }
 
-//校验接口
+// IValidate 校验接口
 type IValidate interface {
 	RegisterValidator() *Verify
 }
 
-//校验者
+// Verifier 校验者
 func Verifier() *Verify {
 	return NewVerify()
 }
@@ -63,7 +63,7 @@ func (this *Verify) Use(validate IValidate, validates ...IValidate) *Verify {
 	return this
 }
 
-//自定义tag
+// Tag 自定义tag
 func (this *Verify) Tag(tag string, rules ...*VerifyRule) *Verify {
 	if tag != "" && len(rules) > 0 {
 		this.VerifyRules.Store(tag, NewRuleGroup(tag, rules...))
@@ -71,7 +71,7 @@ func (this *Verify) Tag(tag string, rules ...*VerifyRule) *Verify {
 	return this
 }
 
-//服务层校验 struct https://github.com/go-playground/validator/blob/master/_examples/simple/main.go
+// Struct 服务层校验 struct https://github.com/go-playground/validator/blob/master/_examples/simple/main.go
 func (this *Verify) Struct() *ErrorResult {
 	return Receiver(this.Validator.Struct(this.VerifierStruct))
 }
@@ -80,12 +80,12 @@ func (this *Verify) Unwrap() interface{} {
 	return this.Struct().Unwrap()
 }
 
-//接收数据
+// Receiver 接收数据
 func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
 	return Receiver(values...)
 }
 
-//注册规则
+// RegisterValidator 注册规则
 func RegisterValidator(validate IValidate) *Verify {
 	v := reflect.ValueOf(validate)
 	verify := NewVerify()
@@ -94,7 +94,7 @@ func RegisterValidator(validate IValidate) *Verify {
 	return verify
 }
 
-//注册自定义校验规则
+// RegisterValidation 注册自定义校验规则
 func RegisterValidation(tag string, fn validator.Func) {
 	err := Validator.RegisterValidation(tag, fn)
 	if err != nil {
@@ -102,7 +102,7 @@ func RegisterValidation(tag string, fn validator.Func) {
 	}
 }
 
-//手动调用注册校验
+// Validate 手动调用注册校验
 func Validate(validate IValidate) *Verify {
 	verify := validate.RegisterValidator()
 	verify.Verifier = validate
@@ -137,7 +137,7 @@ func NewRuleGroup(tag string, rules ...*VerifyRule) *RuleGroup {
 	return rg.setRule()
 }
 
-// 规则组
+// RuleGroup 规则组
 type RuleGroup struct {
 	tag     string
 	rule    string
@@ -146,7 +146,7 @@ type RuleGroup struct {
 	Rules   []*VerifyRule
 }
 
-//设置规则
+// 设置规则
 func (this *RuleGroup) setRule() *RuleGroup {
 	rules := make([]string, 0)
 	for _, vrs := range this.Rules {
@@ -169,6 +169,7 @@ func (this *RuleGroup) Rule() string {
 
 type ValidatorToFunc func(fieldLevel validator.FieldLevel) (bool, code.ICode)
 
+// ToFunc
 // 自定义规则校验顺序优先与gin原始binging tag `json:"xxx" binding:"required"`
 // 自定义tag转换Func
 func (this *RuleGroup) ToFunc() validator.Func {
@@ -214,7 +215,7 @@ func (this *RuleGroup) valid(rule string, fl validator.FieldLevel, v interface{}
 	}
 }
 
-//抛异常
+// 抛异常
 func (this *RuleGroup) Throw(rule string) {
 	keys := strings.Split(rule, "=")
 	if len(keys) > 1 {

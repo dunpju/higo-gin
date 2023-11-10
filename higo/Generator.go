@@ -18,10 +18,14 @@ func init() {
 	InitController()
 	InitParam()
 	InitCode()
+	InitEnum()
+	InitService()
 	genCommand.AddCommand(gen.ModelCommand)
 	genCommand.AddCommand(ControllerCommand)
 	genCommand.AddCommand(ParamCommand)
 	genCommand.AddCommand(CodeCommand)
+	genCommand.AddCommand(EnumCommand)
+	genCommand.AddCommand(ServiceCommand)
 	rootCommand.AddCommand(genCommand)
 }
 
@@ -203,5 +207,51 @@ var CodeCommand = &cobra.Command{
 			}
 			templates.NewCode(codeArguments).Generate()
 		}
+	},
+}
+
+func InitEnum() {
+	EnumCommand.Flags().StringVarP(&name, "name", "n", "", `枚举Token,--name=bin\\enum_cmd.md或--name="-e=state -f=状态:issue-1-发布,draft-2-草稿"`)
+	err := EnumCommand.MarkFlagRequired("name")
+	if err != nil {
+		panic(err)
+	}
+	EnumCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\Enums")
+	err = EnumCommand.MarkFlagRequired("out")
+	if err != nil {
+		panic(err)
+	}
+}
+
+var EnumCommand = &cobra.Command{
+	Use:     "enum",
+	Short:   "Enum构建工具",
+	Long:    "Enum构建工具",
+	Example: "enum --name=bin\\enum_cmd.md或--name=\"-e=state -f=状态:issue-1-发布,draft-2-草稿\" --out=app\\Enums",
+	Run: func(cmd *cobra.Command, args []string) {
+		templates.NewEnum(name, out).Generate()
+	},
+}
+
+func InitService() {
+	ServiceCommand.Flags().StringVarP(&name, "name", "n", "", `服务名称,--name=TestService`)
+	err := ServiceCommand.MarkFlagRequired("name")
+	if err != nil {
+		panic(err)
+	}
+	ServiceCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\Services")
+	err = ServiceCommand.MarkFlagRequired("out")
+	if err != nil {
+		panic(err)
+	}
+}
+
+var ServiceCommand = &cobra.Command{
+	Use:     "service",
+	Short:   "Service构建工具",
+	Long:    "Service构建工具",
+	Example: "service --name=TestService --out=app\\Services",
+	Run: func(cmd *cobra.Command, args []string) {
+		templates.NewService(dirutil.Basename(out), name, out).Generate()
 	},
 }

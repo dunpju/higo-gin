@@ -23,7 +23,7 @@ func WsRespString(messageData string) WsWriteMessage {
 	return WsWriteMessage{MessageType: WsRespstring, MessageData: []byte(messageData)}
 }
 
-func WsRespMap(messageData maputil.ArrayMap) WsWriteMessage {
+func WsRespMap(messageData *maputil.ArrayMap) WsWriteMessage {
 	return WsWriteMessage{MessageType: WsRespmap, MessageData: []byte(messageData.String())}
 }
 

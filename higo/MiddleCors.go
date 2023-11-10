@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-// 跨域
+// Cors 跨域
 type Cors struct{}
 
-// 构造函数
+// NewCors 构造函数
 func NewCors() *Cors {
 	return &Cors{}
 }
