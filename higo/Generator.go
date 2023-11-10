@@ -30,10 +30,11 @@ func init() {
 }
 
 var (
-	name     string
-	out      string
-	yamlPath string
-	isYaml   bool
+	name            string
+	out             string
+	yamlPath        string
+	isYaml          bool
+	capitalBeganReg = regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 )
 
 var rootCommand = &cobra.Command{
