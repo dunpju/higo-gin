@@ -408,7 +408,8 @@ func (this *Higo) run(fn func()) {
 			fmt.Println(err)
 		}
 		if match {
-			if err := rootCommand.Execute(); err != nil {
+			RootInit()
+			if err := RootCommand.Execute(); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}

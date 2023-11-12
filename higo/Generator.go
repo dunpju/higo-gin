@@ -13,22 +13,6 @@ import (
 	"regexp"
 )
 
-func init() {
-	gen.InitModel()
-	InitController()
-	InitParam()
-	InitCode()
-	InitEnum()
-	InitService()
-	genCommand.AddCommand(gen.ModelCommand)
-	genCommand.AddCommand(ControllerCommand)
-	genCommand.AddCommand(ParamCommand)
-	genCommand.AddCommand(CodeCommand)
-	genCommand.AddCommand(EnumCommand)
-	genCommand.AddCommand(ServiceCommand)
-	rootCommand.AddCommand(genCommand)
-}
-
 var (
 	name            string
 	out             string
@@ -37,7 +21,12 @@ var (
 	capitalBeganReg = regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 )
 
-var rootCommand = &cobra.Command{
+func RootInit() {
+	GenCommandInit()
+	RootCommand.AddCommand(GenCommand)
+}
+
+var RootCommand = &cobra.Command{
 	Use:   "",
 	Short: "命令行工具",
 	Long:  `命令行工具`,
@@ -46,7 +35,22 @@ var rootCommand = &cobra.Command{
 	},
 }
 
-var genCommand = &cobra.Command{
+func GenCommandInit() {
+	gen.InitModel()
+	InitController()
+	InitParam()
+	InitCode()
+	InitEnum()
+	InitService()
+	GenCommand.AddCommand(gen.ModelCommand)
+	GenCommand.AddCommand(ControllerCommand)
+	GenCommand.AddCommand(ParamCommand)
+	GenCommand.AddCommand(CodeCommand)
+	GenCommand.AddCommand(EnumCommand)
+	GenCommand.AddCommand(ServiceCommand)
+}
+
+var GenCommand = &cobra.Command{
 	Use:     "gen",
 	Short:   "构建工具",
 	Long:    "构建工具",
