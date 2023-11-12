@@ -37,7 +37,7 @@ project
 
 ## 安装
 ```
-go get -u github.com/dunpju/higo-gin@v1.0.0
+go get -u github.com/dunpju/higo-gin@v1.2.11
 ```
 # 使用
 ### 配置
