@@ -85,6 +85,11 @@ func (this *Verify) Receiver(values ...interface{}) *ErrorResult {
 	return Receiver(values...)
 }
 
+// MultiBind 多次绑定
+func (this *Verify) MultiBind(values ...interface{}) *ErrorResult {
+	return this.Receiver(values)
+}
+
 // RegisterValidator 注册规则
 func RegisterValidator(validate IValidate) *Verify {
 	v := reflect.ValueOf(validate)
@@ -215,7 +220,7 @@ func (this *RuleGroup) valid(rule string, fl validator.FieldLevel, v interface{}
 	}
 }
 
-// 抛异常
+// Throw 抛异常
 func (this *RuleGroup) Throw(rule string) {
 	keys := strings.Split(rule, "=")
 	if len(keys) > 1 {
