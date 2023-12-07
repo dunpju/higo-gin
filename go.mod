@@ -11,14 +11,13 @@ require (
 	github.com/dunpju/higo-enum v1.0.5
 	github.com/dunpju/higo-ioc v1.0.4
 	github.com/dunpju/higo-logger v1.0.11
-	github.com/dunpju/higo-orm v1.0.32
+	github.com/dunpju/higo-orm v1.0.33
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.31
 	github.com/dunpju/higo-throw v1.0.16
 	github.com/dunpju/higo-utils v1.1.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
-	github.com/golang/protobuf v1.5.2
 	github.com/gomodule/redigo v1.8.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/nsf/termbox-go v1.1.1
@@ -38,6 +37,7 @@ require (
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect

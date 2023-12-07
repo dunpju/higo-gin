@@ -3,9 +3,9 @@ package templates
 import (
 	"fmt"
 	"github.com/dunpju/higo-gin/higo/templates/tpls"
+	"github.com/dunpju/higo-utils/utils"
 	"github.com/dunpju/higo-utils/utils/dirutil"
 	"github.com/dunpju/higo-utils/utils/fileutil"
-	"github.com/golang/protobuf/protoc-gen-go/generator"
 	"log"
 	"os"
 )
@@ -25,7 +25,7 @@ type Param struct {
 }
 
 func NewParam(name string, out string) *Param {
-	humpUnpreName := generator.CamelCase(name)
+	humpUnpreName := utils.String.CaseToCamel(name)
 	pkg := dirutil.Basename(out)
 	outDir := out
 	file := "Param" + humpUnpreName + ".go"
