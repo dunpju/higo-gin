@@ -233,7 +233,15 @@ func (this *Higo) loadConfigure() *Higo {
 
 // Middleware 全局中间件
 func (this *Higo) Middleware(middlewares ...IMiddleware) *Higo {
-	this.middle = append(this.middle, middlewares...)
+	for _, middleware := range middlewares {
+		if m, ok := middleware.(*Cors); ok && len(this.middle) > 0 {
+			middle := make([]IMiddleware, 0)
+			middle = append(middle, m)
+			this.middle = append(middle, this.middle...)
+		} else {
+			this.middle = append(this.middle, middleware)
+		}
+	}
 	return this
 }
 
