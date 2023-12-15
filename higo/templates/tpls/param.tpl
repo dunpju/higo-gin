@@ -3,6 +3,12 @@ package {{.Package}}
 import (
 	"github.com/dunpju/higo-gin/higo"
 	"github.com/gin-gonic/gin"
+	"sync"
+)
+
+var (
+	{{.StructName}}Once     sync.Once
+	{{.StructName}}Validate *higo.Verify
 )
 
 type {{.StructName}} struct {
@@ -12,9 +18,12 @@ type {{.StructName}} struct {
 
 func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
 	param := &{{.StructName}}{}
-	//higo.Validate(param).Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
-	//higo.Validate(param).Receiver(ctx.ShouldBindJSON(param)).Unwrap() // get from the json
-	//higo.Validate(param).Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
+    {{.StructName}}Once.Do(func() {
+    	{{.StructName}}Validate = higo.Validate(param)
+    })
+	//{{.StructName}}Validate.Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
+	//{{.StructName}}Validate.Receiver(ctx.ShouldBindJSON(param)).Unwrap() // get from the json
+	//{{.StructName}}Validate.Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
 	return param
 }
 
