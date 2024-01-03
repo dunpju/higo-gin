@@ -27,6 +27,7 @@ func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
 	return param
 }
 
+// RegisterValidator
 // https://pkg.go.dev/github.com/go-playground/validator
 //
 //The custom tag, binding the tag eg: binding:"custom_tag_name"
