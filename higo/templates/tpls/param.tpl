@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	{{.StructName}}Once     sync.Once
-	{{.StructName}}Validate *higo.Verify
+	{{.LowerCamelStructName}}Once     sync.Once
+	{{.LowerCamelStructName}}Validate *higo.Verify
 )
 
 type {{.StructName}} struct {
@@ -18,12 +18,12 @@ type {{.StructName}} struct {
 
 func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
 	param := &{{.StructName}}{}
-    {{.StructName}}Once.Do(func() {
-    	{{.StructName}}Validate = higo.Validate(param)
+    {{.LowerCamelStructName}}Once.Do(func() {
+    	{{.LowerCamelStructName}}Validate = higo.Validate(param)
     })
-	//{{.StructName}}Validate.Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
-	//{{.StructName}}Validate.Receiver(ctx.ShouldBindJSON(param)).Unwrap() // get from the json
-	//{{.StructName}}Validate.Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
+	//{{.LowerCamelStructName}}Validate.Receiver(ctx.ShouldBindQuery(param)).Unwrap() // get from the form
+	//{{.LowerCamelStructName}}Validate.Receiver(ctx.ShouldBindJSON(param)).Unwrap() // get from the json
+	//{{.LowerCamelStructName}}Validate.Receiver(ctx.ShouldBindBodyWith(param, binding.JSON)).Unwrap() // get from the json multiple binding
 	return param
 }
 

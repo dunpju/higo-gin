@@ -18,18 +18,19 @@ const (
 )
 
 type Param struct {
-	Package    string
-	StructName string
-	OutDir     string
-	FileName   string
+	Package              string
+	StructName           string
+	LowerCamelStructName string
+	OutDir               string
+	FileName             string
 }
 
 func NewParam(name string, out string) *Param {
-	humpUnpreName := utils.String.CaseToCamel(name)
+	unpreCamelName := utils.String.CaseToCamel(name)
 	pkg := dirutil.Basename(out)
 	outDir := out
-	file := "Param" + humpUnpreName + ".go"
-	return &Param{Package: pkg, StructName: humpUnpreName, OutDir: outDir, FileName: file}
+	file := "Param" + unpreCamelName + ".go"
+	return &Param{Package: pkg, StructName: unpreCamelName, LowerCamelStructName: utils.String.Lcfirst(unpreCamelName), OutDir: outDir, FileName: file}
 }
 
 func (this *Param) Template(tplfile string) *tpls.Tpl {
