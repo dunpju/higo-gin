@@ -3,6 +3,7 @@ package templates
 import (
 	"fmt"
 	"github.com/dunpju/higo-gin/higo/templates/tpls"
+	"github.com/dunpju/higo-orm/gen"
 	"github.com/dunpju/higo-utils/utils"
 	"github.com/dunpju/higo-utils/utils/fileutil"
 	"github.com/dunpju/higo-utils/utils/stringutil"
@@ -263,14 +264,14 @@ func (this *Code) Generate() {
 		b.generate()
 		this.funcNames = append(this.funcNames, b.FuncName)
 	}
-	if this.Arguments.Auto == "yes" && len(this.funcNames) > 0 {
+	if this.Arguments.Auto == gen.Yes && len(this.funcNames) > 0 {
 		NewAutoload(this.funcNames, this.OutDir).generate()
 	}
 }
 
 func (this *Code) generate() {
 	utils.Dir.Open(this.OutDir).Create()
-	if utils.File.Exist(this.File) && this.Arguments.Force != "yes" {
+	if utils.File.Exist(this.File) && this.Arguments.Force != gen.Yes {
 		log.Println(this.File + " already existed")
 		return
 	}

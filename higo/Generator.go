@@ -18,6 +18,8 @@ var (
 	out             string
 	yamlPath        string
 	isYaml          bool
+	isAuto          bool
+	isForce         bool
 	capitalBeganReg = regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 )
 
@@ -160,24 +162,31 @@ func InitCode() {
 	if err != nil {
 		panic(err)
 	}
-	CodeCommand.Flags().BoolVarP(&isYaml, "yaml", "y", false, "生成yaml模板文件,如:true")
+	CodeCommand.Flags().BoolVarP(&isYaml, "yaml", "y", false, "生成yaml模板文件")
+	CodeCommand.Flags().BoolVarP(&isAuto, "auto", "a", false, "自动增长")
+	CodeCommand.Flags().BoolVarP(&isForce, "force", "f", false, "强制覆盖")
 }
 
 var CodeCommand = &cobra.Command{
-	Use:     "code",
-	Short:   "Code构建工具",
-	Long:    "Code构建工具",
-	Example: "code --name=ErrorCode --out=app\\Codes --path=bin\\200.yaml文件,或bin\\yaml目录",
+	Use:   "code",
+	Short: "Code构建工具",
+	Long:  "Code构建工具",
+	Example: `  - 1、单配置文件生成: 
+    code --name=ErrorCode --out=app\Codes --path=bin\200.yaml
+  - 2、多配置文件,覆盖生成: 
+    code --name=ErrorCode --out=app\Codes --path=bin\yaml --auto --force
+  - 3、生成yaml模版文件: 
+    code --name=ErrorCode --out=app\Codes --path=bin\200.yaml --yaml`,
 	Run: func(cmd *cobra.Command, args []string) {
-		match, err := regexp.Match(`\.yaml`, []byte(yamlPath))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		if !match {
-			yamlPath += ".yaml"
-		}
 		if isYaml {
+			matchYamlSuffix, err := regexp.Match(`\.yaml`, []byte(yamlPath))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			if !matchYamlSuffix {
+				yamlPath += ".yaml"
+			}
 			yamlTpl := utils.Dir.Basename(yamlPath, ".yaml")
 			match, err := regexp.Match(`\d+`, []byte(yamlTpl))
 			if err != nil {
@@ -209,6 +218,14 @@ var CodeCommand = &cobra.Command{
 				Name:    name,
 				Out:     out,
 				Path:    yamlPath,
+			}
+			codeArguments.Auto = gen.No
+			if isAuto {
+				codeArguments.Auto = gen.Yes
+			}
+			codeArguments.Force = gen.No
+			if isForce {
+				codeArguments.Force = gen.Yes
 			}
 			templates.NewCode(codeArguments).Generate()
 		}
