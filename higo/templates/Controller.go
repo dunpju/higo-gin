@@ -16,6 +16,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -117,7 +118,15 @@ func (this *Controller) Generate() {
 	if len(childPath) > 0 {
 		childPathStr = fmt.Sprintf("/%s/", strings.Join(childPath, "/"))
 	}
-	newPkgPath := goMod.Module.Path + fmt.Sprintf("%s%s", childPathStr, strings.ReplaceAll(utils.Dir.Dirname(this.File), "\\", "/"))
+	afterPath := fmt.Sprintf("%s%s", childPathStr, strings.ReplaceAll(utils.Dir.Dirname(this.File), "\\", "/"))
+	afterPathMatch, err := regexp.MatchString("^/", afterPath)
+	if err != nil {
+		panic(err)
+	}
+	if !afterPathMatch {
+		afterPath = fmt.Sprintf("/%s", afterPath)
+	}
+	newPkgPath := goMod.Module.Path + afterPath
 	funcName := strings.ReplaceAll(newPkgPath, "/", "_")
 	funcName = strings.ReplaceAll(funcName, ".", "8")
 	funcName = "New_gen_" + strings.ReplaceAll(funcName, "-", "9") + "_" + this.Name
