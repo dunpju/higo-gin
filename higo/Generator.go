@@ -2,6 +2,7 @@ package higo
 
 import (
 	"fmt"
+	gen2 "github.com/dunpju/higo-enum/gen"
 	"github.com/dunpju/higo-gin/higo/templates"
 	"github.com/dunpju/higo-orm/gen"
 	"github.com/dunpju/higo-utils/utils"
@@ -42,13 +43,13 @@ func GenCommandInit() {
 	InitController()
 	InitParam()
 	InitCode()
-	InitEnum()
+	gen2.InitEnum()
 	InitService()
 	GenCommand.AddCommand(gen.ModelCommand)
 	GenCommand.AddCommand(ControllerCommand)
 	GenCommand.AddCommand(ParamCommand)
 	GenCommand.AddCommand(CodeCommand)
-	GenCommand.AddCommand(EnumCommand)
+	GenCommand.AddCommand(gen2.EnumCommand)
 	GenCommand.AddCommand(ServiceCommand)
 }
 
@@ -229,29 +230,6 @@ var CodeCommand = &cobra.Command{
 			}
 			templates.NewCode(codeArguments).Generate()
 		}
-	},
-}
-
-func InitEnum() {
-	EnumCommand.Flags().StringVarP(&name, "name", "n", "", `枚举Token,--name=bin\\enum_cmd.md或--name="-e=state -f=状态:issue-1-发布,draft-2-草稿"`)
-	err := EnumCommand.MarkFlagRequired("name")
-	if err != nil {
-		panic(err)
-	}
-	EnumCommand.Flags().StringVarP(&out, "out", "o", "", "生成目录,如:app\\Enums")
-	err = EnumCommand.MarkFlagRequired("out")
-	if err != nil {
-		panic(err)
-	}
-}
-
-var EnumCommand = &cobra.Command{
-	Use:     "enum",
-	Short:   "Enum构建工具",
-	Long:    "Enum构建工具",
-	Example: "enum --name=bin\\enum_cmd.md或--name=\"-e=state -f=状态:issue-1-发布,draft-2-草稿\" --out=app\\Enums",
-	Run: func(cmd *cobra.Command, args []string) {
-		templates.NewEnum(name, out).Generate()
 	},
 }
 

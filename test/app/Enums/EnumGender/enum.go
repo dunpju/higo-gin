@@ -1,37 +1,69 @@
 package EnumGender
 
-import "github.com/dunpju/higo-enum/enum"
+import (
+	"fmt"
+)
 
-var e Gender
-
-func Inspect(value int) error {
-	return e.Inspect(value)
-}
-
-//是否正在使用
-type Gender int
-
-func (this Gender) Name() string {
-	return "Gender"
-}
-
-func (this Gender) Inspect(value interface{}) error {
-	return enum.Inspect(this, value)
-}
-
-func (this Gender) Message() string {
-	return enum.String(this)
-}
+var (
+	enums map[Gender]*enum
+)
 
 const (
 	Unknown Gender = 0 //未知
-	Male    Gender = 1 //男
-	Female  Gender = 2 //女
+	Male Gender = 1 //男
+	Female Gender = 2 //女
 )
 
-func (this Gender) Register() enum.Message {
-	return make(enum.Message).
-		Put(Unknown, "未知").
-		Put(Male, "男").
-		Put(Female, "女")
+func init() {
+	enums = make(map[Gender]*enum)
+	enums[Unknown] = newEnum(int(Unknown), "未知")
+	enums[Male] = newEnum(int(Male), "男")
+	enums[Female] = newEnum(int(Female), "女")
+}
+
+type enum struct {
+	code    int
+	message string
+}
+
+func newEnum(code int, message string) *enum {
+	return &enum{code: code, message: message}
+}
+
+func Enums() map[Gender]*enum {
+	return enums
+}
+
+func Inspect(value int) error {
+	_, err := Gender(value).inspect()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Gender 是否正在使用
+type Gender int
+
+func (this Gender) inspect() (*enum, error) {
+	if e, ok := enums[this]; ok {
+		return e, nil
+	}
+	return nil, fmt.Errorf("%d enum undefined", this)
+}
+
+func (this Gender) get() *enum {
+	e, err := this.inspect()
+	if err != nil {
+		panic(err)
+	}
+	return e
+}
+
+func (this Gender) Code() int {
+	return this.get().code
+}
+
+func (this Gender) Message() string {
+	return this.get().message
 }

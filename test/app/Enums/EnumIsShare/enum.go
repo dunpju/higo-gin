@@ -1,35 +1,67 @@
 package EnumIsShare
 
-import "github.com/dunpju/higo-enum/enum"
+import (
+	"fmt"
+)
 
-var e IsShare
-
-func Inspect(value int) error {
-	return e.Inspect(value)
-}
-
-//是否分享
-type IsShare int
-
-func (this IsShare) Name() string {
-	return "IsShare"
-}
-
-func (this IsShare) Inspect(value interface{}) error {
-	return enum.Inspect(this, value)
-}
-
-func (this IsShare) Message() string {
-	return enum.String(this)
-}
+var (
+	enums map[IsShare]*enum
+)
 
 const (
 	Yes IsShare = 1 //是
-	No  IsShare = 2 //否
+	No IsShare = 2 //否
 )
 
-func (this IsShare) Register() enum.Message {
-	return make(enum.Message).
-		Put(Yes, "是").
-		Put(No, "否")
+func init() {
+	enums = make(map[IsShare]*enum)
+	enums[Yes] = newEnum(int(Yes), "是")
+	enums[No] = newEnum(int(No), "否")
+}
+
+type enum struct {
+	code    int
+	message string
+}
+
+func newEnum(code int, message string) *enum {
+	return &enum{code: code, message: message}
+}
+
+func Enums() map[IsShare]*enum {
+	return enums
+}
+
+func Inspect(value int) error {
+	_, err := IsShare(value).inspect()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// IsShare 是否分享
+type IsShare int
+
+func (this IsShare) inspect() (*enum, error) {
+	if e, ok := enums[this]; ok {
+		return e, nil
+	}
+	return nil, fmt.Errorf("%d enum undefined", this)
+}
+
+func (this IsShare) get() *enum {
+	e, err := this.inspect()
+	if err != nil {
+		panic(err)
+	}
+	return e
+}
+
+func (this IsShare) Code() int {
+	return this.get().code
+}
+
+func (this IsShare) Message() string {
+	return this.get().message
 }

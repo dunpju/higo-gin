@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/dunpju/higo-annotation v1.0.1
 	github.com/dunpju/higo-config v1.0.1
-	github.com/dunpju/higo-enum v1.0.5
+	github.com/dunpju/higo-enum v1.0.7
 	github.com/dunpju/higo-ioc v1.0.4
 	github.com/dunpju/higo-logger v1.0.11
 	github.com/dunpju/higo-orm v1.0.33
@@ -23,7 +23,7 @@ require (
 	github.com/nsf/termbox-go v1.1.1
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7
 	github.com/robfig/cron/v3 v3.0.0
-	github.com/spf13/cobra v1.2.1
+	github.com/spf13/cobra v1.8.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/gorm v1.25.2
