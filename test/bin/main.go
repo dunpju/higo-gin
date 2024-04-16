@@ -15,6 +15,10 @@ import (
 )
 
 func main() {
+
+	higo.ResponserTest()("ttt", 0, "hhh")
+	return
+
 	//tt();
 	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)
 	output, _ := exec.Command("sh", "-c", checkStatement).CombinedOutput()
