@@ -49,22 +49,45 @@ func checkErrors(errs error) {
 	}
 }
 
+type IResult interface {
+	SetCode(code int)
+	SetMessage(msg string)
+	SetData(data interface{})
+}
+
 type JsonResult struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 
-func NewJsonResult(code int, message string, data interface{}) *JsonResult {
+func (j JsonResult) SetCode(code int) {
+	j.Code = code
+}
+
+func (j JsonResult) SetMessage(msg string) {
+	j.Message = msg
+}
+
+func (j JsonResult) SetData(data interface{}) {
+	j.Data = data
+}
+
+func NewJsonResult(code int, message string, data interface{}) IResult {
 	return &JsonResult{Code: code, Message: message, Data: data}
 }
 
-var resultPool *sync.Pool
+type ResultHandler func(code int, message string, data interface{}) IResult
+
+var (
+	resultPool *sync.Pool
+	NewResult  interface{} = NewJsonResult
+)
 
 func init() {
 	resultPool = &sync.Pool{
 		New: func() interface{} {
-			return NewJsonResult(0, "", nil)
+			return NewResult.(ResultHandler)(0, "", nil)
 		},
 	}
 }
@@ -82,14 +105,26 @@ func (this ResultFunc) ErrorJson(message string, code int, data interface{}) {
 
 func Responser(ctx *gin.Context) ResultFunc {
 	return func(message string, code int, data interface{}) func(output Output) {
-		r := resultPool.Get().(*JsonResult)
-		defer resultPool.Put(r)
-		r.Message = message
-		r.Code = code
-		r.Data = data
+		result := resultPool.Get().(IResult)
+		defer resultPool.Put(result)
+		result.SetMessage(message)
+		result.SetCode(code)
+		result.SetData(data)
 		return func(output Output) {
-			output(ctx, r)
+			output(ctx, result)
 		}
+	}
+}
+
+func ResponserTest() ResultFunc {
+	return func(message string, code int, data interface{}) func(output Output) {
+		result := resultPool.Get().(IResult)
+		defer resultPool.Put(result)
+		result.SetMessage(message)
+		result.SetCode(code)
+		result.SetData(data)
+		fmt.Println(result)
+		return func(output Output) {}
 	}
 }
 
