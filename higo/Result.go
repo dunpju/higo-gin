@@ -61,15 +61,15 @@ type JsonResult struct {
 	Data    interface{} `json:"data"`
 }
 
-func (j JsonResult) SetCode(code int) {
+func (j *JsonResult) SetCode(code int) {
 	j.Code = code
 }
 
-func (j JsonResult) SetMessage(msg string) {
+func (j *JsonResult) SetMessage(msg string) {
 	j.Message = msg
 }
 
-func (j JsonResult) SetData(data interface{}) {
+func (j *JsonResult) SetData(data interface{}) {
 	j.Data = data
 }
 
@@ -81,13 +81,13 @@ type ResultHandler func(code int, message string, data interface{}) IResult
 
 var (
 	resultPool *sync.Pool
-	NewResult  interface{} = NewJsonResult
+	NewResult  ResultHandler = NewJsonResult
 )
 
 func init() {
 	resultPool = &sync.Pool{
 		New: func() interface{} {
-			return NewResult.(ResultHandler)(0, "", nil)
+			return NewResult(0, "", nil)
 		},
 	}
 }
@@ -123,6 +123,7 @@ func ResponserTest() ResultFunc {
 		result.SetMessage(message)
 		result.SetCode(code)
 		result.SetData(data)
+		fmt.Println(message, code, data)
 		fmt.Println(result)
 		return func(output Output) {}
 	}
