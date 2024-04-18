@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -125,6 +126,11 @@ func ResponserTest() ResultFunc {
 		result.SetData(data)
 		fmt.Println(message, code, data)
 		fmt.Println(result)
+		marshal, err := json.Marshal(result)
+		if err != nil {
+			return nil
+		}
+		fmt.Println(string(marshal))
 		return func(output Output) {}
 	}
 }

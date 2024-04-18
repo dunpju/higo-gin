@@ -14,8 +14,30 @@ import (
 	"os/exec"
 )
 
-func main() {
+type Resp struct {
+	Code    int         `json:"code"`
+	Message string      `json:"msg"`
+	Data    interface{} `json:"data"`
+}
 
+func (r *Resp) SetCode(code int) {
+	r.Code = code
+}
+
+func (r *Resp) SetMessage(msg string) {
+	r.Message = msg
+}
+
+func (r *Resp) SetData(data interface{}) {
+	r.Data = data
+}
+
+func NewResp(code int, message string, data interface{}) higo.IResult {
+	return &Resp{Code: code, Message: message, Data: data}
+}
+
+func main() {
+	higo.NewResult = NewResp
 	higo.ResponserTest()("ttt", 0, "hhh")
 	return
 
