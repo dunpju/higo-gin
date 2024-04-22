@@ -1,5 +1,5 @@
 package Codes
 
 func autoload() {
-	code400()
+	code200()
 }
