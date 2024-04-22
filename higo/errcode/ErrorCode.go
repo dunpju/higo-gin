@@ -14,7 +14,7 @@ func (this ErrorCode) Message(variables ...interface{}) string {
 	return code.Get(this, variables...)
 }
 
-func (this ErrorCode) Register() code.Message {
+func (this ErrorCode) Register() *code.Message {
 	Autoload()
 	return code.Container()
 }

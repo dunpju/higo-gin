@@ -3,7 +3,7 @@ module github.com/dunpju/higo-gin
 go 1.18
 
 require (
-	gitee.com/dengpju/higo-code v1.0.7
+	gitee.com/dengpju/higo-code v1.0.8
 	gitee.com/dengpju/higo-parameter v1.0.3
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/dunpju/higo-annotation v1.0.1

@@ -39,7 +39,6 @@ func NewResp(code int, message string, data interface{}) higo.IResult {
 func main() {
 	higo.NewResult = NewResp
 	higo.ResponserTest()("ttt", 0, "hhh")
-	return
 
 	//tt();
 	checkStatement := fmt.Sprintf("netstat -ano | grep %d", 6123)

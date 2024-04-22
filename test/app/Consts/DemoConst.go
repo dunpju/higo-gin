@@ -14,7 +14,7 @@ func (this SuccessConst) Message(variables ...interface{}) string {
 	return code.Get(this, variables...)
 }
 
-func (this SuccessConst) Register() code.Message {
+func (this SuccessConst) Register() *code.Message {
 	return code.Container().
 		Put(Success, "成功")
 }
@@ -39,7 +39,7 @@ func (this DemoConst) Message(variables ...interface{}) string {
 	return code.Get(this, variables...)
 }
 
-func (this DemoConst) Register() code.Message {
+func (this DemoConst) Register() *code.Message {
 	return code.Container().
 		Put(ServerError, "系统错误").
 		Put(AuthError, "认证错误").

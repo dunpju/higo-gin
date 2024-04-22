@@ -23,7 +23,7 @@ const (
     {{- end}}
 )
 
-func (this {{$.Name}}) Register() code.Message {
+func (this {{$.Name}}) Register() *code.Message {
 	return code.Container().
 	{{- range $i,$v := .CodeMap}}
 	    {{- if ne $i $.LenMap}}
