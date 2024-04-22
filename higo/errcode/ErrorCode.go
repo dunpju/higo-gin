@@ -18,3 +18,11 @@ func (this ErrorCode) Register() code.Message {
 	Autoload()
 	return code.Container()
 }
+
+func (this ErrorCode) Int() int {
+	return int(this)
+}
+
+func (this ErrorCode) Int64() int64 {
+	return int64(this)
+}
