@@ -138,11 +138,11 @@ func NewCode(args *CodeArguments) *Code {
 		c.Codes = append(c.Codes, newCode(args))
 	} else if args.Path != "" {
 		c.OutDir = args.Out
-		inputfile := utils.File.Read(args.Path)
-		if !inputfile.Exist() {
+		inputFile := utils.File.Read(args.Path)
+		if !inputFile.Exist() {
 			log.Fatalln(args.Path + " configure file or directory non-exist")
 		}
-		if inputfile.IsDir() {
+		if inputFile.IsDir() {
 			files := utils.Dir.Open(args.Path).Suffix("yaml").Scan().Get()
 			for _, file := range files {
 				load(c, file, args)
@@ -166,14 +166,14 @@ type KeyValueDoc struct {
 func load(c *Code, file string, args *CodeArguments) {
 	fileName := utils.Dir.Basename(file, ".yaml")
 	yamlFile := utils.File.Read(file)
-	keysort := make([]string, 0)
+	keySort := make([]string, 0)
 	err := yamlFile.ForEach(func(line int, b []byte) bool {
 		ok, err := regexp.Match("^[a-zA-Z]", b)
 		if err != nil {
 			panic(err)
 		}
 		if ok {
-			keysort = append(keysort, strings.TrimRight(string(b), ":"))
+			keySort = append(keySort, strings.TrimRight(string(b), ":"))
 		}
 		return true
 	})
@@ -193,7 +193,7 @@ func load(c *Code, file string, args *CodeArguments) {
 		OutDir:    args.Out,
 		Arguments: args,
 	}
-	for i, k := range keysort {
+	for i, k := range keySort {
 		kk := utils.String.CaseToCamel(strings.ToLower(strings.Trim(k, "")))
 		m := yamlMap[k]
 		if m == nil {

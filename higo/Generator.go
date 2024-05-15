@@ -18,6 +18,8 @@ var (
 	name            string
 	out             string
 	yamlPath        string
+	jsonFile        string
+	tag             string
 	isYaml          bool
 	isAuto          bool
 	isForce         bool
@@ -135,15 +137,19 @@ func InitParam() {
 	if err != nil {
 		panic(err)
 	}
+	ParamCommand.Flags().StringVarP(&jsonFile, "json", "j", "", "输入json文件")
+	ParamCommand.Flags().BoolVarP(&isForce, "force", "f", false, "强制覆盖")
+	ParamCommand.Flags().StringVarP(&tag, "tag", "t", "", "tag,如json")
 }
 
 var ParamCommand = &cobra.Command{
-	Use:     "param",
-	Short:   "Param构建工具",
-	Long:    "Param构建工具",
-	Example: "param --name=list --out=app\\Params",
+	Use:   "param",
+	Short: "Param构建工具",
+	Long:  "Param构建工具",
+	Example: `param --name=list --out=app\Params
+param --name=list --out=app\Params --json=bin\param.json --force --tag=json`,
 	Run: func(cmd *cobra.Command, args []string) {
-		templates.NewParam(name, out).Generate()
+		templates.NewParam(name, out, jsonFile, tag, isForce).Generate()
 	},
 }
 

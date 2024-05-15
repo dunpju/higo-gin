@@ -14,6 +14,9 @@ var (
 type {{.StructName}} struct {
 	//Id    uint64 `form:"id" binding:"id"` // get from the form
 	//Id    uint64 `json:"id" binding:"id"` // get from the json
+	{{- range $i,$iter := .ParamFieldList}}
+	{{$iter.FieldName}}{{$iter.FieldType}} `{{$iter.Tag}}:"{{$iter.TagName}}"`
+	{{- end}}
 }
 
 func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
@@ -51,6 +54,5 @@ func New{{.StructName}}(ctx *gin.Context) *{{.StructName}} {
 //}
 func (this *{{.StructName}}) RegisterValidator() *higo.Verify {
 	return higo.Verifier()
-	//	.Tag("id",
-	//		higo.Rule("required", Codes.Success))
+	//	.Tag("id", higo.Rule("required", Codes.Success))
 }

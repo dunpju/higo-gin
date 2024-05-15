@@ -2,7 +2,7 @@ package tpls
 
 import (
 	"github.com/dunpju/higo-utils/utils"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"runtime"
@@ -26,7 +26,7 @@ func context(tplName string) string {
 	if err != nil {
 		panic(err)
 	}
-	context, err := ioutil.ReadAll(f)
+	context, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)
 	}

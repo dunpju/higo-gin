@@ -37,7 +37,7 @@ func NewControllerTool() *ControllerTool {
 func (this *ControllerTool) Generate() {
 	if this.IsGenerateParam.Bool() {
 		for _, tag := range this.ParamTag {
-			NewParam(this.Name+tag, this.OutParamDir).Generate()
+			NewParam(this.Name+tag, this.OutParamDir, "", "", false).Generate()
 		}
 	}
 }
