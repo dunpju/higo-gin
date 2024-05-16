@@ -1,0 +1,15 @@
+{
+  "id": "1548901111999770526",
+  "parentId": "0",
+  "name": "index",
+  "title": "系统首页",
+  "code": "system",
+  "category": "MENU",
+  "module": "1548901111999770525",
+  "menuType": "MENU",
+  "path": "/index",
+  "component": "index/index",
+  "icon": "home-outlined",
+  "sortCode": 0,
+  "visible": "TRUE"
+}

@@ -23,6 +23,8 @@ var (
 	isYaml          bool
 	isAuto          bool
 	isForce         bool
+	isGormTag       bool
+	isJsonTag       bool
 	capitalBeganReg = regexp.MustCompile(`^[A-Z].*`) //匹配大写字母开头
 )
 
@@ -44,12 +46,14 @@ func GenCommandInit() {
 	gen.InitModel()
 	InitController()
 	InitParam()
+	InitVo()
 	InitCode()
 	gen2.InitEnum()
 	InitService()
 	GenCommand.AddCommand(gen.ModelCommand)
 	GenCommand.AddCommand(ControllerCommand)
 	GenCommand.AddCommand(ParamCommand)
+	GenCommand.AddCommand(VoCommand)
 	GenCommand.AddCommand(CodeCommand)
 	GenCommand.AddCommand(gen2.EnumCommand)
 	GenCommand.AddCommand(ServiceCommand)
@@ -150,6 +154,34 @@ var ParamCommand = &cobra.Command{
 param --name=list --out=app\Params --json=bin\param.json --force --tag=json`,
 	Run: func(cmd *cobra.Command, args []string) {
 		templates.NewParam(name, out, jsonFile, tag, isForce).Generate()
+	},
+}
+
+func InitVo() {
+	VoCommand.Flags().StringVarP(&name, "name", "n", "", "参数结构体名称")
+	err := VoCommand.MarkFlagRequired("name")
+	if err != nil {
+		panic(err)
+	}
+	VoCommand.Flags().StringVarP(&out, "out", "o", "", `生成目录,如:app\vo`)
+	err = VoCommand.MarkFlagRequired("out")
+	if err != nil {
+		panic(err)
+	}
+	VoCommand.Flags().StringVarP(&jsonFile, "json", "j", "", "输入json文件")
+	VoCommand.Flags().BoolVarP(&isForce, "force", "f", false, "强制覆盖")
+	VoCommand.Flags().BoolVarP(&isGormTag, "gormTag", "G", false, "添加gorm tag")
+	VoCommand.Flags().BoolVarP(&isJsonTag, "jsonTag", "J", false, "添加json tag")
+}
+
+var VoCommand = &cobra.Command{
+	Use:   "vo",
+	Short: "Vo构建工具",
+	Long:  "Vo构建工具",
+	Example: `vo --name=list --out=app\vo
+vo --name=list --out=app\vo --json=bin\vo.json --force --gormTag --jsonTag`,
+	Run: func(cmd *cobra.Command, args []string) {
+		templates.NewVO(name, out, jsonFile, isGormTag, isJsonTag, isForce).Generate()
 	},
 }
 
