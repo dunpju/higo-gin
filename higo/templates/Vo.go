@@ -9,6 +9,8 @@ import (
 	"github.com/dunpju/higo-utils/utils/fileutil"
 	"log"
 	"os"
+	"sort"
+	"strings"
 )
 
 type VO struct {
@@ -69,25 +71,17 @@ func (this *VO) Generate() {
 			panic(err)
 		}
 		fieldMaxLen := 0
+		fieldNameSort := make([]string, 0)
 		for fieldName, _ := range jsonContextMap {
+			fieldNameSort = append(fieldNameSort, fieldName)
 			if fieldMaxLen < len(fieldName) {
 				fieldMaxLen = len(fieldName)
 			}
 		}
-		for fieldName, value := range jsonContextMap {
-			var fieldType string
-			switch value.(type) {
-			case int:
-				fieldType = "int"
-			case int64, int32:
-				fieldType = "int64"
-			case uint64, uint32:
-				fieldType = "uint64"
-			case float64, float32:
-				fieldType = "float64"
-			case string:
-				fieldType = "string"
-			}
+		sort.Strings(fieldNameSort)
+		for _, fieldName := range fieldNameSort {
+			value := jsonContextMap[fieldName]
+			fieldType := TypeAssert(value)
 			camelFieldName := utils.String.CaseToCamel(fieldName)
 			tag := ""
 			if this.GormTag {
@@ -137,4 +131,24 @@ func (this *VO) Generate() {
 	} else {
 		fmt.Println("VO: " + outfile.Name + " generate success!")
 	}
+}
+
+func TypeAssert(value interface{}) string {
+	switch value.(type) {
+	case int:
+		return "int"
+	case int64, int32:
+		return "int64"
+	case uint64, uint32:
+		return "uint64"
+	case float64, float32:
+		if strings.Contains(fmt.Sprintf("%v", value), ".") {
+			return "float64"
+		} else {
+			return "int64"
+		}
+	case string:
+		return "string"
+	}
+	return "interface{}"
 }
