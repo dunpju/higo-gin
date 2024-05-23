@@ -306,7 +306,12 @@ func (this *Higo) IsRedisPool() *Higo {
 }
 
 func (this *Higo) InitGroupIsAuth(b bool) *Higo {
-	router.SetInitGroupIsAuth(b)
+	router.GlobalGroupIsAuth(b)
+	return this
+}
+
+func (this *Higo) InitGroupIsDataAuth(b bool) *Higo {
+	router.GlobalGroupIsDataAuth(b)
 	return this
 }
 
