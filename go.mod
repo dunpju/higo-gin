@@ -13,7 +13,7 @@ require (
 	github.com/dunpju/higo-logger v1.0.11
 	github.com/dunpju/higo-orm v1.0.44
 	github.com/dunpju/higo-redis v1.0.6
-	github.com/dunpju/higo-router v1.0.32
+	github.com/dunpju/higo-router v1.0.33
 	github.com/dunpju/higo-throw v1.0.16
 	github.com/dunpju/higo-utils v1.1.0
 	github.com/gin-gonic/gin v1.6.3

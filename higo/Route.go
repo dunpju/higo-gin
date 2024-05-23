@@ -113,6 +113,18 @@ func (this *Higo) IsStatic(value bool) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteIsStatic, value)
 }
 
+func (this *Higo) IsAuth(value bool) *router.RouteAttribute {
+	return router.NewRouteAttribute(router.RouteIsAuth, value)
+}
+
+func (this *Higo) IsDataAuth(value bool) *router.RouteAttribute {
+	return router.NewRouteAttribute(router.RouteIsDataAuth, value)
+}
+
+func (this *Higo) Title(value string) *router.RouteAttribute {
+	return router.NewRouteAttribute(router.RouteTitle, value)
+}
+
 // Desc 描述
 func (this *Higo) Desc(value string) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteDesc, value)
