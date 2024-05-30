@@ -1,6 +1,7 @@
 package errcode
 
 import (
+	"fmt"
 	"gitee.com/dengpju/higo-code/code"
 )
 
@@ -25,4 +26,12 @@ func (this ErrorCode) Int() int {
 
 func (this ErrorCode) Int64() int64 {
 	return int64(this)
+}
+
+func (this ErrorCode) Error(variables ...interface{}) error {
+	return fmt.Errorf(this.Message(variables...))
+}
+
+func (this ErrorCode) Panic(variables ...interface{}) {
+	panic(fmt.Errorf(this.Message(variables...)))
 }
