@@ -26,36 +26,40 @@ type requester struct {
 }
 
 func (this *requester) Context() *gin.Context {
-	goid, err := utils.Runtime.GoroutineID()
+	gid, err := utils.Runtime.GoroutineID()
 	if err != nil {
 		panic(err)
 	}
-	v, ok := this.value.Load(goid)
+	v, ok := this.value.Load(gid)
 	if ok {
 		return v.(*gin.Context)
 	}
-	panic(fmt.Errorf("goroutine id %d gin context empty, Cannot penetrate goroutine get gin context", goid))
+	panic(fmt.Errorf("goroutine id %d gin context empty, Cannot penetrate goroutine get gin context", gid))
 }
 
 func (this *requester) Set(ctx *gin.Context) {
-	goid, err := utils.Runtime.GoroutineID()
+	gid, err := utils.Runtime.GoroutineID()
 	if err != nil {
 		panic(err)
 	}
-	this.value.Store(goid, ctx)
+	this.value.Store(gid, ctx)
 }
 
 func (this requester) Remove() {
-	goid, err := utils.Runtime.GoroutineID()
+	gid, err := utils.Runtime.GoroutineID()
 	if err != nil {
 		panic(err)
 	}
-	this.value.Delete(goid)
+	this.value.Delete(gid)
 }
 
 func handleConvert(handler interface{}) interface{} {
 	if handle, ok := handler.(func(*gin.Context)); ok {
-		return handle
+		return func(ctx *gin.Context) {
+			defer Request.Remove()
+			Request.Set(ctx)
+			handle(ctx)
+		}
 	} else if handle, ok := handler.(func()); ok {
 		return func(ctx *gin.Context) {
 			defer Request.Remove()

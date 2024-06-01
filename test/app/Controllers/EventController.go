@@ -50,11 +50,13 @@ func (this *EventController) Test2() interface{} {
 
 var i = 0
 
-func (this *EventController) Test3() {
+func (this *EventController) Test3(ctx1 *gin.Context) {
 	fmt.Println("请求数量")
-	goid, _ := runtimeutil.GoroutineID()
-	if goid%2 == 0 {
-		fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), goid, "休眠")
+	gid, _ := runtimeutil.GoroutineID()
+	tid, err := runtimeutil.ThreadID()
+	fmt.Println(err)
+	if gid%2 == 0 {
+		fmt.Printf("线程: %d 协成: %d  %s\n", tid, gid, "休眠")
 		time.Sleep(2 * time.Second)
 		i++
 		if i == 1 {
@@ -65,9 +67,11 @@ func (this *EventController) Test3() {
 	ctx := request.Context()
 	tt := ctx.Query("tt")
 
-	fmt.Printf("线程: %d 协成: %d  %s\n", runtimeutil.ThreadID(), goid, tt)
+	fmt.Printf("线程: %d 协成: %d  %s\n", tid, gid, tt)
 	go func() {
-		fmt.Printf("线程: %d 子协成: %d 数据:%s\n", runtimeutil.ThreadID(), goid, tt)
+		gid, _ := runtimeutil.GoroutineID()
+		tid, _ := runtimeutil.ThreadID()
+		fmt.Printf("线程: %d 子协成: %d 数据:%s\n", tid, gid, tt)
 	}()
 	//exception.Throw(exception.Message(tt), exception.Code(1))
 	responser.SuccessJson("success", 10000, tt)
@@ -82,7 +86,7 @@ func Test4() {
 	responser.SuccessJson("success", 10000, tt)
 }
 
-//订阅数据
+// 订阅数据
 var ev = event.NewEventBus() //需要全局
 
 func (this *EventController) Test(ctx *gin.Context) {
@@ -125,7 +129,7 @@ func getInfo() string {
 	return "这是信息"
 }
 
-//分体
+// 分体
 func getUserInfo(id int) interface{} {
 	return gin.H{"id": id, "商品分体": "ffff"}
 }
