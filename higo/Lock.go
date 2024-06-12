@@ -44,8 +44,8 @@ func (this *Mutex) UnLock(key string) {
 	this.key.Delete(key)
 }
 
-func Lock(key string, fn func()) {
-	lock.Lock(key, fn)
+func Lock(key string, fn func()) bool {
+	return lock.Lock(key, fn)
 }
 
 func Retry(interval time.Duration, retry int, key string, fn func()) {
