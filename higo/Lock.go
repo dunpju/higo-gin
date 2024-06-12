@@ -28,13 +28,12 @@ func (this *Mutex) Lock(key string, fn func()) bool {
 	return !this.lock(key, fn)
 }
 
-func (this *Mutex) Retry(interval time.Duration, retry int, key string, fn func()) {
-	counter := 0
+func (this *Mutex) Retry(returner *Returner, key string, fn func()) {
 start:
 	if this.lock(key, fn) {
-		counter++
-		time.Sleep(interval)
-		if counter <= retry {
+		returner.counter++
+		time.Sleep(returner.Interval)
+		if returner.counter <= returner.Retry {
 			goto start
 		}
 	}
@@ -48,8 +47,13 @@ func Lock(key string, fn func()) bool {
 	return lock.Lock(key, fn)
 }
 
-func Retry(interval time.Duration, retry int, key string, fn func()) {
-	lock.Retry(interval, retry, key, fn)
+type Returner struct {
+	Interval       time.Duration
+	Retry, counter int
+}
+
+func Retry(returner *Returner, key string, fn func()) {
+	lock.Retry(returner, key, fn)
 }
 
 func UnLock(key string) {
