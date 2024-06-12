@@ -24,8 +24,8 @@ func (this *Mutex) lock(key string, fn func()) bool {
 	return ok
 }
 
-func (this *Mutex) Lock(key string, fn func()) {
-	this.lock(key, fn)
+func (this *Mutex) Lock(key string, fn func()) bool {
+	return !this.lock(key, fn)
 }
 
 func (this *Mutex) Retry(interval time.Duration, retry int, key string, fn func()) {
