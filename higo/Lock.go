@@ -5,28 +5,42 @@ import (
 	"time"
 )
 
-var lock = &Locker{
+var lock = &Mutex{
 	key: &sync.Map{},
 }
 
-type Locker struct {
+type Mutex struct {
 	key *sync.Map
 }
 
-func (this *Locker) Lock(key string, fn func()) {
-	_, ok := this.key.Load(key)
+func (this *Mutex) lock(key string, fn func()) bool {
+	mutex, ok := this.key.LoadOrStore(key, &sync.Mutex{})
 	if !ok {
-		this.key.Store(key, key)
+		mutex.(*sync.Mutex).Lock()
+		defer mutex.(*sync.Mutex).Unlock()
 		defer this.UnLock(key)
 		fn()
 	}
+	return ok
 }
 
-func (this *Locker) Try(interval time.Duration, retry int) {
-
+func (this *Mutex) Lock(key string, fn func()) {
+	this.lock(key, fn)
 }
 
-func (this *Locker) UnLock(key string) {
+func (this *Mutex) Retry(interval time.Duration, retry int, key string, fn func()) {
+	counter := 0
+start:
+	if this.lock(key, fn) {
+		counter++
+		time.Sleep(interval)
+		if counter <= retry {
+			goto start
+		}
+	}
+}
+
+func (this *Mutex) UnLock(key string) {
 	this.key.Delete(key)
 }
 
@@ -34,8 +48,8 @@ func Lock(key string, fn func()) {
 	lock.Lock(key, fn)
 }
 
-func TryLock(key string) {
-
+func Retry(interval time.Duration, retry int, key string, fn func()) {
+	lock.Retry(interval, retry, key, fn)
 }
 
 func UnLock(key string) {
