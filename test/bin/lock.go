@@ -23,8 +23,8 @@ func main() {
 			//num := r.Intn(128)
 			//time.Sleep(time.Duration(num))
 			if i == 5 {
-				lockOk := higo.Retry(&higo.Returner{Interval: 1 * time.Second, Retry: 4},
-					&higo.Locker{Key: "test", Timeout: 1 * time.Second},
+				lockOk := higo.Lock(
+					&higo.Locker{Key: "test", Timeout: 1 * time.Second, Interval: 1 * time.Second, Retry: 4},
 					func() {
 						fmt.Println(fmt.Sprintf("%d开始执行锁", i))
 						time.Sleep(3 * time.Second)

@@ -15,8 +15,9 @@ type Mutex struct {
 }
 
 type Locker struct {
-	Key     string
-	Timeout time.Duration
+	Key               string
+	Timeout, Interval time.Duration
+	Retry, counter    int
 }
 
 func (this *Mutex) Lock(locker *Locker, task func()) bool {
@@ -42,12 +43,12 @@ func (this *Mutex) Lock(locker *Locker, task func()) bool {
 	return !ok
 }
 
-func (this *Mutex) Retry(returner *Returner, locker *Locker, task func()) bool {
+func (this *Mutex) Retry(locker *Locker, task func()) bool {
 retry:
 	if !this.Lock(locker, task) {
-		returner.counter++
-		time.Sleep(returner.Interval)
-		if returner.counter <= returner.Retry {
+		locker.counter++
+		time.Sleep(locker.Interval)
+		if locker.counter <= locker.Retry {
 			goto retry
 		}
 		return false
@@ -60,16 +61,10 @@ func (this *Mutex) UnLock(key string) {
 }
 
 func Lock(locker *Locker, task func()) bool {
+	if locker.Retry > 0 {
+		return lock.Retry(locker, task)
+	}
 	return lock.Lock(locker, task)
-}
-
-type Returner struct {
-	Interval       time.Duration
-	Retry, counter int
-}
-
-func Retry(returner *Returner, locker *Locker, task func()) bool {
-	return lock.Retry(returner, locker, task)
 }
 
 func UnLock(key string) {
