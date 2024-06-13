@@ -21,22 +21,24 @@ func (this *Mutex) lock(key string, fn func()) bool {
 		defer this.UnLock(key)
 		fn()
 	}
-	return ok
+	return !ok
 }
 
 func (this *Mutex) Lock(key string, fn func()) bool {
-	return !this.lock(key, fn)
+	return this.lock(key, fn)
 }
 
-func (this *Mutex) Retry(returner *Returner, key string, fn func()) {
+func (this *Mutex) Retry(returner *Returner, key string, fn func()) bool {
 start:
-	if this.lock(key, fn) {
+	if !this.lock(key, fn) {
 		returner.counter++
 		time.Sleep(returner.Interval)
 		if returner.counter <= returner.Retry {
 			goto start
 		}
+		return false
 	}
+	return true
 }
 
 func (this *Mutex) UnLock(key string) {
@@ -52,8 +54,8 @@ type Returner struct {
 	Retry, counter int
 }
 
-func Retry(returner *Returner, key string, fn func()) {
-	lock.Retry(returner, key, fn)
+func Retry(returner *Returner, key string, fn func()) bool {
+	return lock.Retry(returner, key, fn)
 }
 
 func UnLock(key string) {
