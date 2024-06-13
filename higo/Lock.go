@@ -21,7 +21,7 @@ type Locker struct {
 }
 
 func (this *Mutex) Lock(locker *Locker, task func()) bool {
-	_, ok := this.key.LoadOrStore(locker.Key, locker)
+	_, ok := this.key.LoadOrStore(locker.Key, &sync.Mutex{})
 	if !ok {
 		defer this.UnLock(locker.Key)
 		if locker.Timeout > 0 {
