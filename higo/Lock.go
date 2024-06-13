@@ -14,10 +14,8 @@ type Mutex struct {
 }
 
 func (this *Mutex) lock(key string, fn func()) bool {
-	mutex, ok := this.key.LoadOrStore(key, &sync.Mutex{})
+	_, ok := this.key.LoadOrStore(key, &sync.Mutex{})
 	if !ok {
-		mutex.(*sync.Mutex).Lock()
-		defer mutex.(*sync.Mutex).Unlock()
 		defer this.UnLock(key)
 		fn()
 	}
