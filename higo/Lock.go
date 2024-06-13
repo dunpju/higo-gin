@@ -29,12 +29,12 @@ func (this *Mutex) Lock(key string, fn func()) bool {
 }
 
 func (this *Mutex) Retry(returner *Returner, key string, fn func()) bool {
-start:
+retry:
 	if !this.lock(key, fn) {
 		returner.counter++
 		time.Sleep(returner.Interval)
 		if returner.counter <= returner.Retry {
-			goto start
+			goto retry
 		}
 		return false
 	}
