@@ -23,14 +23,18 @@ func main() {
 			//num := r.Intn(128)
 			//time.Sleep(time.Duration(num))
 			if i == 5 {
-				lockOk := higo.Retry(&higo.Returner{Interval: 100 * time.Microsecond, Retry: 3}, "test", func() {
-					fmt.Println(fmt.Sprintf("%d开始执行锁", i))
-					fmt.Println(fmt.Sprintf("%d执行完成", i))
-				})
+				lockOk := higo.Retry(&higo.Returner{Interval: 1 * time.Second, Retry: 4},
+					&higo.Locker{Key: "test", Timeout: 1 * time.Second},
+					func() {
+						fmt.Println(fmt.Sprintf("%d开始执行锁", i))
+						time.Sleep(3 * time.Second)
+						fmt.Println(fmt.Sprintf("%d执行完成", i))
+					})
 				fmt.Printf("lockOk: %v %d\n", lockOk, i)
 			} else {
-				lockOk := higo.Lock("test", func() {
+				lockOk := higo.Lock(&higo.Locker{Key: "test", Timeout: 1 * time.Second}, func() {
 					fmt.Println(fmt.Sprintf("%d开始执行锁", i))
+					time.Sleep(2 * time.Second)
 					fmt.Println(fmt.Sprintf("%d执行完成", i))
 				})
 				fmt.Printf("lockOk: %v %d\n", lockOk, i)

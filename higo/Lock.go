@@ -1,6 +1,7 @@
 package higo
 
 import (
+	"context"
 	"sync"
 	"time"
 )
@@ -13,22 +14,37 @@ type Mutex struct {
 	key *sync.Map
 }
 
-func (this *Mutex) lock(key string, fn func()) bool {
-	_, ok := this.key.LoadOrStore(key, &sync.Mutex{})
+type Locker struct {
+	Key     string
+	Timeout time.Duration
+}
+
+func (this *Mutex) Lock(locker *Locker, task func()) bool {
+	_, ok := this.key.LoadOrStore(locker.Key, locker)
 	if !ok {
-		defer this.UnLock(key)
-		fn()
+		defer this.UnLock(locker.Key)
+		if locker.Timeout > 0 {
+			ctx, cancel := context.WithTimeout(context.Background(), locker.Timeout)
+			defer cancel()
+			go func(ctx context.Context) {
+				select {
+				case <-ctx.Done():
+					this.UnLock(locker.Key)
+					return
+				case <-time.After(locker.Timeout):
+					this.UnLock(locker.Key)
+					return
+				}
+			}(ctx)
+		}
+		task()
 	}
 	return !ok
 }
 
-func (this *Mutex) Lock(key string, fn func()) bool {
-	return this.lock(key, fn)
-}
-
-func (this *Mutex) Retry(returner *Returner, key string, fn func()) bool {
+func (this *Mutex) Retry(returner *Returner, locker *Locker, task func()) bool {
 retry:
-	if !this.lock(key, fn) {
+	if !this.Lock(locker, task) {
 		returner.counter++
 		time.Sleep(returner.Interval)
 		if returner.counter <= returner.Retry {
@@ -43,8 +59,8 @@ func (this *Mutex) UnLock(key string) {
 	this.key.Delete(key)
 }
 
-func Lock(key string, fn func()) bool {
-	return lock.Lock(key, fn)
+func Lock(locker *Locker, task func()) bool {
+	return lock.Lock(locker, task)
 }
 
 type Returner struct {
@@ -52,8 +68,8 @@ type Returner struct {
 	Retry, counter int
 }
 
-func Retry(returner *Returner, key string, fn func()) bool {
-	return lock.Retry(returner, key, fn)
+func Retry(returner *Returner, locker *Locker, task func()) bool {
+	return lock.Retry(returner, locker, task)
 }
 
 func UnLock(key string) {
