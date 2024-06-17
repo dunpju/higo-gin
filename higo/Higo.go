@@ -616,3 +616,9 @@ func (this *Higo) Cron(expr string, fn func()) *Higo {
 	}
 	return this
 }
+
+// GlobalAuth 全局鉴权
+func (this *Higo) GlobalAuth(auth bool) *Higo {
+	router.GlobalGroupIsAuth(auth)
+	return this
+}
