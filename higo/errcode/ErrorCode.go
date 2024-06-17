@@ -3,6 +3,8 @@ package errcode
 import (
 	"fmt"
 	"gitee.com/dengpju/higo-code/code"
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/dunpju/higo-throw/exception"
 )
 
 // Autoload 自动加载
@@ -34,4 +36,12 @@ func (this ErrorCode) Error(variables ...interface{}) error {
 
 func (this ErrorCode) Panic(variables ...interface{}) {
 	panic(fmt.Errorf(this.Message(variables...)))
+}
+
+func (this ErrorCode) Throw(variables ...interface{}) {
+	higo.Throw(exception.Code(int(this)), exception.Message(this.Message(variables...)), exception.Data(nil))
+}
+
+func (this ErrorCode) ThrowData(data interface{}, variables ...interface{}) {
+	higo.Throw(exception.Code(int(this)), exception.Message(this.Message(variables...)), exception.Data(data))
 }
