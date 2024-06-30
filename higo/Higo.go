@@ -305,13 +305,21 @@ func (this *Higo) IsRedisPool() *Higo {
 	return this
 }
 
-func (this *Higo) InitGroupIsAuth(b bool) *Higo {
-	router.GlobalGroupIsAuth(b)
+// GroupDataAuth 全局数据鉴权
+func (this *Higo) GroupDataAuth(auth bool) *Higo {
+	router.GlobalGroupIsDataAuth(auth)
 	return this
 }
 
-func (this *Higo) InitGroupIsDataAuth(b bool) *Higo {
-	router.GlobalGroupIsDataAuth(b)
+// GlobalAuth 全局鉴权
+func (this *Higo) GlobalAuth(auth bool) *Higo {
+	router.GlobalGroupIsAuth(auth)
+	return this
+}
+
+// GlobalGroupPrefix 路由前缀
+func (this *Higo) GlobalGroupPrefix(prefix string) *Higo {
+	router.GlobalGroupPrefix(prefix)
 	return this
 }
 
@@ -614,11 +622,5 @@ func (this *Higo) Cron(expr string, fn func()) *Higo {
 	if err != nil {
 		exception.Throw(exception.Message(err), exception.Code(0))
 	}
-	return this
-}
-
-// GlobalAuth 全局鉴权
-func (this *Higo) GlobalAuth(auth bool) *Higo {
-	router.GlobalGroupIsAuth(auth)
 	return this
 }
