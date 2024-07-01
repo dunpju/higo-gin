@@ -323,6 +323,12 @@ func (this *Higo) GlobalGroupPrefix(prefix string) *Higo {
 	return this
 }
 
+// GlobalApiPrefix 路由API前缀
+func (this *Higo) GlobalApiPrefix(prefix string) *Higo {
+	router.GlobalApiGroupPrefix(prefix)
+	return this
+}
+
 // Boot 启动
 func (this *Higo) Boot() {
 	// 初始化
