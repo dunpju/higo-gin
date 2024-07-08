@@ -329,16 +329,6 @@ func (this *Higo) GlobalApiPrefix(prefix string) *Higo {
 	return this
 }
 
-func (this *Higo) CancelGlobalGroupPrefix(boole bool) *Higo {
-	router.CancelGlobalGroupPrefix(boole)
-	return this
-}
-
-func (this *Higo) CancelGlobalApiGroupPrefix(boole bool) *Higo {
-	router.CancelGlobalApiGroupPrefix(boole)
-	return this
-}
-
 // Boot 启动
 func (this *Higo) Boot() {
 	// 初始化

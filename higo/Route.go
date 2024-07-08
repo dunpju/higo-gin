@@ -121,6 +121,14 @@ func (this *Higo) IsDataAuth(value bool) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteIsDataAuth, value)
 }
 
+func (this *Higo) CancelGlobalGroupPrefix(boole bool) *router.RouteAttribute {
+	return router.CancelGlobalGroupPrefix(boole)
+}
+
+func (this *Higo) CancelGlobalApiGroupPrefix(boole bool) *router.RouteAttribute {
+	return router.CancelGlobalApiGroupPrefix(boole)
+}
+
 func (this *Higo) Title(value string) *router.RouteAttribute {
 	return router.NewRouteAttribute(router.RouteTitle, value)
 }
