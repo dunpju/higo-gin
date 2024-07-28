@@ -16,8 +16,8 @@ require (
 	github.com/dunpju/higo-router v1.0.37
 	github.com/dunpju/higo-throw v1.0.16
 	github.com/dunpju/higo-utils v1.1.4
-	github.com/gin-gonic/gin v1.6.3
-	github.com/go-playground/validator/v10 v10.2.0
+	github.com/gin-gonic/gin v1.7.7
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gomodule/redigo v1.8.3
 	github.com/gorilla/websocket v1.4.2
 	github.com/nsf/termbox-go v1.1.1
@@ -33,6 +33,7 @@ require (
 	github.com/antlr/antlr4 v0.0.0-20201025162310-ac92c48a09df // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dunpju/higo-express v1.0.0 // indirect
+	github.com/dunpju/higo-wsock v1.0.19 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect

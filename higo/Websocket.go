@@ -11,7 +11,7 @@ import (
 
 type WebsocketCheckFunc func(r *http.Request) bool
 
-type WebsocketPingFunc func(websocketConn *WebsocketConn, waittime time.Duration)
+type WebsocketPingFunc func(websocketConn *WebsocketConn, wait time.Duration)
 
 type WebsocketClient struct {
 	clients sync.Map
@@ -45,7 +45,7 @@ func (this *WebsocketClient) Remove(conn *websocket.Conn) {
 	this.clients.Delete(conn.RemoteAddr().String())
 }
 
-//ws连接中间件
+// ws连接中间件
 func wsConnMiddleWare() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		conn := websocketConnFunc(ctx)
@@ -59,7 +59,7 @@ func wsConnMiddleWare() gin.HandlerFunc {
 }
 
 // 连接升级协议handle
-func wsUpgraderHandle(route *router.Route) gin.HandlerFunc {
+func wsUpGraderHandle(route *router.Route) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		_, ok := ctx.Get(WsConnIp)
 		if !ok {

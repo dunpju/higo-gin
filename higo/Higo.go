@@ -579,11 +579,11 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 	return this
 }
 
-// 中间件顺序倒序包裹，越往后添加的中间件越贴近需要执行的逻辑
+// 中间件顺序是倒序包裹，越往后添加的中间件越贴近需要执行的逻辑
 func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc {
 	handles := handleSlice(route)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
-		handles = append(handles, wsUpgraderHandle(route))
+		handles = append(handles, wsUpGraderHandle(route))
 	} else {
 		handles = append(handles, handle)
 	}

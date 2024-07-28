@@ -29,7 +29,7 @@ func (this *WebsocketController) Route(hg *higo.Higo) {
 	hg.Ws("/send_all", this.SendAll, hg.Flag("WebsocketController.SendAll"), hg.Desc("SendAll"))
 }
 
-//webSocket请求
+// Conn webSocket请求
 func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
 	fmt.Println("控制器 Conn")
 	fmt.Println("控制器 Conn", this)
