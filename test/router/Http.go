@@ -46,4 +46,5 @@ func (this *Http) http(hg *higo.Higo) {
 		hg.Get("/test_get_redis", V3.NewRedisController().Test, hg.Flag("test_get_redis"), hg.Desc("V3 测试redis"))
 
 	})
+	hg.Route(Controllers.NewWebsocketController())
 }

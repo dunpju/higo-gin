@@ -4,13 +4,11 @@ import (
 	"github.com/dunpju/higo-config/config"
 	"github.com/dunpju/higo-router/router"
 	"github.com/dunpju/higo-utils/utils/sliceutil"
+	"github.com/dunpju/higo-wsock/wsock"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"github.com/robfig/cron/v3"
-	"net/http"
 	"reflect"
 	"sync"
-	"time"
 )
 
 const (
@@ -35,12 +33,8 @@ var (
 	root             *sliceutil.SliceString
 	MiddleCorsFunc   func(hg *Higo) gin.HandlerFunc
 	MiddleAuthFunc   func(hg *Higo) gin.HandlerFunc
-	Upgrader         websocket.Upgrader
-	WsPingHandle     WebsocketPingFunc
-	WsContainer      *WebsocketClient
+	WsContainer      *wsock.WebsocketClient
 	refWsResponder   reflect.Type
-	WsCheckOrigin    WebsocketCheckFunc
-	WsPitpatSleep    time.Duration
 )
 
 func init() {
@@ -59,16 +53,8 @@ func init() {
 		AppConfigDir = sliceutil.NewSliceString()
 		MiddleCorsFunc = middleCorsFunc
 		MiddleAuthFunc = middleAuthFunc
-		WsCheckOrigin = func(r *http.Request) bool {
-			return true
-		}
-		Upgrader = websocket.Upgrader{
-			CheckOrigin: WsCheckOrigin,
-		}
-		WsPingHandle = wsPingFunc
-		WsContainer = NewWebsocketClient()
+		WsContainer = wsock.NewWebsocketClient()
 		refWsResponder = reflect.TypeOf((WebsocketResponder)(nil))
-		WsPitpatSleep = time.Second * 1
 		config.AppPrefix = "config"
 		config.AuthPrefix = config.AppPrefix
 		config.AnnoPrefix = config.AppPrefix

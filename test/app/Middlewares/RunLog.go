@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-// 运行日志
+// RunLog 运行日志
 type RunLog struct{}
 
-// 构造函数
+// NewRunLog 构造函数
 func NewRunLog() *RunLog {
 	return &RunLog{}
 }

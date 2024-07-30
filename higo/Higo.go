@@ -13,6 +13,7 @@ import (
 	"github.com/dunpju/higo-utils/utils/runtimeutil"
 	"github.com/dunpju/higo-utils/utils/sliceutil"
 	"github.com/dunpju/higo-utils/utils/tlsutil"
+	"github.com/dunpju/higo-wsock/wsock"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
@@ -583,7 +584,7 @@ func (this *Higo) Handle(route *router.Route) *Higo {
 func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc {
 	handles := handleSlice(route)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
-		handles = append(handles, wsUpGraderHandle(route))
+		handles = append(handles, wsock.Handler(handle))
 	} else {
 		handles = append(handles, handle)
 	}
@@ -594,7 +595,7 @@ func appendHandle(handle gin.HandlerFunc, route *router.Route) []gin.HandlerFunc
 func handleSlice(route *router.Route) []gin.HandlerFunc {
 	handles := make([]gin.HandlerFunc, 0)
 	if reflect.ValueOf(route.Handle()).Type().ConvertibleTo(refWsResponder) {
-		handles = append(handles, wsConnMiddleWare())
+		handles = append(handles, wsock.ConnUpGrader())
 	}
 	if groupMiddles, ok := route.GroupMiddle().([]interface{}); ok {
 		for _, groupMiddle := range groupMiddles {

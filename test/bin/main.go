@@ -56,9 +56,10 @@ func main() {
 
 	higo.Init(sliceutil.NewSliceString(".", "")).
 		Middleware(Middlewares.NewRunLog()).
+		Middleware(Middlewares.NewWebsocket()).
 		AddServe(router.NewHttp(), Middlewares.NewHttp()).
 		AddServe(router.NewHttps(), beanConfig).
-		AddServe(router.NewWebsocket()).
+		//AddServe(router.NewWebsocket()).
 		IsAutoTLS(true).
 		IsRedisPool().
 		Beans(beanConfig).
