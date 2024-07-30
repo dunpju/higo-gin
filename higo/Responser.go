@@ -2,6 +2,7 @@ package higo
 
 import (
 	"github.com/dunpju/higo-orm/arm"
+	"github.com/dunpju/higo-wsock/wsock"
 	"github.com/gin-gonic/gin"
 	"reflect"
 	"sync"
@@ -136,7 +137,7 @@ func (this ModelsResponder) Handle(method reflect.Value) interface{} {
 	}
 }
 
-type WebsocketResponder func(*gin.Context) WsWriteMessage
+type WebsocketResponder func(*gin.Context) wsock.WsWriteMessage
 
 func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -144,7 +145,7 @@ func (this WebsocketResponder) RespondTo() gin.HandlerFunc {
 	}
 }
 func (this WebsocketResponder) Handle(method reflect.Value) interface{} {
-	return func(ctx *gin.Context) WsWriteMessage {
-		return methodCall(ctx, method).(WsWriteMessage)
+	return func(ctx *gin.Context) wsock.WsWriteMessage {
+		return methodCall(ctx, method).(wsock.WsWriteMessage)
 	}
 }

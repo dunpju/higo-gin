@@ -1,11 +1,8 @@
 package Controllers
 
 import (
-	"fmt"
 	"github.com/dunpju/higo-gin/higo"
-	"github.com/dunpju/higo-gin/test/app/Consts"
-	"github.com/dunpju/higo-gin/test/app/Entity"
-	"github.com/dunpju/higo-throw/exception"
+	"github.com/dunpju/higo-wsock/wsock"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,27 +27,32 @@ func (this *WebsocketController) Route(hg *higo.Higo) {
 }
 
 // Conn webSocket请求
-func (this *WebsocketController) Conn(ctx *gin.Context) higo.WsWriteMessage {
-	fmt.Println("控制器 Conn")
-	fmt.Println("控制器 Conn", this)
-	fmt.Println("控制器 Conn", ctx.Request.URL.Path)
-	//测试异常抛出
-	exception.Throw(exception.Message("111"), exception.Code(Consts.CodeError), exception.Data("hhh"))
-	loginEntity := Entity.NewLoginEntity()
-	err := ctx.ShouldBind(loginEntity)
-	if err != nil {
-		panic(err)
+func (this *WebsocketController) Conn() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		wsock.Response(ctx).WriteMessage("dddd")
+		/*fmt.Println("控制器 Conn")
+		fmt.Println("控制器 Conn", this)
+		fmt.Println("控制器 Conn", ctx.Request.URL.Path)
+		//测试异常抛出
+		exception.Throw(exception.Message("111"), exception.Code(Consts.CodeError), exception.Data("hhh"))
+		loginEntity := Entity.NewLoginEntity()
+		err := ctx.ShouldBind(loginEntity)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Conn", loginEntity)*/
+
 	}
-	fmt.Println("Conn", loginEntity)
-
-	return higo.WsRespStruct(loginEntity)
 }
 
-func (this *WebsocketController) Echo(ctx *gin.Context) higo.WsWriteMessage {
-	return higo.WsRespString("echo")
+func (this *WebsocketController) Echo() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		wsock.Response(ctx).WriteMessage("dddd")
+	}
 }
 
-func (this *WebsocketController) SendAll(ctx *gin.Context) string {
-	higo.WsContainer.SendAll(ctx.Query("msg"))
-	return "ok"
+func (this *WebsocketController) SendAll() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		wsock.WsContainer.SendAll(ctx.Query("msg"))
+	}
 }

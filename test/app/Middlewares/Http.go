@@ -6,10 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// http服务中间件
+// Http http服务中间件
 type Http struct{}
 
-// 构造函数
+// NewHttp 构造函数
 func NewHttp() *Http {
 	return &Http{}
 }

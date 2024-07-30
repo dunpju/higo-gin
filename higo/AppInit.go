@@ -4,7 +4,6 @@ import (
 	"github.com/dunpju/higo-config/config"
 	"github.com/dunpju/higo-router/router"
 	"github.com/dunpju/higo-utils/utils/sliceutil"
-	"github.com/dunpju/higo-wsock/wsock"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
 	"reflect"
@@ -33,7 +32,6 @@ var (
 	root             *sliceutil.SliceString
 	MiddleCorsFunc   func(hg *Higo) gin.HandlerFunc
 	MiddleAuthFunc   func(hg *Higo) gin.HandlerFunc
-	WsContainer      *wsock.WebsocketClient
 	refWsResponder   reflect.Type
 )
 
@@ -53,7 +51,6 @@ func init() {
 		AppConfigDir = sliceutil.NewSliceString()
 		MiddleCorsFunc = middleCorsFunc
 		MiddleAuthFunc = middleAuthFunc
-		WsContainer = wsock.NewWebsocketClient()
 		refWsResponder = reflect.TypeOf((WebsocketResponder)(nil))
 		config.AppPrefix = "config"
 		config.AuthPrefix = config.AppPrefix

@@ -46,7 +46,14 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 		structPath := structFuncRegexp.ReplaceAllString(funcForPCName, "")
 		diname := structPath + "/" + structName
 		icl := Di(diname)
-		if nil != icl {
+		if isWs := router.RouteAttributes(attributes).Find(router.RouteIsWs); isWs != nil && isWs == true {
+			handle, ok := handler.(func() gin.HandlerFunc)
+			if ok {
+				router.AddRoute(httpMethod, relativePath, handle(), attributes...)
+			} else {
+				panic("Websocket Handle Only Support \"func() gin.HandlerFunc\" Type")
+			}
+		} else if nil != icl {
 			router.AddRoute(httpMethod, relativePath, newDispatch(icl, method).Convert(handler), attributes...)
 		} else {
 			router.AddRoute(httpMethod, relativePath, handler, attributes...)
@@ -67,7 +74,7 @@ func (this *Higo) AddGroup(prefix string, callable func(), attributes ...*router
 
 // Ws websocket路由
 func (this *Higo) Ws(relativePath string, handler interface{}, attributes ...*router.RouteAttribute) *Higo {
-	this.AddRoute(router.WEBSOCKET, relativePath, handler, attributes...)
+	this.AddRoute(router.WEBSOCKET, relativePath, handler, append(attributes, router.IsWs(true))...)
 	return this
 }
 

@@ -15,5 +15,6 @@ func NewWebsocket() *Websocket {
 }
 
 func (this *Websocket) Middle(hg *higo.Higo) gin.HandlerFunc {
+	wsock.SetServe("http")
 	return wsock.ConnUpGrader()
 }
