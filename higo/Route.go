@@ -46,6 +46,13 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 		structPath := structFuncRegexp.ReplaceAllString(funcForPCName, "")
 		diName := structPath + "/" + structName
 		icl := Di(diName)
+		globalMiddle := make([]interface{}, 0)
+		for _, middle := range this.middle {
+			globalMiddle = append(globalMiddle, middle.Middle(this))
+		}
+		if len(globalMiddle) > 0 {
+			attributes = append(attributes, router.GlobalMiddle(globalMiddle...))
+		}
 		if isWs := router.RouteAttributes(attributes).Find(router.RouteIsWs); isWs != nil && isWs == true {
 			handle, ok := handler.(func(*gin.Context))
 			if ok {

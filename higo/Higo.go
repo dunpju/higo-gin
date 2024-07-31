@@ -74,7 +74,7 @@ func (this *Higo) _init() *Higo {
 	// 全局异常
 	this.Engine.Use(NewRecover().Exception(this))
 	// 设置跨域、鉴权
-	this.Middleware(NewCors(), NewAuth())
+	this.middleware(NewCors(), NewAuth())
 	// 初始分隔符
 	pathSeparator = dirutil.PathSeparator()
 	// 未加载env
@@ -246,6 +246,20 @@ func (this *Higo) Middleware(middlewares ...IMiddleware) *Higo {
 	return this
 }
 
+func (this *Higo) setMiddle(middle []IMiddleware) *Higo {
+	this.middle = middle
+	return this
+}
+
+func (this *Higo) middleware(middlewares ...IMiddleware) *Higo {
+	middle := make([]IMiddleware, 0)
+	for _, middleware := range middlewares {
+		middle = append(middle, middleware)
+	}
+	this.middle = append(middle, this.middle...)
+	return this
+}
+
 // AuthHandlerFunc 设置鉴权中间件
 func (this *Higo) AuthHandlerFunc(middle IMiddleware) *Higo {
 	MiddleAuthFunc = middle.Middle
@@ -338,7 +352,6 @@ func (this *Higo) Boot() {
 	for _, s := range this.serves {
 		this.registerServe(s.router, s.middles...)
 	}
-
 	//自动注册校验
 	VerifyContainer.Range(func(key, verify interface{}) bool {
 		verify.(*Verify).VerifyRules.Range(func(tag, rules interface{}) bool {
@@ -349,23 +362,21 @@ func (this *Higo) Boot() {
 	})
 	//启动服务
 	for _, ser := range serves {
+		middles := make([]IMiddleware, 0)
+		middles = append(middles, this.middle...)
+		middles = append(middles, ser.Middle...)
 		//初始化
 		hg := Init(this.GetRoot()).
 			_init().
+			setMiddle(middles).
 			//设置服务类型
 			SetType(ser.Type).
 			//设置服务名称
 			SetName(ser.Name)
 
-		//全局中间件
-		for _, m := range this.middle {
+		//中间件
+		for _, m := range hg.middle {
 			hg.Engine.Use(m.Middle(hg))
-		}
-		//serve Middle
-		for _, mid := range ser.Middle {
-			if m, ok := mid.(IMiddleware); ok {
-				hg.Engine.Use(m.Middle(hg))
-			}
 		}
 		//是否使用自带ssl测试https
 		if this.isAutoTLS {
