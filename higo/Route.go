@@ -44,14 +44,14 @@ func (this *Higo) AddRoute(httpMethod string, relativePath string, handler inter
 		method = strings.Replace(method, ").", "", 1)
 		method = strings.Replace(method, "-fm", "", 1)
 		structPath := structFuncRegexp.ReplaceAllString(funcForPCName, "")
-		diname := structPath + "/" + structName
-		icl := Di(diname)
+		diName := structPath + "/" + structName
+		icl := Di(diName)
 		if isWs := router.RouteAttributes(attributes).Find(router.RouteIsWs); isWs != nil && isWs == true {
-			handle, ok := handler.(func() gin.HandlerFunc)
+			handle, ok := handler.(func(*gin.Context))
 			if ok {
-				router.AddRoute(httpMethod, relativePath, handle(), attributes...)
+				router.AddRoute(httpMethod, relativePath, handle, attributes...)
 			} else {
-				panic("Websocket Handle Only Support \"func() gin.HandlerFunc\" Type")
+				panic(`Websocket Handle Only Support "func(*gin.Context)" Type`)
 			}
 		} else if nil != icl {
 			router.AddRoute(httpMethod, relativePath, newDispatch(icl, method).Convert(handler), attributes...)

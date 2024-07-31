@@ -2,14 +2,20 @@ package main
 
 import (
 	"fmt"
+	"gitee.com/dengpju/higo-code/code"
 	"github.com/dunpju/higo-config/config"
 	"github.com/dunpju/higo-gin/higo"
 	"github.com/dunpju/higo-gin/test/app/Beans"
 	"github.com/dunpju/higo-gin/test/app/Middlewares"
 	"github.com/dunpju/higo-gin/test/router"
+	"github.com/dunpju/higo-logger/logger"
 	"github.com/dunpju/higo-orm/him"
+	"github.com/dunpju/higo-throw/exception"
+	"github.com/dunpju/higo-utils/utils/maputil"
 	"github.com/dunpju/higo-utils/utils/randomutil"
+	"github.com/dunpju/higo-utils/utils/runtimeutil"
 	"github.com/dunpju/higo-utils/utils/sliceutil"
+	"github.com/dunpju/higo-wsock/wsock"
 	term "github.com/nsf/termbox-go"
 	"os/exec"
 )
@@ -53,6 +59,29 @@ func main() {
 	//fmt.Println(demoController.DB)
 
 	//higo.WsPitpatSleep = time.Second * 5
+	wsock.WsRecoverHandle = func(conn *wsock.WebsocketConn, r interface{}) (respMsg string) {
+		goid, _ := runtimeutil.GoroutineID()
+		logger.LoggerStack(r, goid)
+		if msg, ok := r.(*code.CodeMessage); ok {
+			respMsg = maputil.Array().
+				Put("code", msg.Code).
+				Put("message", msg.Message).
+				Put("data", nil).
+				String()
+		} else if arrayMap, ok := r.(maputil.ArrayMap); ok {
+			respMsg = arrayMap.String()
+		} else if arrayMap, ok := r.(*maputil.ArrayMap); ok {
+			respMsg = arrayMap.String()
+		} else {
+			fmt.Printf("%T\n", r)
+			respMsg = maputil.Array().
+				Put("code", 0).
+				Put("message", exception.ErrorToString(r)).
+				Put("data", nil).
+				String()
+		}
+		return
+	}
 
 	higo.Init(sliceutil.NewSliceString(".", "")).
 		Middleware(Middlewares.NewRunLog()).

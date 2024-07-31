@@ -11,12 +11,12 @@ require (
 	github.com/dunpju/higo-enum v1.0.9
 	github.com/dunpju/higo-ioc v1.0.4
 	github.com/dunpju/higo-logger v1.0.11
-	github.com/dunpju/higo-orm v1.0.60
+	github.com/dunpju/higo-orm v1.0.61
 	github.com/dunpju/higo-redis v1.0.6
 	github.com/dunpju/higo-router v1.0.37
 	github.com/dunpju/higo-throw v1.0.16
 	github.com/dunpju/higo-utils v1.1.4
-	github.com/dunpju/higo-wsock v1.0.19
+	github.com/dunpju/higo-wsock v1.0.21
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gomodule/redigo v1.8.3

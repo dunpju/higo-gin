@@ -25,5 +25,5 @@ func (this *Dispatch) Convert(handler interface{}) interface{} {
 			return hRef.Convert(rRef).Interface().(IResponder).Handle(this.method)
 		}
 	}
-	panic("unknown dispatch")
+	panic("unknown Responder Handle")
 }
