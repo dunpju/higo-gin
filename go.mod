@@ -13,10 +13,10 @@ require (
 	github.com/dunpju/higo-logger v1.0.11
 	github.com/dunpju/higo-orm v1.0.61
 	github.com/dunpju/higo-redis v1.0.6
-	github.com/dunpju/higo-router v1.0.41
+	github.com/dunpju/higo-router v1.0.43
 	github.com/dunpju/higo-throw v1.0.16
 	github.com/dunpju/higo-utils v1.1.4
-	github.com/dunpju/higo-wsock v1.0.25
+	github.com/dunpju/higo-wsock v1.0.26
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gomodule/redigo v1.8.3
