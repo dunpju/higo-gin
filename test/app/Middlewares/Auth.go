@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 鉴权
+// Auth 鉴权
 type Auth struct{}
 
-// 构造函数
+// NewAuth 构造函数
 func NewAuth() *Auth {
 	return &Auth{}
 }
