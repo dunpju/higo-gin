@@ -1,10 +1,10 @@
 package Entity
 
 type LoginEntity struct {
-	UserName    string `json:"username" binding:"required"`
-	Password    string `json:"password" binding:"required"`
-	CaptchaCode string `json:"captcha_code" binding:"required"`
-	Time        string `json:"time" binding:"required"`
+	UserName    string `json:"username"`
+	Password    string `json:"password"`
+	CaptchaCode string `json:"captcha_code"`
+	Time        string `json:"time"`
 }
 
 func NewLoginEntity() *LoginEntity {
