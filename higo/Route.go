@@ -25,7 +25,7 @@ func NewRouterCollect() *RouterCollect {
 func (this RouterCollect) Get(serve, method, relativePath string) *router.Route {
 	node, err := router.GetRoutes(serve).Search(method, relativePath)
 	if err != nil {
-		exception.Throw(exception.Message(relativePath+" Undefined route"), exception.Code(0))
+		exception.Throw(exception.Message(relativePath+" Undefined route,"+err.Error()), exception.Code(0))
 	}
 	return node.Route
 }
