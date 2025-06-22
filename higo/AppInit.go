@@ -35,7 +35,7 @@ var (
 	refWsResponder   reflect.Type
 )
 
-func init() {
+func AppInit() {
 	initOnce.Do(func() {
 		serves = make([]*Serve, 0)
 		container = NewDependency()

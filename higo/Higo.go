@@ -59,6 +59,7 @@ func _newServe(router IRouterLoader, middles []IMiddleware) serve {
 
 // Init 初始化
 func Init(root *sliceutil.SliceString) *Higo {
+	AppInit()
 	hg = &Higo{
 		Engine: gin.New(),
 		middle: make([]IMiddleware, 0),
