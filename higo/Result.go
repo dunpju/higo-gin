@@ -145,12 +145,10 @@ func ResponserTest() ResultFunc {
 
 func OK(ctx *gin.Context, v interface{}) {
 	ctx.JSON(http.StatusOK, v)
-	ctx.Abort()
 }
 
 func Error(ctx *gin.Context, v interface{}) {
 	ctx.JSON(http.StatusBadRequest, v)
-	ctx.Abort()
 }
 
 // Receiver 结果接收者
