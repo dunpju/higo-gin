@@ -1,6 +1,9 @@
 package responser
 
-import "github.com/dunpju/higo-gin/higo"
+import (
+	"github.com/dunpju/higo-gin/higo"
+	"github.com/gin-gonic/gin"
+)
 
 func Success(data interface{}) {
 	ctx := higo.Request.Context()
@@ -20,4 +23,8 @@ func SuccessJson(message string, code int, data interface{}) {
 func ErrorJson(message string, code int, data interface{}) {
 	ctx := higo.Request.Context()
 	higo.Responser(ctx).ErrorJson(message, code, data)
+}
+
+func Context(ctx *gin.Context) higo.ResultFunc {
+	return higo.Responser(ctx)
 }

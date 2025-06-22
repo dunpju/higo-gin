@@ -96,6 +96,14 @@ func init() {
 type ResultFunc func(message string, code int, data interface{}) func(output Output)
 type Output func(ctx *gin.Context, v interface{})
 
+func (this ResultFunc) Success(data interface{}) {
+	this("success", 0, data)(OK)
+}
+
+func (this ResultFunc) Error(data interface{}) {
+	this("error", http.StatusBadRequest, data)(Error)
+}
+
 func (this ResultFunc) SuccessJson(message string, code int, data interface{}) {
 	this(message, code, data)(OK)
 }
@@ -137,12 +145,12 @@ func ResponserTest() ResultFunc {
 
 func OK(ctx *gin.Context, v interface{}) {
 	ctx.JSON(http.StatusOK, v)
-	panic(nil)
+	ctx.Abort()
 }
 
 func Error(ctx *gin.Context, v interface{}) {
 	ctx.JSON(http.StatusBadRequest, v)
-	panic(nil)
+	ctx.Abort()
 }
 
 // Receiver 结果接收者
